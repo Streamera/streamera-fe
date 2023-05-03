@@ -1,3 +1,4 @@
 import Home from './Home';
+import QRCode from './Payment';
 
-export { Home };
+export { Home, QRCode };

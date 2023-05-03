@@ -2,6 +2,7 @@ export type ChainConfig = {
     name: string;
     shortName: string;
     id: string;
+    numericId: number | string;
     evmChain?: string;
     rpc: string;
     nativeCurrency: {

@@ -5,11 +5,12 @@ import './App.scss';
 import './keyframes.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
-import { Home } from './Pages';
-import { Button } from 'react-bootstrap';
+import { Home, QRCode } from './Pages';
+//import { Button } from 'react-bootstrap';
 import { ellipsizeThis } from './common/utils';
-import { createContext, useCallback, useRef, useState } from 'react';
+import { createContext, useCallback, useEffect, useRef, useState } from 'react';
 import { useCurrentPath } from './Hooks/UseCurrentPath';
+import { Squid } from '@0xsquid/sdk';
 
 const { BSC_TEST, POLYGON_TEST, BSC, POLYGON } = ChainConfigs;
 const isTestnet = process.env.REACT_APP_CHAIN_ENV === "testnet";
@@ -33,9 +34,14 @@ export const AddressContext = createContext({
     chainName: "",
 });
 
+export const SquidContext = createContext<{ squid: Squid | null }>({
+    squid: null,
+});
+
 // for useCurrentPath
 const routes = [
     { path: '/' },
+    { path: '/pay/:streamerId' },
 ];
 
 function App() {
@@ -49,6 +55,10 @@ function App() {
 
     //header will be hidden too
     const [shouldShowSwitcher, setShouldShowSwitcher] = useState(false);
+
+    //squid router
+    const [squid, setSquid] = useState<Squid | null>(null);
+    let isSquidInit = useRef(false);
 
     const navigate = useNavigate();
     const currentPath = useCurrentPath(routes);
@@ -88,9 +98,33 @@ function App() {
     }, []);
 
     const onFinishLoading = () => {
+		setIsLoading(false);
     }
 
-    if (!window.ethereum) {
+    // initial loading
+    useEffect(() => {
+        const initSquid = async () => {
+            if(isSquidInit.current) {
+                return;
+            }
+
+            // only init once
+            isSquidInit.current = true;
+
+            // instantiate the SDK
+            const squid = new Squid({
+                baseUrl: "https://testnet.api.0xsquid.com" // for mainnet use "https://api.0xsquid.com"
+            });
+
+            // init the SDK
+            await squid.init();
+            setSquid(squid);
+        };
+
+        initSquid();
+    }, []);
+
+    /* if (!window.ethereum) {
         return (
             <div className="metamask-404">
                 <img src="/assets/metamask404.png" alt="404"/>
@@ -99,7 +133,7 @@ function App() {
                 }}>Get Metamask</Button>
             </div>
         )
-    }
+    } */
 
 	return (
 		<div className="App">
@@ -117,7 +151,10 @@ function App() {
 						<div className={`metamask-btn ${address? 'disabled' : ''}`}>
 							<img src="/metamask-logo.png" alt="metamask-logo"></img>
 							<div className='metamask-text'>
-								<span>{address? ellipsizeThis(address, 9, 9) : 'Connect'}</span>
+								<span>{
+									!window.ethereum? 'Get Metamask' :
+									(address? ellipsizeThis(address, 9, 9) : 'Connect')
+								}</span>
 							</div>
 						</div>
 					</EVMConnector>
@@ -155,9 +192,24 @@ function App() {
             }
 
 			{/** Please update routes constant if there's a new page */}
-			<Routes>
-				<Route path="/" element={<Home />}></Route>
-			</Routes>
+            <SquidContext.Provider
+                value={{
+                    squid
+                }}
+            >
+                <AddressContext.Provider 
+                    value={{
+                        address,
+                        chain,
+                        chainName
+                    }}
+                >
+                    <Routes>
+                        <Route path="/" element={<Home />}></Route>
+                        <Route path="/pay/:streamerId" element={<QRCode />}></Route>
+                    </Routes>
+                </AddressContext.Provider>
+            </SquidContext.Provider>
 
 			{/* <footer>
 				sitemap

@@ -95,6 +95,7 @@ const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChain
 
         else {
             setDisabled(false);
+            setIsLoading(false);
         }
     }, []);
 
@@ -109,6 +110,18 @@ const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChain
             }
         }
     };
+
+    if(!window.ethereum) {
+        return (
+            <button 
+                style={style}
+                className={className}
+                onClick={() => { window.location.href = `https://metamask.io/download/`; }}
+            >
+                {children}
+            </button>
+        )
+    }
 
     return (
         <button 
