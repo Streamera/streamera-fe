@@ -58,7 +58,7 @@ const Page = () => {
             <div className='player-image'>
                 this is player image
             </div>
-            
+
             <strong className='mb-2'>Chain</strong>
             <Select
                 className='chain-select'
