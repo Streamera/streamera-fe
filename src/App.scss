@@ -12,16 +12,24 @@ body {
     align-items: center;
     text-align: center;
     min-height: 100vh;
+    max-width: 1260px;
 
     margin: auto;
 
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
     header {
         position: absolute;
-        top: 0;
-        padding: 10px 50px;
+        top: 10px;
         justify-content: space-between;
+    }
+
+    footer {
+        position: fixed;
+        display: flex;
+        justify-content: space-between;
+        bottom: 10px;
+        width: 100%;
         max-width: 1260px;
     }
 
@@ -44,12 +52,8 @@ body {
 
         h1 {
             font-size: 80px;
-            font-family: 'Starguard';
             color: white;
             margin-bottom: 30px;
-
-            -webkit-text-stroke-width: 1px;
-            -webkit-text-stroke-color: rgba(0,0,0,0.5) !important;
 
             @media screen and (max-width: 900px) {
                 margin-top: 40px;
@@ -61,7 +65,6 @@ body {
             background-color: white;
     
             text-transform: uppercase;
-            font-family: 'Starguard';
             letter-spacing: 3px;
             font-size: 50px;
             width: 250px;
@@ -182,9 +185,6 @@ body {
         margin-left: 10px;
 
         font-size: 16px;
-
-        -webkit-text-stroke-width: 0.5px;
-        -webkit-text-stroke-color: rgba(0,0,0,0.5) !important;
     }
 
     img.logo {
@@ -193,11 +193,8 @@ body {
     }
 
     .logo-text {
-        -webkit-text-stroke-width: 0.5px;
-        -webkit-text-stroke-color: rgba(0,0,0,0.5) !important;
-
-        font-family: 'Starguard';
-        color: white;
+        font-family: Roboto, 'sans-serif';
+        color: black;
     }
 
     span.logo-text {

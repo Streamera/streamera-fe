@@ -5,7 +5,7 @@ import './App.scss';
 import './keyframes.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
-import { Home, QRCode } from './Pages';
+import { Home, QRCode, Landing } from './Pages';
 //import { Button } from 'react-bootstrap';
 import { ellipsizeThis } from './common/utils';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
@@ -146,20 +146,20 @@ function App() {
 						handleNewAccount={handleNewAccount}
 						handleChainChange={handleChainChange}
 						onFinishLoading={onFinishLoading}
-						className={`${isLoading? 'loading' : ''} metamask-connector ${address? 'logged-in' : ''}`}
+						className={`${isLoading? 'loading' : ''} metamask-connector`}
 					>
 						<div className={`metamask-btn ${address? 'disabled' : ''}`}>
 							<img src="/metamask-logo.png" alt="metamask-logo"></img>
 							<div className='metamask-text'>
 								<span>{
 									!window.ethereum? 'Get Metamask' :
-									(address? ellipsizeThis(address, 9, 9) : 'Connect')
+									(address? ellipsizeThis(address, 6, 0) : 'Connect')
 								}</span>
 							</div>
 						</div>
 					</EVMConnector>
 
-					<span className={`logo-text ${address? 'd-block' : 'd-none'}`}>{ellipsizeThis(address, 5, 5)}</span>
+					{/* <span className={`logo-text ${address? 'd-block' : 'd-none'}`}>{ellipsizeThis(address, 5, 5)}</span> */}
 				</div>
 			</header>
 
@@ -205,15 +205,21 @@ function App() {
                     }}
                 >
                     <Routes>
-                        <Route path="/" element={<Home />}></Route>
+                        <Route path="/" element={address? <Home /> : <Landing />}></Route>
+                        <Route path="/landing" element={<Landing />}></Route>
                         <Route path="/pay/:streamerId" element={<QRCode />}></Route>
                     </Routes>
                 </AddressContext.Provider>
             </SquidContext.Provider>
 
-			{/* <footer>
-				sitemap
-			</footer> */}
+			<footer>
+                <span>
+				    Made with ❤️ by the Streamera Team.
+                </span>
+                <span>
+                    Twitter and stuff
+                </span>
+			</footer>
 
 			<ToastContainer
                 position="bottom-left"
