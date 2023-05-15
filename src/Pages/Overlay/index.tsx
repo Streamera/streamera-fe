@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback, useState } from 'react';
 import './styles.scss'
-import { OverlayButtonType } from './types';
+import { OverlayButtonType, Timeframe } from './types';
 import Marquee from 'react-fast-marquee';
 
 const Page = () => {
@@ -21,7 +21,15 @@ const Page = () => {
     const [ leaderboardText, setLeaderboardText ] = useState<string>("Leaderboard");
     const [ leaderboardTextColor, setLeaderboardTextColor ] = useState<string>("#000000");
     const [ leaderboardBackgroundColor, setLeaderboardBackgroundColor ] = useState<string>("#ffffff");
-    const [ leaderboardTimeframe, setLeaderboardTimeframe ] = useState<string>("#ffffff");
+    const [ leaderboardTimeframe, setLeaderboardTimeframe ] = useState<Timeframe>("all-time");
+
+    // Milestone
+    const [ milestoneText, setMilestoneText ] = useState<string>("Milestone");
+    const [ milestoneTextColor, setMilestoneTextColor ] = useState<string>("#000000");
+    const [ milestoneBackgroundColor, setMilestoneBackgroundColor ] = useState<string>("#ffffff");
+    const [ milestoneProgressMainColor, setMilestoneProgressMainColor ] = useState<string>("#000000");
+    const [ milestoneProgressColor, setMilestoneProgressColor ] = useState<string>("#ffffff");
+    const [ milestoneTimeframe, setMilestoneTimeframe ] = useState<Timeframe>("all-time");
 
     // announcement
     const onMarqueeColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +80,7 @@ const Page = () => {
     }, []);
 
     const onLeaderboardTimeframeChanged = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
-        setLeaderboardTimeframe(e.target.value);
+        setLeaderboardTimeframe(e.target.value as Timeframe);
     }, []);
 
     const onGifValueChanged = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -80,6 +88,31 @@ const Page = () => {
             setGif(URL.createObjectURL(event.target.files[0]));
             setGifFile(event.target.files[0]);
         }
+    }, []);
+
+    //milestone
+    const onMilestoneTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setMilestoneText(e.target.value);
+    }, []);
+
+    const onMilestoneTextColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setMilestoneTextColor(e.target.value);
+    }, []);
+
+    const onMilestoneBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setMilestoneBackgroundColor(e.target.value);
+    }, []);
+
+    const onMilestoneProgressMainColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setMilestoneProgressMainColor(e.target.value);
+    }, []);
+
+    const onMilestoneProgressColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setMilestoneProgressColor(e.target.value);
+    }, []);
+
+    const onMilestoneTimeframeChanged = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
+        setMilestoneTimeframe(e.target.value as Timeframe);
     }, []);
 
     return (
@@ -188,13 +221,43 @@ const Page = () => {
                                 <option value="weekly">Weekly</option>
                                 <option value="daily">Daily</option>
                             </select>
-                        </div>                    
+                        </div>
                     </>
                 }
                 { /** Milestone */}
                 {
                     activeTab === "milestone" &&
-                    <></>
+                    <>
+                        <div className="video-frame center">
+                            <div className="milestone-container" style={{ color: milestoneTextColor, backgroundColor: milestoneBackgroundColor, }}>
+                                <span style={{marginBottom: 10}}>{milestoneText}</span>
+                                <div className="progress-container" style={{ backgroundColor: milestoneProgressMainColor }}>
+                                    <div className="progress" style={{ backgroundColor: milestoneProgressColor }}></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="d-flex flex-column align-items-start mt-3 w-100">
+                            <div className="d-flex align-items-center mt-3 w-100">
+                                <strong className='mr-2'>Color</strong>
+                                <input type="color" value={milestoneTextColor} onChange={onMilestoneTextColorChange}/>
+                                <strong className='ml-5 mr-2'>Background Color</strong>
+                                <input type="color" value={milestoneBackgroundColor} onChange={onMilestoneBackgroundColorChange}/>
+                                <strong className='ml-5 mr-2'>Progress Main Color</strong>
+                                <input type="color" value={milestoneProgressMainColor} onChange={onMilestoneProgressMainColorChange}/>
+                                <strong className='ml-5 mr-2'>Progress Color</strong>
+                                <input type="color" value={milestoneProgressColor} onChange={onMilestoneProgressColorChange}/>
+                            </div>
+                            <strong className='mt-3'>Text</strong>
+                            <input type="text" className='form-control' style={{ maxWidth: 500 }} value={milestoneText} onChange={onMilestoneTextChange}/>
+                            <strong className='mt-3'>Timeframe</strong>
+                            <select className='form-control' style={{ maxWidth: 500 }} value={milestoneTimeframe} onChange={onMilestoneTimeframeChanged}>
+                                <option value="all-time">All Time</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="daily">Daily</option>
+                            </select>
+                        </div>
+                    </>
                 }
                 { /** Voting */}
                 {

@@ -61,7 +61,8 @@
             }
 
             .notification-container,
-            .leaderboard-container {
+            .leaderboard-container,
+            .milestone-container {
                 margin: auto;
                 display: flex;
                 flex-direction: column;
@@ -79,6 +80,21 @@
                 > ul {
                     list-style: decimal;
                     text-align: left;
+                }
+            }
+
+            .milestone-container {
+                > .progress-container {
+                    height: 10px;
+                    width: 300px;
+                    border-radius: 5px;
+                    border: 1px solid black;
+
+                    > .progress {
+                        width: 30%;
+                        border-radius: inherit;
+                        height: 100%;
+                    }
                 }
             }
         }
