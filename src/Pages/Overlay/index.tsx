@@ -10,13 +10,20 @@ const Page = () => {
     const [ displayText, setDisplayText ] = useState<string>("Sample Text");
     const [ textSpeed, setTextSpeed ] = useState<number>(100);
 
-    // GIF
+    // Notification
     const [ notificationText, setNotificationText ] = useState<string>("Chad donated $99!");
     const [ notificationTextColor, setNotificationTextColor ] = useState<string>("#000000");
     const [ notificationBackgroundColor, setNotificationBackgroundColor ] = useState<string>("#ffffff");
     const [ gifFile, setGifFile ] = useState<File>();
     const [ gif, setGif ] = useState<string>("");
 
+    // Leaderboard
+    const [ leaderboardText, setLeaderboardText ] = useState<string>("Leaderboard");
+    const [ leaderboardTextColor, setLeaderboardTextColor ] = useState<string>("#000000");
+    const [ leaderboardBackgroundColor, setLeaderboardBackgroundColor ] = useState<string>("#ffffff");
+    const [ leaderboardTimeframe, setLeaderboardTimeframe ] = useState<string>("#ffffff");
+
+    // announcement
     const onMarqueeColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setMarqueeColor(e.target.value);
     }, []);
@@ -38,6 +45,7 @@ const Page = () => {
         setDisplayText(e.target.value);
     }, []);
 
+    // notifications
     const onNotificationTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setNotificationText(e.target.value);
     }, []);
@@ -48,6 +56,23 @@ const Page = () => {
 
     const onNotificationBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setNotificationBackgroundColor(e.target.value);
+    }, []);
+
+    // leaderboard
+    const onLeaderboardTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setLeaderboardText(e.target.value);
+    }, []);
+
+    const onLeaderboardTextColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setLeaderboardTextColor(e.target.value);
+    }, []);
+
+    const onLeaderboardBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setLeaderboardBackgroundColor(e.target.value);
+    }, []);
+
+    const onLeaderboardTimeframeChanged = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
+        setLeaderboardTimeframe(e.target.value);
     }, []);
 
     const onGifValueChanged = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -127,15 +152,44 @@ const Page = () => {
                             <input type="file" accept='image/gif' onChange={onGifValueChanged}/>
                             <strong className='mt-3'>Notification Text</strong>
                             <input type="text" className='form-control' style={{ maxWidth: 500 }} value={notificationText} onChange={onNotificationTextChange}/>
-                           
                         </div>
-
                     </>
                 }
                 { /** Leaderboard */}
                 {
                     activeTab === "leaderboard" &&
-                    <></>
+                    <>
+                        <div className="video-frame center">
+                            <div className="leaderboard-container" style={{ color: leaderboardTextColor, backgroundColor: leaderboardBackgroundColor, }}>
+                                <span style={{marginBottom: 30}}>{leaderboardText}</span>
+                                <div className="row" style={{ width: 250 }}>
+                                    <div className="col-6">Chad 1</div>
+                                    <div className="col-6">$99</div>
+                                    <div className="col-6">Chad 2</div>
+                                    <div className="col-6">$98</div>
+                                    <div className="col-6">Chad 3</div>
+                                    <div className="col-6">$97</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="d-flex flex-column align-items-start mt-3 w-100">
+                            <div className="d-flex align-items-center mt-3 w-100">
+                                <strong className='mr-2'>Color</strong>
+                                <input type="color" value={leaderboardTextColor} onChange={onLeaderboardTextColorChange}/>
+                                <strong className='ml-5 mr-2'>Background Color</strong>
+                                <input type="color" value={leaderboardBackgroundColor} onChange={onLeaderboardBackgroundColorChange}/>
+                            </div>
+                            <strong className='mt-3'>Text</strong>
+                            <input type="text" className='form-control' style={{ maxWidth: 500 }} value={leaderboardText} onChange={onLeaderboardTextChange}/>
+                            <strong className='mt-3'>Timeframe</strong>
+                            <select className='form-control' style={{ maxWidth: 500 }} value={leaderboardTimeframe} onChange={onLeaderboardTimeframeChanged}>
+                                <option value="all-time">All Time</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="daily">Daily</option>
+                            </select>
+                        </div>                    
+                    </>
                 }
                 { /** Milestone */}
                 {

@@ -60,16 +60,25 @@
                 width: 100%;
             }
 
-            .notification-container {
+            .notification-container,
+            .leaderboard-container {
                 margin: auto;
                 display: flex;
                 flex-direction: column;
+                border-radius: 10px;
+                padding: 20px;
+
                 > img {
                     width: 200px;
                 }
 
                 > span {
                     padding: 5px;
+                }
+
+                > ul {
+                    list-style: decimal;
+                    text-align: left;
                 }
             }
         }
