@@ -1,0 +1,1 @@
+export type OverlayButtonType = "announcement" | "notification" | "leaderboard" | "milestone" | "voting" | "qrcode";

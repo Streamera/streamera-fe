@@ -5,7 +5,7 @@ import './App.scss';
 import './keyframes.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
-import { Home, QRCode, Landing, Profile, Integration } from './Pages';
+import { Home, QRCode, Landing, Profile, Integration, Overlay } from './Pages';
 //import { Button } from 'react-bootstrap';
 import { ellipsizeThis } from './common/utils';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
@@ -258,6 +258,7 @@ function App() {
                         <Route path="/landing" element={<Landing />}></Route>
                         <Route path="/profile" element={<Profile />}></Route>
                         <Route path="/integration" element={<Integration />}></Route>
+                        <Route path="/overlay" element={<Overlay />}></Route>
                         <Route path="/pay/:streamerId" element={<QRCode />}></Route>
                     </Routes>
                 </AddressContext.Provider>
