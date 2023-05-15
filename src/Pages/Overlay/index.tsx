@@ -5,17 +5,24 @@ import Marquee from 'react-fast-marquee';
 
 const Page = () => {
     const [ activeTab, setActiveTab ] = useState<OverlayButtonType>("announcement");
-    const [ color, setColor ] = useState<string>("#000000");
-    const [ backgroundColor, setBackgroundColor ] = useState<string>("#ffffff");
+    const [ marqueeColor, setMarqueeColor ] = useState<string>("#000000");
+    const [ marqueeBackgroundColor, setMarqueeBackgroundColor ] = useState<string>("#ffffff");
     const [ displayText, setDisplayText ] = useState<string>("Sample Text");
     const [ textSpeed, setTextSpeed ] = useState<number>(100);
 
-    const onColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setColor(e.target.value);
+    // GIF
+    const [ notificationText, setNotificationText ] = useState<string>("Chad donated $99!");
+    const [ notificationTextColor, setNotificationTextColor ] = useState<string>("#000000");
+    const [ notificationBackgroundColor, setNotificationBackgroundColor ] = useState<string>("#ffffff");
+    const [ gifFile, setGifFile ] = useState<File>();
+    const [ gif, setGif ] = useState<string>("");
+
+    const onMarqueeColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setMarqueeColor(e.target.value);
     }, []);
 
-    const onBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setBackgroundColor(e.target.value);
+    const onMarqueeBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setMarqueeBackgroundColor(e.target.value);
     }, []);
 
     const onTextSpeedChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -31,6 +38,25 @@ const Page = () => {
         setDisplayText(e.target.value);
     }, []);
 
+    const onNotificationTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setNotificationText(e.target.value);
+    }, []);
+
+    const onNotificationTextColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setNotificationTextColor(e.target.value);
+    }, []);
+
+    const onNotificationBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setNotificationBackgroundColor(e.target.value);
+    }, []);
+
+    const onGifValueChanged = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            setGif(URL.createObjectURL(event.target.files[0]));
+            setGifFile(event.target.files[0]);
+        }
+    }, []);
+
     return (
         <div className='overlay-page'>
             <div className="nav-container">
@@ -43,34 +69,89 @@ const Page = () => {
             </div>
             
             <div className="main-content">
-                <strong>Announcement</strong>
-                <div className="video-frame">
-                    <Marquee
-                        style={{
-                            color,
-                            backgroundColor,
-                            borderTopLeftRadius: 'inherit',
-                            borderTopRightRadius: 'inherit',
-                        }}
-                        speed={textSpeed}
-                    >
-                        <div className="marquee-text">
-                            {displayText}
+                <strong>{activeTab.charAt(0).toUpperCase() + activeTab.substring(1, activeTab.length)}</strong>
+                { /** Announcement */}
+                {
+                    activeTab === "announcement" &&
+                    <>
+                        <div className="video-frame">
+                            <Marquee
+                                style={{
+                                    color: marqueeColor,
+                                    backgroundColor: marqueeBackgroundColor,
+                                    borderTopLeftRadius: 'inherit',
+                                    borderTopRightRadius: 'inherit',
+                                }}
+                                speed={textSpeed}
+                            >
+                                <div className="marquee-text">
+                                    {displayText}
+                                </div>
+                            </Marquee>
                         </div>
-                    </Marquee>
-                </div>
-                <div className="d-flex align-items-center mt-3 w-100">
-                    <strong className='mr-2'>Text Color</strong>
-                    <input type="color" value={color} onChange={onColorChange}/>
-                    <strong className='ml-5 mr-2'>Background Color</strong>
-                    <input type="color" value={backgroundColor} onChange={onBackgroundColorChange}/>
-                    <strong className='ml-5 mr-2'>Text Speed</strong>
-                    <input type="decimal" step={1} className='form-control' style={{ maxWidth: 100 }} value={textSpeed} onChange={onTextSpeedChange}/>
-                </div>
-                <div className="d-flex flex-column mt-4 align-items-start w-100">
-                    <strong>Display Text</strong>
-                    <input type="text" className='form-control mt-1' value={displayText} onChange={onDisplayTextchange}/>
-                </div>
+                        <div className="d-flex align-items-center mt-3 w-100">
+                            <strong className='mr-2'>Text Color</strong>
+                            <input type="color" value={marqueeColor} onChange={onMarqueeColorChange}/>
+                            <strong className='ml-5 mr-2'>Background Color</strong>
+                            <input type="color" value={marqueeBackgroundColor} onChange={onMarqueeBackgroundColorChange}/>
+                            <strong className='ml-5 mr-2'>Text Speed</strong>
+                            <input type="decimal" step={1} className='form-control' style={{ maxWidth: 100 }} value={textSpeed} onChange={onTextSpeedChange}/>
+                        </div>
+                        <div className="d-flex flex-column mt-4 align-items-start w-100">
+                            <strong>Display Text</strong>
+                            <input type="text" className='form-control mt-1' value={displayText} onChange={onDisplayTextchange}/>
+                        </div>
+                    </>
+                }
+                { /** Notification */}
+                {
+                    activeTab === "notification" &&
+                    <>
+                        <div className="video-frame center">
+                            <div className="notification-container">
+                                {
+                                    gif &&
+                                    <img src={gif} alt="gif"/>
+                                }
+                                <span style={{ color: notificationTextColor, backgroundColor: notificationBackgroundColor }}>{notificationText}</span>
+                            </div>
+                        </div>
+                        <div className="d-flex flex-column align-items-start mt-3 w-100">
+                            <div className="d-flex align-items-center mt-3 w-100">
+                                <strong className='mr-2'>Color</strong>
+                                <input type="color" value={notificationTextColor} onChange={onNotificationTextColorChange}/>
+                                <strong className='ml-5 mr-2'>Background Color</strong>
+                                <input type="color" value={notificationBackgroundColor} onChange={onNotificationBackgroundColorChange}/>
+                            </div>
+                            <strong className='mt-3'>GIF</strong>
+                            <input type="file" accept='image/gif' onChange={onGifValueChanged}/>
+                            <strong className='mt-3'>Notification Text</strong>
+                            <input type="text" className='form-control' style={{ maxWidth: 500 }} value={notificationText} onChange={onNotificationTextChange}/>
+                           
+                        </div>
+
+                    </>
+                }
+                { /** Leaderboard */}
+                {
+                    activeTab === "leaderboard" &&
+                    <></>
+                }
+                { /** Milestone */}
+                {
+                    activeTab === "milestone" &&
+                    <></>
+                }
+                { /** Voting */}
+                {
+                    activeTab === "voting" &&
+                    <></>
+                }
+                { /** QR Code */}
+                {
+                    activeTab === "qrcode" &&
+                    <></>
+                }
                 <div className="button-container">
                     <button className='save'>Save</button>
                 </div>
