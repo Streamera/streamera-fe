@@ -5,7 +5,7 @@ import './App.scss';
 import './keyframes.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
-import { Home, QRCode, Landing, Profile } from './Pages';
+import { Home, QRCode, Landing, Profile, Integration } from './Pages';
 //import { Button } from 'react-bootstrap';
 import { ellipsizeThis } from './common/utils';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
@@ -46,6 +46,9 @@ export const SquidContext = createContext<SquidContextData>({
 // for useCurrentPath
 const routes = [
     { path: '/' },
+    { path: '/profile' },
+    { path: '/integration' },
+    { path: '/landing' },
     { path: '/pay/:streamerId' },
 ];
 
@@ -254,6 +257,7 @@ function App() {
                         <Route path="/" element={address? <Home /> : <Landing />}></Route>
                         <Route path="/landing" element={<Landing />}></Route>
                         <Route path="/profile" element={<Profile />}></Route>
+                        <Route path="/integration" element={<Integration />}></Route>
                         <Route path="/pay/:streamerId" element={<QRCode />}></Route>
                     </Routes>
                 </AddressContext.Provider>
