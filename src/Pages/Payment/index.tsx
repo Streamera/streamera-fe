@@ -1,57 +1,12 @@
 import { useParams } from 'react-router';
 import './styles.scss'
 import { Button, InputNumber, Select } from 'antd';
-import { useContext, useEffect, useState } from 'react';
-import { AddressContext, SquidContext } from '../../App';
-import { SupportedChain } from './types';
-import { ChainConfigs } from '../../Components/EVM';
-import _ from 'lodash';
-import { ChainConfig } from '../../Components/EVM/ChainConfigs/types';
-import { TokenData } from '@0xsquid/sdk';
+import { useContext} from 'react';
+import { SquidContext } from '../../App';
 
 const Page = () => {
     let { streamerId } = useParams();
-    let { squid } = useContext(SquidContext);
-    let { chain } = useContext(AddressContext);
-    const [supportedChains, setSupportedChains] = useState<SupportedChain[]>([]);
-    const [supportedTokens, setSupportedTokens] = useState<{ [chain: string]: TokenData[] }>({});
-
-    useEffect(() => {
-        if(!squid) {
-            return;
-        }
-
-        let supportedChains: SupportedChain[] = [];
-        let supportedTokens: { [chain: string]: TokenData[] } = {};
-
-        let uniqueIds: string[] = [];
-        squid.tokens.forEach(token => {
-            let chainConfig = _.find(ChainConfigs, { numericId: token.chainId });
-            let chainName = chainConfig?.name ?? token.chainId.toString();
-
-            if(!supportedTokens[chainName]) {
-                supportedTokens[chainName] = [];
-            }
-
-            supportedTokens[chainName].push(token);
-
-            // only one chain per option
-            if(uniqueIds.includes(token.chainId.toString())) {
-                return;
-            }
-
-            uniqueIds.push(token.chainId.toString());
-
-            supportedChains.push({
-                name: chainName,
-                chainId: token.chainId,
-                chainLogo: token.logoURI
-            });
-        });
-
-        setSupportedChains(supportedChains);
-        setSupportedTokens(supportedTokens);
-    }, [squid]);
+    let { supportedChains, supportedTokens } = useContext(SquidContext);
 
     return (
         <div className='payment-page'>

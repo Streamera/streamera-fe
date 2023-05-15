@@ -8,6 +8,7 @@ const Page = () => {
                 <Link to="/overlay" className='link-button'>Saweria Overlay</Link>
                 <Link to="/history" className='link-button'>History</Link>
                 <Link to="/integration" className='link-button'>Integration</Link>
+                <Link to="/profile" className='link-button'>Profile</Link>
             </div>
         </div>
     );

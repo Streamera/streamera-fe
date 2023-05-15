@@ -6,24 +6,25 @@
     width: 100%;
 
     .link-button-container {
-        /* display: grid;
+        display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 30px; */
+        gap: 30px;
         width: 70%;
-        display: flex;
+        /* display: flex;
         align-items: center;
         justify-content: center;
-        flex-wrap: wrap;
+        flex-wrap: wrap; */
 
         a.link-button {
-            width: 25vw;
+            width: 100%;
+            // width: 25vw;
             height: 33vh;
             border: 1px solid black;
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
+            // margin-bottom: 20px;
 
             text-decoration: none;
             color: black;
@@ -33,9 +34,9 @@
                 box-shadow: 0 0 15px 0px rgba(0,0,0,0.3);
             }
 
-            &:nth-child(even) {
+            /* &:nth-child(even) {
                 margin-left: 20px;
-            }
+            } */
         }
     }
 }

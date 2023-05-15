@@ -5,12 +5,15 @@ import './App.scss';
 import './keyframes.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
-import { Home, QRCode, Landing } from './Pages';
+import { Home, QRCode, Landing, Profile } from './Pages';
 //import { Button } from 'react-bootstrap';
 import { ellipsizeThis } from './common/utils';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
 import { useCurrentPath } from './Hooks/UseCurrentPath';
-import { Squid } from '@0xsquid/sdk';
+import { Squid, TokenData } from '@0xsquid/sdk';
+import { Link } from 'react-router-dom';
+import { SquidContextData, SupportedChain } from './types';
+import _ from 'lodash';
 
 const { BSC_TEST, POLYGON_TEST, BSC, POLYGON } = ChainConfigs;
 const isTestnet = process.env.REACT_APP_CHAIN_ENV === "testnet";
@@ -34,8 +37,10 @@ export const AddressContext = createContext({
     chainName: "",
 });
 
-export const SquidContext = createContext<{ squid: Squid | null }>({
+export const SquidContext = createContext<SquidContextData>({
     squid: null,
+    supportedChains: [],
+    supportedTokens: {},
 });
 
 // for useCurrentPath
@@ -46,6 +51,8 @@ const routes = [
 
 function App() {
     const [address, setAddress] = useState('');
+    const [supportedChains, setSupportedChains] = useState<SupportedChain[]>([]);
+    const [supportedTokens, setSupportedTokens] = useState<{ [chain: string]: TokenData[] }>({});
 
     const [chain, setChain] = useState('');
     const [chainName, setChainName] = useState('');
@@ -124,6 +131,43 @@ function App() {
         initSquid();
     }, []);
 
+    useEffect(() => {
+        if(!squid) {
+            return;
+        }
+
+        let supportedChains: SupportedChain[] = [];
+        let supportedTokens: { [chain: string]: TokenData[] } = {};
+
+        let uniqueIds: string[] = [];
+        squid.tokens.forEach(token => {
+            let chainConfig = _.find(ChainConfigs, { numericId: token.chainId });
+            let chainName = chainConfig?.name ?? token.chainId.toString();
+
+            if(!supportedTokens[chainName]) {
+                supportedTokens[chainName] = [];
+            }
+
+            supportedTokens[chainName].push(token);
+
+            // only one chain per option
+            if(uniqueIds.includes(token.chainId.toString())) {
+                return;
+            }
+
+            uniqueIds.push(token.chainId.toString());
+
+            supportedChains.push({
+                name: chainName,
+                chainId: token.chainId,
+                chainLogo: token.logoURI
+            });
+        });
+
+        setSupportedChains(supportedChains);
+        setSupportedTokens(supportedTokens);
+    }, [squid]);
+
     /* if (!window.ethereum) {
         return (
             <div className="metamask-404">
@@ -138,7 +182,7 @@ function App() {
 	return (
 		<div className="App">
 			<header className={`pc ${!shouldRenderHeader || shouldShowSwitcher? 'd-none' : 'd-flex'} w-100`}>
-				<img src="/Media/Icons/logo.png" alt="logo" className='logo'/>
+				<Link to="/"><img src="/Media/Icons/logo.png" alt="logo" className='logo'/></Link>
 
 				{/** Connectors */}
 				<div className={`connector-container`}>
@@ -194,7 +238,9 @@ function App() {
 			{/** Please update routes constant if there's a new page */}
             <SquidContext.Provider
                 value={{
-                    squid
+                    squid,
+                    supportedChains,
+                    supportedTokens,
                 }}
             >
                 <AddressContext.Provider 
@@ -207,6 +253,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={address? <Home /> : <Landing />}></Route>
                         <Route path="/landing" element={<Landing />}></Route>
+                        <Route path="/profile" element={<Profile />}></Route>
                         <Route path="/pay/:streamerId" element={<QRCode />}></Route>
                     </Routes>
                 </AddressContext.Provider>
