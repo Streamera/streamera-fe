@@ -51,6 +51,15 @@ const Page = () => {
         setSelectedChain(e.target.value);
     }, []);
 
+    // save button
+    const onSaveClick = useCallback(() => {
+        if(!address) {
+            return;
+        }
+
+        return;
+    }, [address]);
+
     return (
         <div className='profile-page'>
             <input ref={inputRef} type="file" className='d-none' name="profile" onChange={onPfpValueChanged}></input>
@@ -150,6 +159,16 @@ const Page = () => {
                                 )
                             }
                         </select>
+                    </div>
+                    <div className="button-container">
+                        <button 
+                            className='save' 
+                            onClick={onSaveClick} 
+                            disabled={!address} 
+                            style={{cursor: address? 'pointer' : 'no-drop'}}
+                        >
+                            {address? 'Save' : 'Connect to Continue'}
+                        </button>
                     </div>
                 </div>
             </div>

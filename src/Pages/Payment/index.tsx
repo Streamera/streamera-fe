@@ -5,7 +5,7 @@ import { useContext} from 'react';
 import { SquidContext } from '../../App';
 
 const Page = () => {
-    let { streamerId } = useParams();
+    let { streamerAddress } = useParams();
     let { supportedChains, supportedTokens } = useContext(SquidContext);
 
     return (
@@ -41,7 +41,7 @@ const Page = () => {
                 >
                 </Select>
             </div>
-            <Button type="primary" className='tip-button'>Tip {streamerId} Now</Button>
+            <Button type="primary" className='tip-button'>Tip {streamerAddress} Now</Button>
         </div>
     );
 }

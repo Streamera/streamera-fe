@@ -171,6 +171,15 @@ const Page = () => {
         setVotingChoices(newChoices);
     }, [votingChoices]);
 
+    // save button
+    const onSaveClick = useCallback(() => {
+        if(!address) {
+            return;
+        }
+
+        return;
+    }, [address]);
+
     return (
         <div className='overlay-page'>
             <div className="nav-container">
@@ -377,7 +386,14 @@ const Page = () => {
                     </>
                 }
                 <div className="button-container">
-                    <button className='save'>Save</button>
+                    <button 
+                        className='save' 
+                        onClick={onSaveClick} 
+                        disabled={!address} 
+                        style={{cursor: address? 'pointer' : 'no-drop'}}
+                    >
+                        {address? 'Save' : 'Connect to Continue'}
+                    </button>
                 </div>
             </div>
         </div>

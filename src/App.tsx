@@ -5,7 +5,7 @@ import './App.scss';
 import './keyframes.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
-import { Home, QRCode, Landing, Profile, Integration, Overlay } from './Pages';
+import { Home, Payment, Landing, Profile, Integration, Overlay } from './Pages';
 //import { Button } from 'react-bootstrap';
 import { ellipsizeThis } from './common/utils';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
@@ -48,8 +48,9 @@ const routes = [
     { path: '/' },
     { path: '/profile' },
     { path: '/integration' },
+    { path: '/overlay' },
     { path: '/landing' },
-    { path: '/pay/:streamerId' },
+    { path: '/pay/:streamerAddress' },
 ];
 
 function App() {
@@ -171,6 +172,16 @@ function App() {
         setSupportedTokens(supportedTokens);
     }, [squid]);
 
+    useEffect(() => {
+        console.log(currentPath);
+        if(!currentPath) {
+            // no random pages
+            navigate('/');
+            return;
+        }
+
+    }, [currentPath, navigate]);
+
     /* if (!window.ethereum) {
         return (
             <div className="metamask-404">
@@ -259,7 +270,7 @@ function App() {
                         <Route path="/profile" element={<Profile />}></Route>
                         <Route path="/integration" element={<Integration />}></Route>
                         <Route path="/overlay" element={<Overlay />}></Route>
-                        <Route path="/pay/:streamerId" element={<QRCode />}></Route>
+                        <Route path="/pay/:streamerAddress" element={<Payment />}></Route>
                     </Routes>
                 </AddressContext.Provider>
             </SquidContext.Provider>
