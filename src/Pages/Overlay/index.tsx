@@ -1,11 +1,15 @@
-import { ChangeEvent, useCallback, useState } from 'react';
+import { ChangeEvent, useCallback, useContext, useState } from 'react';
 import './styles.scss'
 import { OverlayButtonType, Timeframe } from './types';
 import Marquee from 'react-fast-marquee';
 import { toast } from 'react-toastify';
 import { cloneObj } from '../../common/utils';
+import { QRCode } from 'react-qrcode-logo';
+import { AddressContext } from '../../App';
+import logo from '../../../public/Media/Icons/logo.png';
 
 const Page = () => {
+    const { address } = useContext(AddressContext);
     const [ activeTab, setActiveTab ] = useState<OverlayButtonType>("announcement");
     const [ marqueeColor, setMarqueeColor ] = useState<string>("#000000");
     const [ marqueeBackgroundColor, setMarqueeBackgroundColor ] = useState<string>("#ffffff");
@@ -364,7 +368,13 @@ const Page = () => {
                 { /** QR Code */}
                 {
                     activeTab === "qrcode" &&
-                    <></>
+                    <>
+                        <span className='mt-3'>Your payees will be able to send donations to you by scanning this QR Code.</span>
+                        <QRCode 
+                            value={`https://metamask.app.link/dapp/localhost:3000/pay/${address}`}
+                            logoImage='/Media/Icons/logo.png'
+                        />
+                    </>
                 }
                 <div className="button-container">
                     <button className='save'>Save</button>
