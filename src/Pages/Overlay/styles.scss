@@ -62,7 +62,8 @@
 
             .notification-container,
             .leaderboard-container,
-            .milestone-container {
+            .milestone-container,
+            .voting-container {
                 margin: auto;
                 display: flex;
                 flex-direction: column;
@@ -97,6 +98,11 @@
                     }
                 }
             }
+
+            .voting-container {
+                padding: 15px;
+                border: 1px solid black;
+            }
         }
 
         > ul {
@@ -124,6 +130,25 @@
 
                 &.test {
                     background-color: rgb(232, 225, 97);
+                }
+            }
+        }
+
+        .choices-container {
+            display: flex;
+            flex-direction: row;
+            margin-top: 10px;
+
+            .vote-choice {
+                display: flex;
+                align-items: center;
+                padding: 10px;
+                border: 1px solid black;
+                border-radius: 10px;
+                margin-right: 10px;
+
+                > span {
+                    margin-right: 10px;
                 }
             }
         }

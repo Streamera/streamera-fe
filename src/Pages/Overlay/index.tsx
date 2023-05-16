@@ -2,6 +2,8 @@ import { ChangeEvent, useCallback, useState } from 'react';
 import './styles.scss'
 import { OverlayButtonType, Timeframe } from './types';
 import Marquee from 'react-fast-marquee';
+import { toast } from 'react-toastify';
+import { cloneObj } from '../../common/utils';
 
 const Page = () => {
     const [ activeTab, setActiveTab ] = useState<OverlayButtonType>("announcement");
@@ -30,6 +32,13 @@ const Page = () => {
     const [ milestoneProgressMainColor, setMilestoneProgressMainColor ] = useState<string>("#000000");
     const [ milestoneProgressColor, setMilestoneProgressColor ] = useState<string>("#ffffff");
     const [ milestoneTimeframe, setMilestoneTimeframe ] = useState<Timeframe>("all-time");
+
+    // Voting
+    const [ votingText, setVotingText ] = useState<string>("Voting");
+    const [ votingChoice, setVotingChoice ] = useState<string>("");
+    const [ votingTextColor, setVotingTextColor ] = useState<string>("#000000");
+    const [ votingBackgroundColor, setVotingBackgroundColor ] = useState<string>("#ffffff");
+    const [ votingChoices, setVotingChoices ] = useState<string[]>([]);
 
     // announcement
     const onMarqueeColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -114,6 +123,49 @@ const Page = () => {
     const onMilestoneTimeframeChanged = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
         setMilestoneTimeframe(e.target.value as Timeframe);
     }, []);
+
+    //voting
+    const onVotingTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setVotingText(e.target.value);
+    }, []);
+
+    const onVotingChoiceChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setVotingChoice(e.target.value);
+    }, []);
+
+    const clearVotingChoice = useCallback(() => {
+        setVotingChoice("");
+    }, []);
+
+    const onVotingTextColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setVotingTextColor(e.target.value);
+    }, []);
+
+    const onVotingBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setVotingBackgroundColor(e.target.value);
+    }, []);
+
+    const onChoiceAdd = useCallback(() => {
+        if(!votingChoice) {
+            return;
+        }
+
+        let newChoices = cloneObj<string[]>(votingChoices);
+        newChoices.push(votingChoice);
+
+        if(newChoices.length > 5) {
+            toast.error("Max number of choices reached.");
+            return;
+        }
+
+        setVotingChoices(newChoices);
+        clearVotingChoice();
+    }, [votingChoices, votingChoice, clearVotingChoice]);
+
+    const onChoiceDelete = useCallback((choice: string) => {
+        let newChoices = votingChoices.filter(x => x !== choice);
+        setVotingChoices(newChoices);
+    }, [votingChoices]);
 
     return (
         <div className='overlay-page'>
@@ -262,7 +314,52 @@ const Page = () => {
                 { /** Voting */}
                 {
                     activeTab === "voting" &&
-                    <></>
+                    <>
+                        <div className="video-frame center">
+                            <div className="voting-container" style={{ color: votingTextColor, backgroundColor: votingBackgroundColor, }}>
+                                <span style={{marginBottom: 30}}>{votingText}</span>
+                                <div className="row" style={{ width: 350 }}>
+                                    {
+                                        votingChoices.map((choice) => (
+                                            <>
+                                                <div className="col-6 text-left">{choice}</div>
+                                                <div className="col-6 text-right">$0.00</div>
+                                            </>
+                                        ))
+                                    }
+                                </div>
+                                <div className="row mt-5">
+                                    <div className="col-6 text-left">Ends: here</div>
+                                    <div className="col-6 text-right">Total: $99.99</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="d-flex flex-column align-items-start mt-3 w-100">
+                            <div className="d-flex align-items-center mt-3 w-100">
+                                <strong className='mr-2'>Color</strong>
+                                <input type="color" value={votingTextColor} onChange={onVotingTextColorChange}/>
+                                <strong className='ml-5 mr-2'>Background Color</strong>
+                                <input type="color" value={votingBackgroundColor} onChange={onVotingBackgroundColorChange}/>
+                            </div>
+                            <strong className='mt-3'>Title</strong>
+                            <input type="text" className='form-control' style={{ maxWidth: 500 }} value={votingText} onChange={onVotingTextChange}/>
+                            <strong className='mt-3'>New Choice</strong>
+                            <div className="d-flex align-items-center" style={{ maxWidth: 500 }}>
+                                <input type="text" className='form-control' value={votingChoice} onChange={onVotingChoiceChange}/>
+                                <button className="btn btn-success btn-sm ml-2" onClick={() => { onChoiceAdd() } }><i className="fa fa-plus"></i></button>
+                            </div>
+                            <div className="choices-container">
+                                {
+                                    votingChoices.map((choice) => (
+                                        <div className="vote-choice">
+                                            <span>{choice}</span>
+                                            <button className='btn btn-sm btn-danger' onClick={() => { onChoiceDelete(choice) }}><i className="fa fa-trash"></i></button>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </div>
+                    </>
                 }
                 { /** QR Code */}
                 {
