@@ -34,6 +34,7 @@ const allowedChains = isTestnet ? [
 export const AddressContext = createContext({
     address: "",
     chain: "",
+    chainId: -1,
     chainName: "",
 });
 
@@ -59,6 +60,7 @@ function App() {
     const [supportedTokens, setSupportedTokens] = useState<{ [chain: string]: TokenData[] }>({});
 
     const [chain, setChain] = useState('');
+    const [chainId, setChainId] = useState(-1);
     const [chainName, setChainName] = useState('');
     // const [isMobile, setIsMobile] = useState(false);
     const [shouldRenderHeader, setShouldRenderHeader] = useState(true);
@@ -87,17 +89,20 @@ function App() {
     }, []);
 
     const handleChainChange = useCallback(async (chain: string) => {
-        if(currentChain.current !== chain) {
-            currentChain.current = chain;
-            setChain(chain);
-            let chainName = allowedChains.filter(x => x.id === chain)[0]?.shortName ?? '';
-            setChainName(chainName.toLowerCase());
-            setShouldShowSwitcher(
-                currentPath !== '/'
-                && !allowedChains.map(x => x.id).includes(chain)
-                && !!address // must be logged in
-            );
-        }
+        currentChain.current = chain;
+        setChain(chain);
+
+        let chainConfig = allowedChains.filter(x => x.id === chain)[0];
+        let chainName = chainConfig?.shortName ?? '';
+        let chainId = chainConfig?.numericId ?? -1;
+        setChainName(chainName.toLowerCase());
+        setChainId(typeof(chainId) === 'number'? chainId : -1);
+
+        setShouldShowSwitcher(
+            currentPath === '/pay/:streamerAddress'
+            && !allowedChains.map(x => x.id).includes(chain)
+            && !!address // must be logged in
+        );
     }, [currentPath, address]);
 
     const handleUserRejection = useCallback(() => {
@@ -173,13 +178,11 @@ function App() {
     }, [squid]);
 
     useEffect(() => {
-        console.log(currentPath);
         if(!currentPath) {
             // no random pages
             navigate('/');
             return;
         }
-
     }, [currentPath, navigate]);
 
     /* if (!window.ethereum) {
@@ -260,6 +263,7 @@ function App() {
                 <AddressContext.Provider 
                     value={{
                         address,
+                        chainId,
                         chain,
                         chainName
                     }}
@@ -270,7 +274,7 @@ function App() {
                         <Route path="/profile" element={<Profile />}></Route>
                         <Route path="/integration" element={<Integration />}></Route>
                         <Route path="/overlay" element={<Overlay />}></Route>
-                        <Route path="/pay/:streamerAddress" element={<Payment />}></Route>
+                        <Route path="/pay/:streamerAddress" element={<Payment shouldHide={shouldShowSwitcher}/>}></Route>
                     </Routes>
                 </AddressContext.Provider>
             </SquidContext.Provider>

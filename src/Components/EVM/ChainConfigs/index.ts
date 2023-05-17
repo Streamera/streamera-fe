@@ -16,8 +16,10 @@ export const BSC_TEST: ChainConfig = {
         symbol: 'BNB',
     },
     blockExplorerUrl: 'https://testnet.bscscan.com',
-    linkerContract: '0xB94f603DB09497ee63E320f219585880349dC25f',
-    nftContract: '0xd4d6784025f7518DE86E397cdE4522a2056bf6dc'
+    streameraAddress: '0x2D6d5b42fe8898515a74A2b53055967AE522e290',
+    dexAddress: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1",
+    nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    wrappedNativeTokenAddress: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
 };
 export const POLYGON_TEST: ChainConfig = {
     name: 'Polygon',
@@ -35,8 +37,6 @@ export const POLYGON_TEST: ChainConfig = {
         symbol: 'MATIC',
     },
     blockExplorerUrl: 'https://mumbai.polygonscan.com',
-    linkerContract: '0xB94f603DB09497ee63E320f219585880349dC25f',
-    nftContract: '0x8692157ebE00265F0CE39728110A1FBdF46767E0'
 };
 export const AVAX_TEST: ChainConfig = {
     name: 'Avalanche C-Chain Testnet',
@@ -51,8 +51,6 @@ export const AVAX_TEST: ChainConfig = {
         symbol: 'AVAX',
     },
     blockExplorerUrl: 'https://testnet.snowtrace.io/',
-    linkerContract: '0xB94f603DB09497ee63E320f219585880349dC25f',
-    nftContract: '0x587a55a9a0473346C0a64244721D7F89e6cc16FF'
 };
 export const ETH: ChainConfig = {
     name: 'Ethereum',
@@ -80,8 +78,6 @@ export const BSC: ChainConfig = {
         symbol: 'BNB',
     },
     blockExplorerUrl: 'https://bscscan.com',
-    linkerContract: '0xe571D5Cd76De9a27dc6ca2Ba60369192B1316640',
-    nftContract: '0x0Ad8DF5ADc21e8Ad55Fd562B3d1dF47b1D93B2bF'
 };
 export const AVAX: ChainConfig = {
     name: 'Avalanche C-Chain',
@@ -110,8 +106,6 @@ export const POLYGON: ChainConfig = {
         symbol: 'MATIC',
     },
     blockExplorerUrl: 'https://polygonscan.com',
-    linkerContract: '0xe571D5Cd76De9a27dc6ca2Ba60369192B1316640',
-    nftContract: '0xd1bEb88f97fFbB768399265e36Fa33a7599fd848'
 };
 export const ARB: ChainConfig = {
     name: 'Arbitrum One',

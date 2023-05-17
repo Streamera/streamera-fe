@@ -11,6 +11,8 @@ export type ChainConfig = {
         symbol: string;
     };
     blockExplorerUrl?: string;
-    linkerContract?: string;
-    nftContract?: string;
+    streameraAddress?: string;
+    dexAddress?: string;
+    nativeTokenAddress?: string; // token address when native token (unwrapped) is used
+    wrappedNativeTokenAddress?: string; // wrapped token address like wbnb
 }
