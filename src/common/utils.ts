@@ -120,6 +120,10 @@ export const getWsUrl = () => {
     return process.env.REACT_APP_WS_URL!;
 }
 
+export const getSignaturePassword = () => {
+    return process.env.REACT_APP_SIGNATURE_PASSWORD!;
+}
+
 export const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text);
 }
