@@ -5,7 +5,7 @@ import './App.scss';
 import './keyframes.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
-import { Home, Payment, Landing, Profile, Integration, Overlay } from './Pages';
+import { Home, Payment, Landing, Profile, Integration, Overlay, Studio } from './Pages';
 //import { Button } from 'react-bootstrap';
 import { ellipsizeThis } from './common/utils';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
@@ -52,6 +52,7 @@ const routes = [
     { path: '/overlay' },
     { path: '/landing' },
     { path: '/pay/:streamerAddress' },
+    { path: '/studio/:streamerAddress' },
 ];
 
 function App() {
@@ -260,7 +261,7 @@ function App() {
                     supportedTokens,
                 }}
             >
-                <AddressContext.Provider 
+                <AddressContext.Provider
                     value={{
                         address,
                         chainId,
@@ -275,6 +276,7 @@ function App() {
                         <Route path="/integration" element={<Integration />}></Route>
                         <Route path="/overlay" element={<Overlay />}></Route>
                         <Route path="/pay/:streamerAddress" element={<Payment shouldHide={shouldShowSwitcher}/>}></Route>
+                        <Route path="/studio/:streamerAddress" element={<Studio />}></Route>
                     </Routes>
                 </AddressContext.Provider>
             </SquidContext.Provider>
