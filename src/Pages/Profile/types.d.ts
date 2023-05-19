@@ -19,6 +19,7 @@ export type UserDetails = {
     display_name: string;
     to_chain: string;
     to_token_address: string;
+    profile_picture: string;
     facebook?: string;
     instagram?: string;
     twitter?: string;

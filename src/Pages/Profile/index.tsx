@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { Select } from 'antd';
 
 const Page = () => {
+    const [pfpFile, setPfpFile] = useState<File>();
     const [pfp, setPfp] = useState<string>("");
     const [cookies] = useCookies(['signatures']);
     
@@ -20,6 +21,7 @@ const Page = () => {
         display_name: "",
         to_chain: "",
         to_token_address: "",
+        profile_picture: "",
         facebook: "",
         instagram: "",
         twitter: "",
@@ -48,6 +50,7 @@ const Page = () => {
     const onPfpValueChanged = useCallback((event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             setPfp(URL.createObjectURL(event.target.files[0]));
+            setPfpFile(event.target.files[0]);
         }
     }, []);
 
@@ -96,6 +99,10 @@ const Page = () => {
             userDetails.instagram = userDetails.instagram ?? "";
 
             setUserDetails(userDetails);
+            
+            if(userDetails.profile_picture) {
+                setPfp(userDetails.profile_picture);
+            }
         }
 
         getUser();
@@ -108,7 +115,7 @@ const Page = () => {
             return;
         }
 
-        let symbol = supportedTokens[userDetails.to_chain].filter(x => x.address === userDetails.to_token_address)[0]?.symbol ?? "";
+        let symbol = supportedTokens[userDetails.to_chain.toString()].filter(x => x.address === userDetails.to_token_address)[0]?.symbol ?? "";
         setToTokenSymbol(symbol);
         
         let chainName = supportedChains.filter(x => x.chainId.toString() === userDetails.to_chain)[0]?.name ?? "";
@@ -139,14 +146,38 @@ const Page = () => {
         }
         
         let omitted = _(userDetails).omitBy(_.isEmpty).omit("id").value();
-        let updateUserDetails = {
-            ...omitted, // omit id and all empty inputs
-            to_token_symbol: toTokenSymbol,
-            address,
-            signature
-        };
 
-        let res = await axios.post(`/user/update/${userDetails.id}`, updateUserDetails);
+        let formData = new FormData();
+        for(const [key, value] of Object.entries(omitted)) {
+
+            if(key === "profile_picture") {
+                continue;
+            }
+
+            // social is not needed
+            if(key === "social") {
+                continue;
+            }
+
+            formData.append(key, value);
+        }
+
+        formData.append('address', address);
+        formData.append('signature', signature);
+
+        if(pfpFile) {
+            formData.append('profile_picture', pfpFile);
+        }
+
+        let res = await axios({
+            url: `/user/update/${userDetails.id}`,
+            method: 'POST',
+            data: formData,
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        });
+
         if(!res.data.success) {
             toast.error("Error saving data");
             return;
@@ -154,7 +185,7 @@ const Page = () => {
 
         toast.success("Updated");
         return;
-    }, [address, userDetails, cookies, toTokenSymbol]);
+    }, [address, userDetails, cookies, toTokenSymbol, pfpFile]);
 
     return (
         <div className='profile-page'>
@@ -162,7 +193,6 @@ const Page = () => {
             <div className="pfp-container">
                 <button onClick={onSetPfpClick}>
                     {
-
                         pfp?
                         <img src={pfp} alt="pfp" /> :
                         <i className='fa fa-user'></i>
