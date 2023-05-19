@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useContext, useState } from 'react';
+import { ChangeEvent, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import './styles.scss'
 import { OverlayButtonType, Timeframe } from './types';
 import Marquee from 'react-fast-marquee';
@@ -6,9 +6,14 @@ import { toast } from 'react-toastify';
 import { cloneObj } from '../../common/utils';
 import { QRCode } from 'react-qrcode-logo';
 import { AddressContext } from '../../App';
-import logo from '../../../public/Media/Icons/logo.png';
+import axios from '../../Services/axios';
+import { useCookies } from 'react-cookie';
+import { User } from '../../types';
 
 const Page = () => {
+    // cookies
+    const [ cookies ] = useCookies(['signatures']);
+
     const { address } = useContext(AddressContext);
     const [ activeTab, setActiveTab ] = useState<OverlayButtonType>("announcement");
     const [ marqueeColor, setMarqueeColor ] = useState<string>("#000000");
@@ -43,6 +48,14 @@ const Page = () => {
     const [ votingTextColor, setVotingTextColor ] = useState<string>("#000000");
     const [ votingBackgroundColor, setVotingBackgroundColor ] = useState<string>("#ffffff");
     const [ votingChoices, setVotingChoices ] = useState<string[]>([]);
+
+    //qr code
+    const [ qrId, setQrId ] = useState(0);
+    const [ qrUrl, setQrUrl ] = useState("");
+    const [ qrBlob, setQrBlob ] = useState<Blob>();
+    const [ newQrLogo, setNewQrLogo ] = useState("");
+    const [ newQrLogoFile, setNewQrLogoFile ] = useState<File>();
+    const previousAddress = useRef<string>("");
 
     // announcement
     const onMarqueeColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -171,14 +184,66 @@ const Page = () => {
         setVotingChoices(newChoices);
     }, [votingChoices]);
 
+    // qrcode
+    const onQrCodeLogoChanged = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            setNewQrLogo(URL.createObjectURL(event.target.files[0]));
+            setNewQrLogoFile(event.target.files[0]);
+        }
+    }, []);
+
     // save button
-    const onSaveClick = useCallback(() => {
+    const onSaveClick = useCallback(async() => {
         if(!address) {
             return;
         }
 
+        if(qrBlob && qrId) {
+            let formData = new FormData();
+            formData.append('qr_code', qrBlob);
+            formData.append('signature', cookies['signatures'][address]);
+            let res = await axios({
+                url: `/qr/update/${qrId}`,
+                method: 'POST',
+                data: formData,
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
+            });
+
+            console.log(res);
+        }
+
+        toast.success("Edited");
         return;
-    }, [address]);
+    }, [address, qrBlob, cookies, qrId]);
+
+    // getUserData callbacks
+    const getQrCode = useCallback(async(user: User) => {
+        let qrCodeRes = await axios.post<any>('/qr/find', { user_id: user.id });
+        if(qrCodeRes.data.length === 0) {
+            return;
+        }
+
+        setQrUrl(qrCodeRes.data[0].qr);
+        setQrId(qrCodeRes.data[0].id);
+    }, []);
+
+    // useEffects
+    useEffect(() => {
+        const getUserData = async() => {
+            // get user id
+            let res = await axios.post<User[]>('/user/find', { wallet: address });
+            if(!res.data[0]) {
+                return;
+            }
+
+            let user = res.data[0];
+            getQrCode(user);
+        }
+
+        getUserData();
+    }, [ address, getQrCode ]);
 
     return (
         <div className='overlay-page'>
@@ -379,10 +444,37 @@ const Page = () => {
                     activeTab === "qrcode" &&
                     <>
                         <span className='mt-3'>Your payees will be able to send donations to you by scanning this QR Code.</span>
-                        <QRCode 
-                            value={`https://metamask.app.link/dapp/localhost:3000/pay/${address}`}
-                            logoImage='/Media/Icons/logo.png'
-                        />
+                        {
+                            /* display backend file if not editing */
+                            qrUrl &&
+                            !newQrLogoFile &&
+                            <img src={qrUrl} alt="qrCode"/>
+                        }
+
+                        {
+                            /** editing */
+                            newQrLogoFile &&
+                            <QRCode 
+                                value={`https://metamask.app.link/dapp/localhost:3000/pay/${address}`}
+                                logoImage={newQrLogo}
+                                id="qr-code"
+                                logoOnLoad={() => {
+                                    const canvas: any = document.getElementById("qr-code");
+                                    if(canvas) {
+                                        canvas.toBlob((blob: Blob) => {
+                                            if(address === previousAddress.current) {
+                                                return;
+                                            }
+                                            previousAddress.current = address;
+                                            setQrBlob(blob);
+                                        });
+                                    }
+                                }}
+                                enableCORS
+                            />
+                        }
+                        <strong>Change Logo</strong>
+                        <input type="file" onChange={onQrCodeLogoChanged} accept='image/jpeg, image/png'></input>
                     </>
                 }
                 <div className="button-container">

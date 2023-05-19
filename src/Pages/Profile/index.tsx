@@ -3,11 +3,12 @@ import './styles.scss';
 import { cloneObj, ellipsizeThis } from '../../common/utils';
 import { AddressContext, SquidContext } from '../../App';
 import axios from '../../Services/axios';
-import { User, UserDetails, UserDetailsKeys } from './types';
+import { UserDetails, UserDetailsKeys } from './types';
 import _ from 'lodash';
 import { useCookies } from 'react-cookie';
 import { toast } from 'react-toastify';
 import { Select } from 'antd';
+import { User } from '../../types';
 
 const Page = () => {
     const [pfpFile, setPfpFile] = useState<File>();
