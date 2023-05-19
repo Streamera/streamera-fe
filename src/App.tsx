@@ -56,7 +56,7 @@ const routes = [
 ];
 
 function App() {
-    const [cookies, setCookie, removeCookie] = useCookies([ 'signatures' ]);
+    const [cookies, /* setCookie, removeCookie */] = useCookies([ 'signatures' ]);
 
     const [address, setAddress] = useState('');
     const [isVerified, setIsVerified] = useState(false);
@@ -170,18 +170,18 @@ function App() {
         }
 
         let supportedChains: SupportedChain[] = [];
-        let supportedTokens: { [chain: string]: TokenData[] } = {};
+        let supportedTokens: { [chainId: string]: TokenData[] } = {};
 
         let uniqueIds: string[] = [];
         squid.tokens.forEach(token => {
             let chainConfig = _.find(ChainConfigs, { numericId: token.chainId });
             let chainName = chainConfig?.name ?? token.chainId.toString();
 
-            if(!supportedTokens[chainName]) {
-                supportedTokens[chainName] = [];
+            if(!supportedTokens[token.chainId.toString()]) {
+                supportedTokens[token.chainId.toString()] = [];
             }
 
-            supportedTokens[chainName].push(token);
+            supportedTokens[token.chainId.toString()].push(token);
 
             // only one chain per option
             if(uniqueIds.includes(token.chainId.toString())) {
@@ -295,7 +295,7 @@ function App() {
                         address,
                         chainId,
                         chain,
-                        chainName
+                        chainName,
                     }}
                 >
                     {

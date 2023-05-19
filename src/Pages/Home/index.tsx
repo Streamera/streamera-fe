@@ -15,9 +15,9 @@ const Page = () => {
     const [isVerified, setIsVerified] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
+    /* useEffect(() => {
         removeCookie('signatures');
-    }, [removeCookie]);
+    }, [ removeCookie ]); */
 
     useEffect(() => {
         // we will check signature in backend
