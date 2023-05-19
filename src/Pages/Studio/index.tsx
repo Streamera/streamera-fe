@@ -1,51 +1,47 @@
 import { useParams } from 'react-router';
 import './styles.scss'
 import { Button, InputNumber, Select } from 'antd';
-import { useCallback, useContext, useEffect, useState} from 'react';
+import { useCallback, useContext, useEffect, useRef, useState} from 'react';
 import { ellipsizeThis, getWsUrl, sleep } from '../../common/utils';
 import { toast } from 'react-toastify';
-import { io, Socket } from 'socket.io-client';
 import { StartStudioParams } from './types';
-
-//dont auto connect cause react will connect it immediately upon loading
-// const socket = io(getWsUrl(), { autoConnect: false});
-const socket = io(getWsUrl());
+import { io, Socket } from 'socket.io-client';
 
 const Page = () => {
+    const socketRef = useRef<Socket>();
     const { streamerAddress } = useParams();
 
-    // const startStudio = async({ address }: StartStudioParams) => {
-    //     while(socket.disconnected) {
-    //         console.log(`socket.disconnected: ${socket.disconnected}`);
-    //         // wait for socket to connect
-    //         await sleep(100);
-    //     }
-
-    //     if(address) {
-    //         socket.emit('start_studio', {address});
-    //     }
-    // };
-
     useEffect(() => {
-        socket.emit('start_studio', {address: streamerAddress});
+        // Create the socket connection if it doesn't exist
+        if (!socketRef.current) {
+            socketRef.current = io(getWsUrl());
 
-        // upon connection
-        socket.on("connect", () => {
-            console.log("connected");
-        });
+            // upon connection
+            socketRef.current.on("connect", () => {
+                console.log("connected");
+            });
 
-        // upon disconnection
-        socket.on("disconnect", (reason) => {
-            console.log(`disconnected due to ${reason}`);
-        });
+            // upon disconnection
+            socketRef.current.on("disconnect", (reason) => {
+                console.log(`disconnected due to ${reason}`);
+            });
 
-        socket.on('init', (data) => {
-            console.log(data);
-        });
+            // upon update
+            socketRef.current.on("update", (data) => {
+                console.log(`data`);
+                console.log(data);
+            });
 
-        socket.on(`test`, (data) => {
-            console.log(data);
-        });
+            socketRef.current.emit('start_studio', {address: streamerAddress});
+        }
+
+
+        return () => {
+            // cannot off after useRef, else wont get data
+            // socketRef.current!.off(`connect`);
+            // socketRef.current!.off(`disconnect`);
+            // socketRef.current!.off(`update`);
+        }
 
     }, [streamerAddress]);
 
