@@ -1,12 +1,53 @@
 import { useParams } from 'react-router';
 import './styles.scss'
 import { Button, InputNumber, Select } from 'antd';
-import { useCallback, useContext, useState} from 'react';
-import { ellipsizeThis } from '../../common/utils';
+import { useCallback, useContext, useEffect, useState} from 'react';
+import { ellipsizeThis, getWsUrl, sleep } from '../../common/utils';
 import { toast } from 'react-toastify';
+import { io, Socket } from 'socket.io-client';
+import { StartStudioParams } from './types';
+
+//dont auto connect cause react will connect it immediately upon loading
+// const socket = io(getWsUrl(), { autoConnect: false});
+const socket = io(getWsUrl());
 
 const Page = () => {
     const { streamerAddress } = useParams();
+
+    // const startStudio = async({ address }: StartStudioParams) => {
+    //     while(socket.disconnected) {
+    //         console.log(`socket.disconnected: ${socket.disconnected}`);
+    //         // wait for socket to connect
+    //         await sleep(100);
+    //     }
+
+    //     if(address) {
+    //         socket.emit('start_studio', {address});
+    //     }
+    // };
+
+    useEffect(() => {
+        socket.emit('start_studio', {address: streamerAddress});
+
+        // upon connection
+        socket.on("connect", () => {
+            console.log("connected");
+        });
+
+        // upon disconnection
+        socket.on("disconnect", (reason) => {
+            console.log(`disconnected due to ${reason}`);
+        });
+
+        socket.on('init', (data) => {
+            console.log(data);
+        });
+
+        socket.on(`test`, (data) => {
+            console.log(data);
+        });
+
+    }, [streamerAddress]);
 
     const Announcement = () => {
         let component: JSX.Element = (

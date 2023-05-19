@@ -5,7 +5,7 @@
     left: 0;
     width: 100%;
     min-height: 100vh;
-    background-color: #04F404;
+    // background-color: #04F404;
     z-index: 100;
 
     .announcement, .qr, .poll, .milestone, .leaderboard, .trigger {
@@ -29,7 +29,7 @@
             width: 50%;
             height: 6%;
             font-size: 2.5em;
-            background: rgba(255, 0, 0, 0.5);
+            background: rgba(255, 0, 0, 0.7);
         }
     }
 
@@ -42,7 +42,7 @@
             width: 10%;
             height: 300px;
             font-size: 2.5em;
-            background: rgba(255, 221, 0, 0.9);
+            background: rgba(255, 221, 0, 0.7);
         }
     }
 
@@ -55,7 +55,7 @@
             width: 10%;
             height: 200px;
             font-size: 2.5em;
-            background: rgba(255, 221, 0, 0.9);
+            background: rgba(255, 221, 0, 0.7);
         }
     }
 
@@ -68,7 +68,7 @@
             width: 50%;
             height: 200px;
             font-size: 2.5em;
-            background: rgba(255, 221, 0, 0.9);
+            background: rgba(255, 221, 0, 0.7);
         }
     }
 
@@ -81,7 +81,7 @@
             width: 20%;
             height: 500px;
             font-size: 2.5em;
-            background: rgba(255, 221, 0, 1);
+            background: rgba(255, 221, 0, 0.7);
         }
     }
 
@@ -94,7 +94,7 @@
             width: 20%;
             height: 300px;
             font-size: 2.5em;
-            background: rgba(255, 221, 0, 0.9);
+            background: rgba(255, 221, 0, 0.7);
         }
     }
 }

@@ -65,6 +65,7 @@ function App() {
     const [chainName, setChainName] = useState('');
     // const [isMobile, setIsMobile] = useState(false);
     const [shouldRenderHeader, setShouldRenderHeader] = useState(true);
+    const [shouldRenderFooter, setShouldRenderFooter] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
 
     //header will be hidden too
@@ -183,6 +184,12 @@ function App() {
             // no random pages
             navigate('/');
             return;
+        } else if (currentPath === '/studio/:streamerAddress') {
+            setShouldRenderHeader(false);
+            setShouldRenderFooter(false);
+        } else {
+            setShouldRenderHeader(true);
+            setShouldRenderFooter(true);
         }
     }, [currentPath, navigate]);
 
@@ -276,12 +283,12 @@ function App() {
                         <Route path="/integration" element={<Integration />}></Route>
                         <Route path="/overlay" element={<Overlay />}></Route>
                         <Route path="/pay/:streamerAddress" element={<Payment shouldHide={shouldShowSwitcher}/>}></Route>
-                        <Route path="/studio/:streamerAddress" element={<Studio />}></Route>
+                        <Route path="/studio/:streamerAddress" element={<Studio  />}></Route>
                     </Routes>
                 </AddressContext.Provider>
             </SquidContext.Provider>
 
-			<footer>
+			<footer className={!shouldRenderFooter ? 'd-none' : 'd-flex'}>
                 <span>
 				    Made with ❤️ by the Streamera Team.
                 </span>
