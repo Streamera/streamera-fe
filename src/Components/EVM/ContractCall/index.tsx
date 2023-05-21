@@ -3,11 +3,8 @@ import * as ChainConfigs from '../ChainConfigs';
 import Streamera from '../../../ABI/Streamera.json';
 import ERC20 from '../../../ABI/ERC20.json';
 import _ from 'lodash';
-import { getBaseUrl, ucFirst } from '../../../common/utils';
 import { ChainConfig } from '../ChainConfigs/types';
-import { BridgeCallParam, LocalCallParam, Transaction } from './types';
-import { Squid } from '@0xsquid/sdk';
-const isTestnet = process.env.REACT_APP_CHAIN_ENV === "testnet";
+import { BridgeCallParam, LocalCallParam } from './types';
 
 const chains = ChainConfigs;
 export default class ContractCall {
