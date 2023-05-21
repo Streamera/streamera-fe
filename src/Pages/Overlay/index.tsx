@@ -8,7 +8,7 @@ import { QRCode } from 'react-qrcode-logo';
 import { AddressContext } from '../../App';
 import axios from '../../Services/axios';
 import { useCookies } from 'react-cookie';
-import { Announcement, Leaderboard, Milestone, QrCode, User, Voting } from '../../types';
+import { Announcement, Leaderboard, Milestone, Notification, QrCode, User, Voting } from '../../types';
 
 const Page = () => {
     // cookies
@@ -25,6 +25,7 @@ const Page = () => {
     const [ textSpeed, setTextSpeed ] = useState<number>(100);
 
     // Notification
+    const [ triggerId, setTriggerId ] = useState(0);
     const [ notificationText, setNotificationText ] = useState<string>("Chad donated $99!");
     const [ notificationTextColor, setNotificationTextColor ] = useState<string>("#000000");
     const [ notificationBackgroundColor, setNotificationBackgroundColor ] = useState<string>("#ffffff");
@@ -32,12 +33,14 @@ const Page = () => {
     const [ gif, setGif ] = useState<string>("");
 
     // Leaderboard
+    const [ leaderboardId, setLeaderboardId ] = useState(0);
     const [ leaderboardText, setLeaderboardText ] = useState<string>("Leaderboard");
     const [ leaderboardTextColor, setLeaderboardTextColor ] = useState<string>("#000000");
     const [ leaderboardBackgroundColor, setLeaderboardBackgroundColor ] = useState<string>("#ffffff");
     const [ leaderboardTimeframe, setLeaderboardTimeframe ] = useState<Timeframe>("all-time");
 
     // Milestone
+    const [ milestoneId, setMilestoneId ] = useState(0);
     const [ milestoneText, setMilestoneText ] = useState<string>("Milestone");
     const [ milestoneTextColor, setMilestoneTextColor ] = useState<string>("#000000");
     const [ milestoneBackgroundColor, setMilestoneBackgroundColor ] = useState<string>("#ffffff");
@@ -46,6 +49,7 @@ const Page = () => {
     const [ milestoneTimeframe, setMilestoneTimeframe ] = useState<Timeframe>("all-time");
 
     // Voting
+    const [ votingId, setVotingId ] = useState(0);
     const [ votingText, setVotingText ] = useState<string>("Voting");
     const [ votingChoice, setVotingChoice ] = useState<string>("");
     const [ votingTextColor, setVotingTextColor ] = useState<string>("#000000");
@@ -220,12 +224,45 @@ const Page = () => {
 
     const saveNotification = useCallback(async() => {
         // 'content', 'caption', 'status', 'type'
-        // triggers?
+        /* if(!textSpeed || !displayText || !announcementId || activeTab !== "announcement") {
+            return;
+        }
+
+        let res = await axios.post(`/trigger/update/${triggerId}`, {
+            content: displayText,
+            speed: textSpeed,
+            signature: cookies['signatures'][address],
+            bg_color: marqueeBackgroundColor,
+            font_color: marqueeColor,
+        });
+
+        if(!res.data.success) {
+            toast.success("Error saving Announcement");
+            return;
+        }
+        toast.success("Edited"); */
     }, []);
 
     const saveLeaderboard = useCallback(async() => {
         // 'title', 'status', 'timeframe'
-    }, []);
+        if(!leaderboardTimeframe || !leaderboardText || !leaderboardId || activeTab !== "leaderboard") {
+            return;
+        }
+
+        let res = await axios.post(`/leaderboard/update/${leaderboardId}`, {
+            title: leaderboardText,
+            timeframe: leaderboardTimeframe,
+            signature: cookies['signatures'][address],
+            bg_color: leaderboardBackgroundColor,
+            font_color: leaderboardTextColor,
+        });
+
+        if(!res.data.success) {
+            toast.success("Error saving leaderboard");
+            return;
+        }
+        toast.success("Edited");
+    }, [leaderboardBackgroundColor, leaderboardTextColor, leaderboardTimeframe, leaderboardText, leaderboardId, activeTab, cookies, address]);
 
     const saveMilestone = useCallback(async() => {
         // 'user_id', 'title', 'target', 'style_id', 'start_at', 'end_at', 'timeframe'
@@ -267,10 +304,10 @@ const Page = () => {
 
         // not going to use await here
         saveAnnouncement();
-        // saveNotification();
-        // saveLeaderboard();
-        // saveMilestone();
-        // saveVoting();
+        saveNotification();
+        saveLeaderboard();
+        saveMilestone();
+        saveVoting();
         saveQr();
         return;
     }, [address, saveQr, saveAnnouncement, saveNotification, saveLeaderboard, saveMilestone, saveVoting]);
@@ -289,6 +326,7 @@ const Page = () => {
             bg_color,
             font_color
         } = res.data[0];
+
         setAnnouncementId(id);
         setDisplayText(!content || content.length === 0? "Sample Text" : content);
         setTextSpeed(speed);
@@ -302,7 +340,19 @@ const Page = () => {
             return;
         }
 
-        console.log(res.data);
+        let {
+            id,
+            content,
+            caption,
+            bg_color,
+            font_color
+        } = res.data[0];
+        
+        setAnnouncementId(id);
+        setNotificationText(!caption || caption.length === 0? "Sample Text" : caption);
+        setNotificationBackgroundColor(bg_color ?? "#000000");
+        setNotificationTextColor(font_color ?? "#ffffff");
+        setGif(content);
     }, []);
 
     const getLeaderboard = useCallback(async(user: User) => {
@@ -311,7 +361,19 @@ const Page = () => {
             return;
         }
 
-        console.log(res.data);
+        let {
+            id,
+            title,
+            timeframe,
+            bg_color,
+            font_color
+        } = res.data[0];
+        
+        setLeaderboardId(id);
+        setLeaderboardText(!title || title.length === 0? "Sample Text" : title);
+        setLeaderboardTextColor(bg_color ?? "#000000");
+        setLeaderboardBackgroundColor(font_color ?? "#ffffff");
+        setLeaderboardTimeframe(timeframe as Timeframe);
     }, []);
 
     const getMilestone = useCallback(async(user: User) => {
@@ -353,9 +415,9 @@ const Page = () => {
 
             let user = res.data[0];
             getAnnoucement(user);
-            // getNotification(user)
+            getLeaderboard(user);
+            // getNotification(user);
             // getVoting(user);
-            // getLeaderboard(user);
             // getMilestone(user);
             getQrCode(user);
         }
@@ -363,7 +425,6 @@ const Page = () => {
         getUserData();
     }, [ address, getAnnoucement, getNotification, getVoting, getLeaderboard, getMilestone, getQrCode ]);
 
-    console.log('rendering');
     return (
         <div className='overlay-page'>
             <div className="nav-container">
