@@ -9,7 +9,9 @@ import { AddressContext } from '../../App';
 import axios from '../../Services/axios';
 import { useCookies } from 'react-cookie';
 import { Announcement, Leaderboard, Milestone, Notification, OverlayPosition, QrCode, User, Voting, VotingOptions } from '../../types';
-import { Select } from 'antd';
+import { Select, DatePicker } from 'antd';
+import dayjs from 'dayjs';
+const { RangePicker } = DatePicker;
 
 const timeframeOptions = [
     {
@@ -110,6 +112,9 @@ const Page = () => {
     const [ milestoneProgressColor, setMilestoneProgressColor ] = useState<string>("#ffffff");
     const [ milestoneTimeframe, setMilestoneTimeframe ] = useState<Timeframe>("all-time");
     const [ milestonePosition, setMilestonePosition ] = useState<OverlayPosition>("middle-center");
+    const [ milestoneTarget, setMilestoneTarget ] = useState("0");
+    const [ milestoneStartAt, setMilestoneStartAt ] = useState("");
+    const [ milestoneEndAt, setMilestoneEndAt ] = useState("");
 
     // Voting
     const [ votingId, setVotingId ] = useState(0);
@@ -119,6 +124,8 @@ const Page = () => {
     const [ votingBackgroundColor, setVotingBackgroundColor ] = useState<string>("#ffffff");
     const [ votingChoices, setVotingChoices ] = useState<VotingOptions[]>([]);
     const [ votingPosition, setVotingPosition ] = useState<OverlayPosition>("middle-center");
+    const [ votingStartAt, setVotingStartAt ] = useState("");
+    const [ votingEndAt, setVotingEndAt ] = useState("");
 
     //qr code
     const [ qrId, setQrId ] = useState(0);
@@ -221,6 +228,16 @@ const Page = () => {
         setMilestoneProgressColor(e.target.value);
     }, []);
 
+    const onMilestoneTargetChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setMilestoneTarget(e.target.value);
+    }, []);
+
+    const onMilestoneDateRangeChange = useCallback((dateRangeFn: any, dateRangeStrings: any, info: any) => {
+        let [startDate, endDate] = dateRangeStrings;
+        setMilestoneStartAt(startDate);
+        setMilestoneEndAt(endDate);
+    }, []);
+
     const onMilestoneTimeframeChanged = useCallback((value: Timeframe) => {
         setMilestoneTimeframe(value);
     }, []);
@@ -252,6 +269,12 @@ const Page = () => {
 
     const onVotingPositionChange = useCallback((value: OverlayPosition) => {
         setVotingPosition(value);
+    }, []);
+
+    const onVotingDateRangeChange = useCallback((dateRangeFn: any, dateRangeStrings: any, info: any) => {
+        let [startDate, endDate] = dateRangeStrings;
+        setVotingStartAt(startDate);
+        setVotingEndAt(endDate);
     }, []);
 
     const onChoiceAdd = useCallback(() => {
@@ -393,6 +416,9 @@ const Page = () => {
             bar_empty_color: milestoneProgressMainColor,
             bar_filled_color: milestoneProgressColor,
             position: milestonePosition,
+            start_at: milestoneStartAt,
+            end_at: milestoneEndAt,
+            target: milestoneTarget,
         });
 
         if(!res.data.success) {
@@ -400,7 +426,7 @@ const Page = () => {
             return;
         }
         toast.success("Edited");
-    }, [milestoneId, milestoneBackgroundColor, milestoneProgressColor, milestoneProgressMainColor, milestoneText, milestoneTextColor, milestoneTimeframe, address, cookies, activeTab, milestonePosition]);
+    }, [milestoneId, milestoneBackgroundColor, milestoneProgressColor, milestoneProgressMainColor, milestoneText, milestoneTextColor, milestoneTimeframe, address, cookies, activeTab, milestonePosition, milestoneEndAt, milestoneStartAt, milestoneTarget]);
 
     const saveVoting = useCallback(async() => {
         // 'user_id', 'status', 'title', 'style_id', 'start_at', 'end_at', options
@@ -415,6 +441,8 @@ const Page = () => {
             font_color: votingTextColor,
             options: votingChoices,
             position: votingPosition,
+            start_at: votingStartAt,
+            end_at: votingEndAt,
         });
 
         if(!res.data.success) {
@@ -422,7 +450,7 @@ const Page = () => {
             return;
         }
         toast.success("Edited");
-    }, [votingText, votingChoices, votingId, address, cookies, votingBackgroundColor, votingTextColor, activeTab, votingPosition]);
+    }, [votingText, votingChoices, votingId, address, cookies, votingBackgroundColor, votingTextColor, activeTab, votingPosition, votingStartAt, votingEndAt]);
 
     const saveQr = useCallback(async() => {
         if(!qrId || activeTab !== "qrcode") {
@@ -564,6 +592,9 @@ const Page = () => {
         setMilestoneTextColor(font_color? font_color: "#ffffff");
         setMilestoneTimeframe(timeframe as Timeframe);
         setMilestonePosition(position ?? 'middle-center');
+        setMilestoneTarget(target);
+        setMilestoneStartAt(start_at);
+        setMilestoneEndAt(end_at);
     }, []);
 
     const getVoting = useCallback(async(user: User) => {
@@ -589,6 +620,8 @@ const Page = () => {
         setVotingTextColor(font_color? font_color: "#ffffff");
         setVotingChoices(options);
         setVotingPosition(position ?? 'middle-center');
+        setVotingStartAt(start_at);
+        setVotingEndAt(end_at);
     }, []);
 
     const getQrCode = useCallback(async(user: User) => {
@@ -790,8 +823,18 @@ const Page = () => {
                                 <strong className='ml-5 mr-2'>Progress Color</strong>
                                 <input type="color" value={milestoneProgressColor} onChange={onMilestoneProgressColorChange}/>
                             </div>
+                            <strong className='mt-3'>Date Range</strong>
+                            <RangePicker 
+                                showTime 
+                                value={[dayjs(milestoneStartAt), dayjs(milestoneEndAt)]}
+                                onCalendarChange={onMilestoneDateRangeChange}
+                            />
                             <strong className='mt-3'>Text</strong>
                             <input type="text" className='form-control' style={{ maxWidth: 500 }} value={milestoneText} onChange={onMilestoneTextChange}/>
+                            
+                            <strong className='mt-3'>Target</strong>
+                            <input type="decimal" step={0.01} className='form-control' style={{ maxWidth: 500 }} value={milestoneTarget} onChange={onMilestoneTargetChange}/>
+                            
                             <strong className='mt-3'>Timeframe</strong>
                             <Select
                                 className='w-100 text-left'
@@ -823,10 +866,10 @@ const Page = () => {
                                 <span style={{marginBottom: 30}}>{votingText}</span>
                                 <div className="row" style={{ width: 350 }}>
                                     {
-                                        votingChoices.map((x) => (
+                                        votingChoices.map((x, index) => (
                                             <>
-                                                <div className="col-6 text-left">{x.option}</div>
-                                                <div className="col-6 text-right">$0.00</div>
+                                                <div className="col-6 text-left" key={`voting-option-${index}`}>{x.option}</div>
+                                                <div className="col-6 text-right" key={`voting-value-${index}`}>$0.00</div>
                                             </>
                                         ))
                                     }
@@ -844,6 +887,12 @@ const Page = () => {
                                 <strong className='ml-5 mr-2'>Background Color</strong>
                                 <input type="color" value={votingBackgroundColor} onChange={onVotingBackgroundColorChange}/>
                             </div>
+                            <strong className='mt-3'>Date Range</strong>
+                            <RangePicker 
+                                showTime 
+                                value={[dayjs(votingStartAt), dayjs(votingEndAt)]}
+                                onCalendarChange={onVotingDateRangeChange}
+                            />
                             <strong className='mt-3'>Title</strong>
                             <input type="text" className='form-control' style={{ maxWidth: 500 }} value={votingText} onChange={onVotingTextChange}/>
                             <strong className='mt-3'>New Choice</strong>
