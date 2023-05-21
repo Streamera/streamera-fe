@@ -25,7 +25,7 @@ const Page = () => {
     const [ textSpeed, setTextSpeed ] = useState<number>(100);
 
     // Notification
-    const [ triggerId, setTriggerId ] = useState(0);
+    const [ notificationId, setNotificationId ] = useState(0);
     const [ notificationText, setNotificationText ] = useState<string>("Chad donated $99!");
     const [ notificationTextColor, setNotificationTextColor ] = useState<string>("#000000");
     const [ notificationBackgroundColor, setNotificationBackgroundColor ] = useState<string>("#ffffff");
@@ -224,24 +224,35 @@ const Page = () => {
 
     const saveNotification = useCallback(async() => {
         // 'content', 'caption', 'status', 'type'
-        /* if(!textSpeed || !displayText || !announcementId || activeTab !== "announcement") {
+        if(!notificationText || !notificationId || activeTab !== "notification") {
             return;
         }
 
-        let res = await axios.post(`/trigger/update/${triggerId}`, {
-            content: displayText,
-            speed: textSpeed,
-            signature: cookies['signatures'][address],
-            bg_color: marqueeBackgroundColor,
-            font_color: marqueeColor,
+        let formData = new FormData();
+        if(gifFile) {
+            formData.append('content', gifFile);
+        }
+
+        formData.append('signature', cookies['signatures'][address]);
+        formData.append('caption', notificationText);
+        formData.append('bg_color', notificationBackgroundColor);
+        formData.append('font_color', notificationTextColor);
+
+        let res = await axios({
+            url: `/trigger/update/${notificationId}`,
+            method: 'POST',
+            data: formData,
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
         });
 
         if(!res.data.success) {
-            toast.success("Error saving Announcement");
+            toast.success("Error saving QR Code");
             return;
         }
-        toast.success("Edited"); */
-    }, []);
+        toast.success("Edited");
+    }, [notificationBackgroundColor, notificationTextColor, notificationId, notificationText, gifFile, address, cookies, activeTab]);
 
     const saveLeaderboard = useCallback(async() => {
         // 'title', 'status', 'timeframe'
@@ -348,7 +359,7 @@ const Page = () => {
             font_color
         } = res.data[0];
         
-        setAnnouncementId(id);
+        setNotificationId(id);
         setNotificationText(!caption || caption.length === 0? "Sample Text" : caption);
         setNotificationBackgroundColor(bg_color ?? "#000000");
         setNotificationTextColor(font_color ?? "#ffffff");
@@ -416,7 +427,7 @@ const Page = () => {
             let user = res.data[0];
             getAnnoucement(user);
             getLeaderboard(user);
-            // getNotification(user);
+            getNotification(user);
             // getVoting(user);
             // getMilestone(user);
             getQrCode(user);
