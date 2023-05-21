@@ -8,7 +8,7 @@ import { QRCode } from 'react-qrcode-logo';
 import { AddressContext } from '../../App';
 import axios from '../../Services/axios';
 import { useCookies } from 'react-cookie';
-import { User } from '../../types';
+import { Announcement, Leaderboard, Milestone, QrCode, User, Voting } from '../../types';
 
 const Page = () => {
     // cookies
@@ -16,6 +16,9 @@ const Page = () => {
 
     const { address } = useContext(AddressContext);
     const [ activeTab, setActiveTab ] = useState<OverlayButtonType>("announcement");
+
+    // announcement
+    const [ announcementId, setAnnouncementId ] = useState(0);
     const [ marqueeColor, setMarqueeColor ] = useState<string>("#000000");
     const [ marqueeBackgroundColor, setMarqueeBackgroundColor ] = useState<string>("#ffffff");
     const [ displayText, setDisplayText ] = useState<string>("Sample Text");
@@ -193,34 +196,144 @@ const Page = () => {
     }, []);
 
     // save button
-    const onSaveClick = useCallback(async() => {
+    const saveAnnouncement = useCallback(async() => {
+        // 'content', 'speed', 'start_at', 'end_at', 'status'
+        if(!textSpeed || !displayText || !announcementId || activeTab !== "announcement") {
+            return;
+        }
+
+        let res = await axios.post(`/announcement/update/${announcementId}`, {
+            content: displayText,
+            speed: textSpeed,
+            signature: cookies['signatures'][address],
+            bg_color: marqueeBackgroundColor,
+            font_color: marqueeColor,
+        });
+
+        if(!res.data.success) {
+            toast.success("Error saving Announcement");
+            return;
+        }
+        toast.success("Edited");
+
+    }, [activeTab, address, announcementId, textSpeed, displayText, cookies, marqueeBackgroundColor, marqueeColor]);
+
+    const saveNotification = useCallback(async() => {
+        // 'content', 'caption', 'status', 'type'
+        // triggers?
+    }, []);
+
+    const saveLeaderboard = useCallback(async() => {
+        // 'title', 'status', 'timeframe'
+    }, []);
+
+    const saveMilestone = useCallback(async() => {
+        // 'user_id', 'title', 'target', 'style_id', 'start_at', 'end_at', 'timeframe'
+    }, []);
+
+    const saveVoting = useCallback(async() => {
+        // 'user_id', 'status', 'stream_id', 'title', 'style_id', 'start_at', 'end_at'
+        // polls
+    }, []);
+
+    const saveQr = useCallback(async() => {
+        if(!qrBlob || !qrId || activeTab !== "qrcode") {
+            return;
+        }
+
+        let formData = new FormData();
+        formData.append('qr_code', qrBlob);
+        formData.append('signature', cookies['signatures'][address]);
+        let res = await axios({
+            url: `/qr/update/${qrId}`,
+            method: 'POST',
+            data: formData,
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        });
+
+        if(!res.data.success) {
+            toast.success("Error saving QR Code");
+            return;
+        }
+        toast.success("Edited");
+    }, [ activeTab, address, cookies, qrBlob, qrId]);
+
+    const onSaveClick = useCallback(() => {
         if(!address) {
             return;
         }
 
-        if(qrBlob && qrId) {
-            let formData = new FormData();
-            formData.append('qr_code', qrBlob);
-            formData.append('signature', cookies['signatures'][address]);
-            let res = await axios({
-                url: `/qr/update/${qrId}`,
-                method: 'POST',
-                data: formData,
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                }
-            });
-
-            console.log(res);
-        }
-
-        toast.success("Edited");
+        // not going to use await here
+        saveAnnouncement();
+        // saveNotification();
+        // saveLeaderboard();
+        // saveMilestone();
+        // saveVoting();
+        saveQr();
         return;
-    }, [address, qrBlob, cookies, qrId]);
+    }, [address, saveQr, saveAnnouncement, saveNotification, saveLeaderboard, saveMilestone, saveVoting]);
 
     // getUserData callbacks
+    const getAnnoucement = useCallback(async(user: User) => {
+        let res = await axios.post<Announcement[]>('/announcement/find', { user_id: user.id });
+        if(res.data.length === 0) {
+            return;
+        }
+
+        let {
+            id,
+            content,
+            speed,
+            bg_color,
+            font_color
+        } = res.data[0];
+        setAnnouncementId(id);
+        setDisplayText(!content || content.length === 0? "Sample Text" : content);
+        setTextSpeed(speed);
+        setMarqueeBackgroundColor(bg_color ?? "#000000");
+        setMarqueeColor(font_color ?? "#ffffff");
+    }, []);
+
+    const getNotification = useCallback(async(user: User) => {
+        let res = await axios.post<Notification[]>('/trigger/find', { user_id: user.id });
+        if(res.data.length === 0) {
+            return;
+        }
+
+        console.log(res.data);
+    }, []);
+
+    const getLeaderboard = useCallback(async(user: User) => {
+        let res = await axios.post<Leaderboard[]>('/leaderboard/find', { user_id: user.id });
+        if(res.data.length === 0) {
+            return;
+        }
+
+        console.log(res.data);
+    }, []);
+
+    const getMilestone = useCallback(async(user: User) => {
+        let res = await axios.post<Milestone[]>('/milestone/find', { user_id: user.id });
+        if(res.data.length === 0) {
+            return;
+        }
+
+        console.log(res.data);
+    }, []);
+
+    const getVoting = useCallback(async(user: User) => {
+        let res = await axios.post<Voting[]>('/poll/find', { user_id: user.id });
+        if(res.data.length === 0) {
+            return;
+        }
+
+        console.log(res.data);
+    }, []);
+
     const getQrCode = useCallback(async(user: User) => {
-        let qrCodeRes = await axios.post<any>('/qr/find', { user_id: user.id });
+        let qrCodeRes = await axios.post<QrCode[]>('/qr/find', { user_id: user.id });
         if(qrCodeRes.data.length === 0) {
             return;
         }
@@ -239,12 +352,18 @@ const Page = () => {
             }
 
             let user = res.data[0];
+            getAnnoucement(user);
+            // getNotification(user)
+            // getVoting(user);
+            // getLeaderboard(user);
+            // getMilestone(user);
             getQrCode(user);
         }
 
         getUserData();
-    }, [ address, getQrCode ]);
+    }, [ address, getAnnoucement, getNotification, getVoting, getLeaderboard, getMilestone, getQrCode ]);
 
+    console.log('rendering');
     return (
         <div className='overlay-page'>
             <div className="nav-container">
