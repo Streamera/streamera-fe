@@ -76,12 +76,15 @@ export interface Milestone extends ElementStyle, BasicDataDetails {
     timeframe: string;
     status: 'active' | 'inactive';
 }
+export interface VotingOptions {
+    id: number;
+    option: string;
+}
 export interface Voting extends ElementStyle, BasicDataDetails {
     title: string;
-    streamId: number; // user id?
     start_at: string;
     end_at: string;
-    timeframe: string;
+    options: VotingOptions[];
     status: 'active' | 'inactive';
 }
 export interface QrCode extends ElementStyle, BasicDataDetails {

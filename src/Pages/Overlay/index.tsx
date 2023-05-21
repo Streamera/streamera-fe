@@ -8,7 +8,7 @@ import { QRCode } from 'react-qrcode-logo';
 import { AddressContext } from '../../App';
 import axios from '../../Services/axios';
 import { useCookies } from 'react-cookie';
-import { Announcement, Leaderboard, Milestone, Notification, QrCode, User, Voting } from '../../types';
+import { Announcement, Leaderboard, Milestone, Notification, QrCode, User, Voting, VotingOptions } from '../../types';
 
 const Page = () => {
     // cookies
@@ -54,7 +54,7 @@ const Page = () => {
     const [ votingChoice, setVotingChoice ] = useState<string>("");
     const [ votingTextColor, setVotingTextColor ] = useState<string>("#000000");
     const [ votingBackgroundColor, setVotingBackgroundColor ] = useState<string>("#ffffff");
-    const [ votingChoices, setVotingChoices ] = useState<string[]>([]);
+    const [ votingChoices, setVotingChoices ] = useState<VotingOptions[]>([]);
 
     //qr code
     const [ qrId, setQrId ] = useState(0);
@@ -174,8 +174,11 @@ const Page = () => {
             return;
         }
 
-        let newChoices = cloneObj<string[]>(votingChoices);
-        newChoices.push(votingChoice);
+        let newChoices = cloneObj(votingChoices);
+        newChoices.push({
+            id: 0,
+            option: votingChoice,
+        });
 
         if(newChoices.length > 5) {
             toast.error("Max number of choices reached.");
@@ -186,8 +189,16 @@ const Page = () => {
         clearVotingChoice();
     }, [votingChoices, votingChoice, clearVotingChoice]);
 
-    const onChoiceDelete = useCallback((choice: string) => {
-        let newChoices = votingChoices.filter(x => x !== choice);
+    const onChoiceDelete = useCallback((id: number, choice: string) => {
+        let newChoices: VotingOptions[] = [];
+
+        if(id === 0) {
+            votingChoices.filter(x => x.id !== id);
+        }
+
+        else {
+            votingChoices.filter(x => x.option !== choice);
+        }
         setVotingChoices(newChoices);
     }, [votingChoices]);
 
@@ -277,12 +288,47 @@ const Page = () => {
 
     const saveMilestone = useCallback(async() => {
         // 'user_id', 'title', 'target', 'style_id', 'start_at', 'end_at', 'timeframe'
-    }, []);
+        if(!milestoneTimeframe || !milestoneId || !milestoneText || activeTab !== "milestone") {
+            return;
+        }
+
+        let res = await axios.post(`/milestone/update/${milestoneId}`, {
+            title: milestoneText,
+            timeframe: milestoneTimeframe,
+            signature: cookies['signatures'][address],
+            bg_color: milestoneBackgroundColor,
+            font_color: milestoneTextColor,
+            bar_empty_color: milestoneProgressMainColor,
+            bar_filled_color: milestoneProgressColor,
+        });
+
+        if(!res.data.success) {
+            toast.success("Error saving milestone");
+            return;
+        }
+        toast.success("Edited");
+    }, [milestoneId, milestoneBackgroundColor, milestoneProgressColor, milestoneProgressMainColor, milestoneText, milestoneTextColor, milestoneTimeframe, address, cookies, activeTab]);
 
     const saveVoting = useCallback(async() => {
-        // 'user_id', 'status', 'stream_id', 'title', 'style_id', 'start_at', 'end_at'
-        // polls
-    }, []);
+        // 'user_id', 'status', 'title', 'style_id', 'start_at', 'end_at', options
+        if(!votingText || !votingId || votingChoices.length === 0 || activeTab !== "voting") {
+            return;
+        }
+
+        let res = await axios.post(`/poll/update/${votingId}`, {
+            title: votingText,
+            signature: cookies['signatures'][address],
+            bg_color: votingBackgroundColor,
+            font_color: votingTextColor,
+            options: votingChoices,
+        });
+
+        if(!res.data.success) {
+            toast.success("Error saving polls");
+            return;
+        }
+        toast.success("Edited");
+    }, [votingText, votingChoices, votingId, address, cookies, votingBackgroundColor, votingTextColor, activeTab]);
 
     const saveQr = useCallback(async() => {
         if(!qrBlob || !qrId || activeTab !== "qrcode") {
@@ -393,7 +439,26 @@ const Page = () => {
             return;
         }
 
-        console.log(res.data);
+        let {
+            id,
+            title,
+            target,
+            start_at,
+            end_at,
+            timeframe,
+            bg_color,
+            font_color,
+            bar_filled_color,
+            bar_empty_color
+        } = res.data[0];
+        
+        setMilestoneId(id);
+        setMilestoneText(!title || title.length === 0? "Sample Text" : title);
+        setMilestoneProgressMainColor(bar_empty_color ?? "#000000");
+        setMilestoneProgressColor(bar_filled_color ?? "#ffffff");
+        setMilestoneBackgroundColor(bg_color ?? "#000000");
+        setMilestoneTextColor(font_color ?? "#ffffff");
+        setMilestoneTimeframe(timeframe as Timeframe);
     }, []);
 
     const getVoting = useCallback(async(user: User) => {
@@ -402,7 +467,21 @@ const Page = () => {
             return;
         }
 
-        console.log(res.data);
+        let {
+            id,
+            title,
+            start_at,
+            end_at,
+            bg_color,
+            font_color,
+            options,
+        } = res.data[0];
+        
+        setVotingId(id);
+        setVotingText(!title || title.length === 0? "Sample Text" : title);
+        setVotingBackgroundColor(bg_color ?? "#000000");
+        setVotingTextColor(font_color ?? "#ffffff");
+        setVotingChoices(options);
     }, []);
 
     const getQrCode = useCallback(async(user: User) => {
@@ -428,8 +507,8 @@ const Page = () => {
             getAnnoucement(user);
             getLeaderboard(user);
             getNotification(user);
-            // getVoting(user);
-            // getMilestone(user);
+            getMilestone(user);
+            getVoting(user);
             getQrCode(user);
         }
 
@@ -589,9 +668,9 @@ const Page = () => {
                                 <span style={{marginBottom: 30}}>{votingText}</span>
                                 <div className="row" style={{ width: 350 }}>
                                     {
-                                        votingChoices.map((choice) => (
+                                        votingChoices.map((x) => (
                                             <>
-                                                <div className="col-6 text-left">{choice}</div>
+                                                <div className="col-6 text-left">{x.option}</div>
                                                 <div className="col-6 text-right">$0.00</div>
                                             </>
                                         ))
@@ -619,10 +698,10 @@ const Page = () => {
                             </div>
                             <div className="choices-container">
                                 {
-                                    votingChoices.map((choice) => (
-                                        <div className="vote-choice">
-                                            <span>{choice}</span>
-                                            <button className='btn btn-sm btn-danger' onClick={() => { onChoiceDelete(choice) }}><i className="fa fa-trash"></i></button>
+                                    votingChoices.map((x, index) => (
+                                        <div className="vote-choice" key={`${x.option}|choices|${index}`}>
+                                            <span>{x.option}</span>
+                                            <button className='btn btn-sm btn-danger' onClick={() => { onChoiceDelete(x.id, x.option) }}><i className="fa fa-trash"></i></button>
                                         </div>
                                     ))
                                 }
