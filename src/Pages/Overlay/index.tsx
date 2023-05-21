@@ -8,7 +8,66 @@ import { QRCode } from 'react-qrcode-logo';
 import { AddressContext } from '../../App';
 import axios from '../../Services/axios';
 import { useCookies } from 'react-cookie';
-import { Announcement, Leaderboard, Milestone, Notification, QrCode, User, Voting, VotingOptions } from '../../types';
+import { Announcement, Leaderboard, Milestone, Notification, OverlayPosition, QrCode, User, Voting, VotingOptions } from '../../types';
+import { Select } from 'antd';
+
+const timeframeOptions = [
+    {
+        label: 'All Time',
+        value: 'all-time',
+    },
+    {
+        label: 'Monthly',
+        value: 'monthly',
+    },
+    {
+        label: 'Weekly',
+        value: 'weekly',
+    },
+    {
+        label: 'Daily',
+        value: 'daily',
+    },
+]
+
+const overlayPositionOptions = [
+    {
+        label: 'Top Left',
+        value: 'top-left',
+    },
+    {
+        label: 'Top Center',
+        value: 'top-center',
+    },
+    {
+        label: 'Top Right',
+        value: 'top-right',
+    },
+    {
+        label: 'Middle Left',
+        value: 'middle-left',
+    },
+    {
+        label: 'Middle Center',
+        value: 'middle-center',
+    },
+    {
+        label: 'Middle Right',
+        value: 'middle-right',
+    },
+    {
+        label: 'Bottom Left',
+        value: 'bottom-left',
+    },
+    {
+        label: 'Bottom Center',
+        value: 'bottom-center',
+    },
+    {
+        label: 'Bottom Right',
+        value: 'bottom-right',
+    },
+];
 
 const Page = () => {
     // cookies
@@ -23,6 +82,7 @@ const Page = () => {
     const [ marqueeBackgroundColor, setMarqueeBackgroundColor ] = useState<string>("#ffffff");
     const [ displayText, setDisplayText ] = useState<string>("Sample Text");
     const [ textSpeed, setTextSpeed ] = useState<number>(100);
+    const [ announcementPosition, setAnnouncementPosition ] = useState<OverlayPosition>("middle-center");
 
     // Notification
     const [ notificationId, setNotificationId ] = useState(0);
@@ -31,6 +91,7 @@ const Page = () => {
     const [ notificationBackgroundColor, setNotificationBackgroundColor ] = useState<string>("#ffffff");
     const [ gifFile, setGifFile ] = useState<File>();
     const [ gif, setGif ] = useState<string>("");
+    const [ notificationPosition, setNotificationPosition ] = useState<OverlayPosition>("middle-center");
 
     // Leaderboard
     const [ leaderboardId, setLeaderboardId ] = useState(0);
@@ -38,6 +99,7 @@ const Page = () => {
     const [ leaderboardTextColor, setLeaderboardTextColor ] = useState<string>("#000000");
     const [ leaderboardBackgroundColor, setLeaderboardBackgroundColor ] = useState<string>("#ffffff");
     const [ leaderboardTimeframe, setLeaderboardTimeframe ] = useState<Timeframe>("all-time");
+    const [ leaderboardPosition, setLeaderboardPosition ] = useState<OverlayPosition>("middle-center");
 
     // Milestone
     const [ milestoneId, setMilestoneId ] = useState(0);
@@ -47,6 +109,7 @@ const Page = () => {
     const [ milestoneProgressMainColor, setMilestoneProgressMainColor ] = useState<string>("#000000");
     const [ milestoneProgressColor, setMilestoneProgressColor ] = useState<string>("#ffffff");
     const [ milestoneTimeframe, setMilestoneTimeframe ] = useState<Timeframe>("all-time");
+    const [ milestonePosition, setMilestonePosition ] = useState<OverlayPosition>("middle-center");
 
     // Voting
     const [ votingId, setVotingId ] = useState(0);
@@ -55,6 +118,7 @@ const Page = () => {
     const [ votingTextColor, setVotingTextColor ] = useState<string>("#000000");
     const [ votingBackgroundColor, setVotingBackgroundColor ] = useState<string>("#ffffff");
     const [ votingChoices, setVotingChoices ] = useState<VotingOptions[]>([]);
+    const [ votingPosition, setVotingPosition ] = useState<OverlayPosition>("middle-center");
 
     //qr code
     const [ qrId, setQrId ] = useState(0);
@@ -62,6 +126,7 @@ const Page = () => {
     const [ qrBlob, setQrBlob ] = useState<Blob>();
     const [ newQrLogo, setNewQrLogo ] = useState("");
     const [ newQrLogoFile, setNewQrLogoFile ] = useState<File>();
+    const [ qrPosition, setQrPosition ] = useState<OverlayPosition>("middle-center");
     const previousAddress = useRef<string>("");
 
     // announcement
@@ -86,6 +151,10 @@ const Page = () => {
         setDisplayText(e.target.value);
     }, []);
 
+    const onAnnouncementPositionChange = useCallback((value: OverlayPosition) => {
+        setAnnouncementPosition(value);
+    }, []);
+
     // notifications
     const onNotificationTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setNotificationText(e.target.value);
@@ -97,6 +166,10 @@ const Page = () => {
 
     const onNotificationBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setNotificationBackgroundColor(e.target.value);
+    }, []);
+
+    const onNotificationPositionChange = useCallback((value: OverlayPosition) => {
+        setNotificationPosition(value);
     }, []);
 
     // leaderboard
@@ -112,8 +185,8 @@ const Page = () => {
         setLeaderboardBackgroundColor(e.target.value);
     }, []);
 
-    const onLeaderboardTimeframeChanged = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
-        setLeaderboardTimeframe(e.target.value as Timeframe);
+    const onLeaderboardTimeframeChanged = useCallback((value: Timeframe) => {
+        setLeaderboardTimeframe(value);
     }, []);
 
     const onGifValueChanged = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -121,6 +194,10 @@ const Page = () => {
             setGif(URL.createObjectURL(event.target.files[0]));
             setGifFile(event.target.files[0]);
         }
+    }, []);
+
+    const onLeaderboardPositionChange = useCallback((value: OverlayPosition) => {
+        setLeaderboardPosition(value);
     }, []);
 
     //milestone
@@ -144,8 +221,12 @@ const Page = () => {
         setMilestoneProgressColor(e.target.value);
     }, []);
 
-    const onMilestoneTimeframeChanged = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
-        setMilestoneTimeframe(e.target.value as Timeframe);
+    const onMilestoneTimeframeChanged = useCallback((value: Timeframe) => {
+        setMilestoneTimeframe(value);
+    }, []);
+
+    const onMilestonePositionChange = useCallback((value: OverlayPosition) => {
+        setMilestonePosition(value);
     }, []);
 
     //voting
@@ -167,6 +248,10 @@ const Page = () => {
 
     const onVotingBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setVotingBackgroundColor(e.target.value);
+    }, []);
+
+    const onVotingPositionChange = useCallback((value: OverlayPosition) => {
+        setVotingPosition(value);
     }, []);
 
     const onChoiceAdd = useCallback(() => {
@@ -192,12 +277,12 @@ const Page = () => {
     const onChoiceDelete = useCallback((id: number, choice: string) => {
         let newChoices: VotingOptions[] = [];
 
-        if(id === 0) {
-            votingChoices.filter(x => x.id !== id);
+        if(id !== 0) {
+            newChoices = votingChoices.filter(x => x.id !== id);
         }
 
         else {
-            votingChoices.filter(x => x.option !== choice);
+            newChoices = votingChoices.filter(x => x.option !== choice);
         }
         setVotingChoices(newChoices);
     }, [votingChoices]);
@@ -208,6 +293,10 @@ const Page = () => {
             setNewQrLogo(URL.createObjectURL(event.target.files[0]));
             setNewQrLogoFile(event.target.files[0]);
         }
+    }, []);
+
+    const onQrPositionChange = useCallback((value: OverlayPosition) => {
+        setQrPosition(value);
     }, []);
 
     // save button
@@ -223,15 +312,16 @@ const Page = () => {
             signature: cookies['signatures'][address],
             bg_color: marqueeBackgroundColor,
             font_color: marqueeColor,
+            position: announcementPosition,
         });
 
         if(!res.data.success) {
-            toast.success("Error saving Announcement");
+            toast.success("Error saving announcement");
             return;
         }
         toast.success("Edited");
 
-    }, [activeTab, address, announcementId, textSpeed, displayText, cookies, marqueeBackgroundColor, marqueeColor]);
+    }, [activeTab, address, announcementId, textSpeed, displayText, cookies, marqueeBackgroundColor, marqueeColor, announcementPosition]);
 
     const saveNotification = useCallback(async() => {
         // 'content', 'caption', 'status', 'type'
@@ -248,6 +338,7 @@ const Page = () => {
         formData.append('caption', notificationText);
         formData.append('bg_color', notificationBackgroundColor);
         formData.append('font_color', notificationTextColor);
+        formData.append('position', notificationPosition);
 
         let res = await axios({
             url: `/trigger/update/${notificationId}`,
@@ -259,11 +350,11 @@ const Page = () => {
         });
 
         if(!res.data.success) {
-            toast.success("Error saving QR Code");
+            toast.success("Error saving notification");
             return;
         }
         toast.success("Edited");
-    }, [notificationBackgroundColor, notificationTextColor, notificationId, notificationText, gifFile, address, cookies, activeTab]);
+    }, [notificationBackgroundColor, notificationTextColor, notificationId, notificationText, gifFile, address, cookies, activeTab, notificationPosition]);
 
     const saveLeaderboard = useCallback(async() => {
         // 'title', 'status', 'timeframe'
@@ -277,6 +368,7 @@ const Page = () => {
             signature: cookies['signatures'][address],
             bg_color: leaderboardBackgroundColor,
             font_color: leaderboardTextColor,
+            position: leaderboardPosition,
         });
 
         if(!res.data.success) {
@@ -284,7 +376,7 @@ const Page = () => {
             return;
         }
         toast.success("Edited");
-    }, [leaderboardBackgroundColor, leaderboardTextColor, leaderboardTimeframe, leaderboardText, leaderboardId, activeTab, cookies, address]);
+    }, [leaderboardBackgroundColor, leaderboardTextColor, leaderboardTimeframe, leaderboardText, leaderboardId, activeTab, cookies, address, leaderboardPosition]);
 
     const saveMilestone = useCallback(async() => {
         // 'user_id', 'title', 'target', 'style_id', 'start_at', 'end_at', 'timeframe'
@@ -300,6 +392,7 @@ const Page = () => {
             font_color: milestoneTextColor,
             bar_empty_color: milestoneProgressMainColor,
             bar_filled_color: milestoneProgressColor,
+            position: milestonePosition,
         });
 
         if(!res.data.success) {
@@ -307,7 +400,7 @@ const Page = () => {
             return;
         }
         toast.success("Edited");
-    }, [milestoneId, milestoneBackgroundColor, milestoneProgressColor, milestoneProgressMainColor, milestoneText, milestoneTextColor, milestoneTimeframe, address, cookies, activeTab]);
+    }, [milestoneId, milestoneBackgroundColor, milestoneProgressColor, milestoneProgressMainColor, milestoneText, milestoneTextColor, milestoneTimeframe, address, cookies, activeTab, milestonePosition]);
 
     const saveVoting = useCallback(async() => {
         // 'user_id', 'status', 'title', 'style_id', 'start_at', 'end_at', options
@@ -321,6 +414,7 @@ const Page = () => {
             bg_color: votingBackgroundColor,
             font_color: votingTextColor,
             options: votingChoices,
+            position: votingPosition,
         });
 
         if(!res.data.success) {
@@ -328,15 +422,18 @@ const Page = () => {
             return;
         }
         toast.success("Edited");
-    }, [votingText, votingChoices, votingId, address, cookies, votingBackgroundColor, votingTextColor, activeTab]);
+    }, [votingText, votingChoices, votingId, address, cookies, votingBackgroundColor, votingTextColor, activeTab, votingPosition]);
 
     const saveQr = useCallback(async() => {
-        if(!qrBlob || !qrId || activeTab !== "qrcode") {
+        if(!qrId || activeTab !== "qrcode") {
             return;
         }
 
         let formData = new FormData();
-        formData.append('qr_code', qrBlob);
+        if(qrBlob) {
+            formData.append('qr_code', qrBlob);
+        }
+        formData.append('position', qrPosition);
         formData.append('signature', cookies['signatures'][address]);
         let res = await axios({
             url: `/qr/update/${qrId}`,
@@ -352,7 +449,7 @@ const Page = () => {
             return;
         }
         toast.success("Edited");
-    }, [ activeTab, address, cookies, qrBlob, qrId]);
+    }, [ activeTab, address, cookies, qrBlob, qrId, qrPosition]);
 
     const onSaveClick = useCallback(() => {
         if(!address) {
@@ -381,14 +478,16 @@ const Page = () => {
             content,
             speed,
             bg_color,
-            font_color
+            font_color,
+            position
         } = res.data[0];
 
         setAnnouncementId(id);
         setDisplayText(!content || content.length === 0? "Sample Text" : content);
         setTextSpeed(speed);
-        setMarqueeBackgroundColor(bg_color ?? "#000000");
-        setMarqueeColor(font_color ?? "#ffffff");
+        setMarqueeBackgroundColor(bg_color? bg_color : "#000000");
+        setMarqueeColor(font_color? font_color: "#ffffff");
+        setAnnouncementPosition(position ?? 'middle-center');
     }, []);
 
     const getNotification = useCallback(async(user: User) => {
@@ -402,14 +501,16 @@ const Page = () => {
             content,
             caption,
             bg_color,
-            font_color
+            font_color,
+            position
         } = res.data[0];
         
         setNotificationId(id);
         setNotificationText(!caption || caption.length === 0? "Sample Text" : caption);
-        setNotificationBackgroundColor(bg_color ?? "#000000");
-        setNotificationTextColor(font_color ?? "#ffffff");
+        setNotificationBackgroundColor(bg_color? bg_color : "#000000");
+        setNotificationTextColor(font_color? font_color: "#ffffff");
         setGif(content);
+        setNotificationPosition(position ?? 'middle-center');
     }, []);
 
     const getLeaderboard = useCallback(async(user: User) => {
@@ -423,14 +524,16 @@ const Page = () => {
             title,
             timeframe,
             bg_color,
-            font_color
+            font_color,
+            position
         } = res.data[0];
         
         setLeaderboardId(id);
         setLeaderboardText(!title || title.length === 0? "Sample Text" : title);
-        setLeaderboardTextColor(bg_color ?? "#000000");
-        setLeaderboardBackgroundColor(font_color ?? "#ffffff");
+        setLeaderboardTextColor(bg_color? bg_color : "#000000");
+        setLeaderboardBackgroundColor(font_color? font_color: "#ffffff");
         setLeaderboardTimeframe(timeframe as Timeframe);
+        setLeaderboardPosition(position ?? 'middle-center');
     }, []);
 
     const getMilestone = useCallback(async(user: User) => {
@@ -449,16 +552,18 @@ const Page = () => {
             bg_color,
             font_color,
             bar_filled_color,
-            bar_empty_color
+            bar_empty_color,
+            position
         } = res.data[0];
         
         setMilestoneId(id);
         setMilestoneText(!title || title.length === 0? "Sample Text" : title);
-        setMilestoneProgressMainColor(bar_empty_color ?? "#000000");
-        setMilestoneProgressColor(bar_filled_color ?? "#ffffff");
-        setMilestoneBackgroundColor(bg_color ?? "#000000");
-        setMilestoneTextColor(font_color ?? "#ffffff");
+        setMilestoneProgressMainColor(bar_empty_color? bar_empty_color: "#ffffff");
+        setMilestoneProgressColor(bar_filled_color? bar_filled_color: "#ffffff");
+        setMilestoneBackgroundColor(bg_color? bg_color : "#000000");
+        setMilestoneTextColor(font_color? font_color: "#ffffff");
         setMilestoneTimeframe(timeframe as Timeframe);
+        setMilestonePosition(position ?? 'middle-center');
     }, []);
 
     const getVoting = useCallback(async(user: User) => {
@@ -475,13 +580,15 @@ const Page = () => {
             bg_color,
             font_color,
             options,
+            position,
         } = res.data[0];
         
         setVotingId(id);
         setVotingText(!title || title.length === 0? "Sample Text" : title);
-        setVotingBackgroundColor(bg_color ?? "#000000");
-        setVotingTextColor(font_color ?? "#ffffff");
+        setVotingBackgroundColor(bg_color? bg_color : "#000000");
+        setVotingTextColor(font_color? font_color: "#ffffff");
         setVotingChoices(options);
+        setVotingPosition(position ?? 'middle-center');
     }, []);
 
     const getQrCode = useCallback(async(user: User) => {
@@ -492,6 +599,7 @@ const Page = () => {
 
         setQrUrl(qrCodeRes.data[0].qr);
         setQrId(qrCodeRes.data[0].id);
+        setQrPosition(qrCodeRes.data[0].position ?? 'middle-center');
     }, []);
 
     // useEffects
@@ -555,10 +663,21 @@ const Page = () => {
                             <strong className='ml-5 mr-2'>Text Speed</strong>
                             <input type="decimal" step={1} className='form-control' style={{ maxWidth: 100 }} value={textSpeed} onChange={onTextSpeedChange}/>
                         </div>
+
                         <div className="d-flex flex-column mt-4 align-items-start w-100">
                             <strong>Display Text</strong>
-                            <input type="text" className='form-control mt-1' value={displayText} onChange={onDisplayTextchange}/>
+                            <input type="text" className='form-control mt-1' value={displayText} style={{ maxWidth: 500 }} onChange={onDisplayTextchange}/>
                         </div>
+
+                        <strong className='mt-4'>Position</strong>
+                        <Select
+                            className='w-100 text-left'
+                            style={{ maxWidth: 500 }}
+                            options={overlayPositionOptions}
+                            onChange={value => { onAnnouncementPositionChange(value); }}
+                            value={announcementPosition}
+                        >
+                        </Select>
                     </>
                 }
                 { /** Notification */}
@@ -583,8 +702,19 @@ const Page = () => {
                             </div>
                             <strong className='mt-3'>GIF</strong>
                             <input type="file" accept='image/gif' onChange={onGifValueChanged}/>
+
                             <strong className='mt-3'>Notification Text</strong>
                             <input type="text" className='form-control' style={{ maxWidth: 500 }} value={notificationText} onChange={onNotificationTextChange}/>
+
+                            <strong className='mt-4'>Position</strong>
+                            <Select
+                                className='w-100 text-left'
+                                style={{ maxWidth: 500 }}
+                                options={overlayPositionOptions}
+                                onChange={value => { onNotificationPositionChange(value); }}
+                                value={notificationPosition}
+                            >
+                            </Select>
                         </div>
                     </>
                 }
@@ -614,13 +744,26 @@ const Page = () => {
                             </div>
                             <strong className='mt-3'>Text</strong>
                             <input type="text" className='form-control' style={{ maxWidth: 500 }} value={leaderboardText} onChange={onLeaderboardTextChange}/>
+
                             <strong className='mt-3'>Timeframe</strong>
-                            <select className='form-control' style={{ maxWidth: 500 }} value={leaderboardTimeframe} onChange={onLeaderboardTimeframeChanged}>
-                                <option value="all-time">All Time</option>
-                                <option value="monthly">Monthly</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="daily">Daily</option>
-                            </select>
+                            <Select
+                                className='w-100 text-left'
+                                style={{ maxWidth: 500 }}
+                                options={timeframeOptions}
+                                onChange={value => { onLeaderboardTimeframeChanged(value); }}
+                                value={leaderboardTimeframe}
+                            >
+                            </Select>
+
+                            <strong className='mt-4'>Position</strong>
+                            <Select
+                                className='w-100 text-left'
+                                style={{ maxWidth: 500 }}
+                                options={overlayPositionOptions}
+                                onChange={value => { onLeaderboardPositionChange(value); }}
+                                value={leaderboardPosition}
+                            >
+                            </Select>
                         </div>
                     </>
                 }
@@ -650,12 +793,24 @@ const Page = () => {
                             <strong className='mt-3'>Text</strong>
                             <input type="text" className='form-control' style={{ maxWidth: 500 }} value={milestoneText} onChange={onMilestoneTextChange}/>
                             <strong className='mt-3'>Timeframe</strong>
-                            <select className='form-control' style={{ maxWidth: 500 }} value={milestoneTimeframe} onChange={onMilestoneTimeframeChanged}>
-                                <option value="all-time">All Time</option>
-                                <option value="monthly">Monthly</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="daily">Daily</option>
-                            </select>
+                            <Select
+                                className='w-100 text-left'
+                                style={{ maxWidth: 500 }}
+                                options={timeframeOptions}
+                                onChange={value => { onMilestoneTimeframeChanged(value); }}
+                                value={leaderboardTimeframe}
+                            >
+                            </Select>
+
+                            <strong className='mt-4'>Position</strong>
+                            <Select
+                                className='w-100 text-left'
+                                style={{ maxWidth: 500 }}
+                                options={overlayPositionOptions}
+                                onChange={value => { onMilestonePositionChange(value); }}
+                                value={milestonePosition}
+                            >
+                            </Select>
                         </div>
                     </>
                 }
@@ -706,6 +861,16 @@ const Page = () => {
                                     ))
                                 }
                             </div>
+
+                            <strong className='mt-4'>Position</strong>
+                            <Select
+                                className='w-100 text-left'
+                                style={{ maxWidth: 500 }}
+                                options={overlayPositionOptions}
+                                onChange={value => { onVotingPositionChange(value); }}
+                                value={votingPosition}
+                            >
+                            </Select>
                         </div>
                     </>
                 }
@@ -745,6 +910,16 @@ const Page = () => {
                         }
                         <strong>Change Logo</strong>
                         <input type="file" onChange={onQrCodeLogoChanged} accept='image/jpeg, image/png'></input>
+
+                        <strong className='mt-4'>Position</strong>
+                        <Select
+                            className='w-100 text-left'
+                            style={{ maxWidth: 500 }}
+                            options={overlayPositionOptions}
+                            onChange={value => { onQrPositionChange(value); }}
+                            value={qrPosition}
+                        >
+                        </Select>
                     </>
                 }
                 <div className="button-container">
