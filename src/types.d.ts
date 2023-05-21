@@ -43,12 +43,48 @@ export interface ElementStyle {
     position?: OverlayPosition;
 }
 
-export interface Timestamps {
+export interface BasicDataDetails {
+    id: number;
     created_at: string;
     updated_at: string | null;
     deleted_at: string | null;
 }
-export interface QrCode extends ElementStyle, Timestamps {
+
+export interface Announcement extends ElementStyle, BasicDataDetails {
+    content: string;
+    speed: number;
+    start_at: string;
+    end_at: string;
+    status: 'active' | 'inactive';
+}
+export interface Notification extends ElementStyle, BasicDataDetails {
+    content: string;
+    caption: string;
+    type: string;
+    status: 'active' | 'inactive';
+}
+export interface Leaderboard extends ElementStyle, BasicDataDetails {
+    title: string;
+    timeframe: string;
+    status: 'active' | 'inactive';
+}
+export interface Milestone extends ElementStyle, BasicDataDetails {
+    title: string;
+    target: string;
+    start_at: string;
+    end_at: string;
+    timeframe: string;
+    status: 'active' | 'inactive';
+}
+export interface Voting extends ElementStyle, BasicDataDetails {
+    title: string;
+    streamId: number; // user id?
+    start_at: string;
+    end_at: string;
+    timeframe: string;
+    status: 'active' | 'inactive';
+}
+export interface QrCode extends ElementStyle, BasicDataDetails {
     qr: string;
     status: 'active' | 'inactive';
 }
