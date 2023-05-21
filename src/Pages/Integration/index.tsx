@@ -51,6 +51,21 @@ const Page = () => {
         toast.success("Edited");
     }, [ webhook, cookies, address ]);
 
+    const onTest = useCallback(async() => {
+        try {
+            if(!webhook?.id) {
+                toast.error("Missing webhook!");
+                return;
+            }
+            await axios.post(`/webhooks/test/${webhook.id}`);
+            toast.success("Command sent!");
+        }
+
+        catch {
+            toast.error("Error reaching webhook");
+        }
+    }, [ webhook ]);
+
     const onValueChanged = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         let cloned = cloneObj(webhook);
         if(!cloned) {
@@ -111,7 +126,7 @@ const Page = () => {
                         <span style={{fontSize: 10}}>{'{{amount}} and {{donator}} will be replaced with actual amount and donator'}</span>
                         <div className="button-container">
                             <button className='save' onClick={onSave}>Save</button>
-                            <button className='test'>Test Notification</button>
+                            <button className='test' onClick={onTest}>Test Notification</button>
                         </div>
                     </>
                 }
@@ -128,7 +143,7 @@ const Page = () => {
                         <span style={{fontSize: 10}}>{'{{amount}} and {{donator}} will be replaced with actual amount and donator'}</span>
                         <div className="button-container">
                             <button className='save' onClick={onSave}>Save</button>
-                            <button className='test'>Test Notification</button>
+                            <button className='test' onClick={onTest}>Test Notification</button>
                         </div>
                     </>
                 }
