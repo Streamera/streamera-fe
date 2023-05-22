@@ -10,6 +10,7 @@ import _ from 'lodash';
 import Marquee from 'react-fast-marquee';
 import { componentProperty } from '../Studio/types';
 import { QRCode } from 'react-qrcode-logo';
+import { Progress } from 'antd';
 
 const Page = () => {
     const socketRef = useRef<Socket>();
@@ -276,9 +277,12 @@ const Page = () => {
         <div className="milestone" style={positionState.milestone}>
             <div className='content' style={styleState.milestone}>
                     <span style={{marginBottom: 10}}>{propertyState.milestone.title}</span>
-                    <div className="progress-container" style={{ backgroundColor: propertyState.milestone.bar_empty_color }}>
-                        <div className="progress" style={{ backgroundColor: propertyState.milestone.bar_filled_color }}></div>
-                    </div>
+                    <Progress
+                        percent={propertyState.milestone.percent}
+                        trailColor={propertyState.milestone.bar_empty_color}
+                        strokeColor={propertyState.milestone.bar_filled_color}
+                        showInfo={false}
+                    />
                     <span>{propertyState.milestone.profit} / {propertyState.milestone.target}</span>
             </div>
         </div>
