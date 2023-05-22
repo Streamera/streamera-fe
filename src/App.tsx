@@ -84,6 +84,7 @@ function App() {
 
     //mutable chain id cause dont wanna set into infinite loop
     let currentChain = useRef("");
+    
 
 	// chain event handlers
     const handleNewAccount = useCallback(async (address: string) => {
@@ -96,6 +97,11 @@ function App() {
         }
 
         if(!cookies) {
+            navigate("/");
+            return;
+        }
+
+        if(!address) {
             navigate("/");
             return;
         }
@@ -214,13 +220,6 @@ function App() {
         } else {
             setShouldRenderHeader(true);
             setShouldRenderFooter(true);
-        }
-
-        // navigate back to landing or home if the user is not verified
-        // probably need some fix here for studio page?
-        if(!isVerified && currentPath !== '/studio/:streamerAddress') {
-            navigate('/');
-            return;
         }
     }, [currentPath, navigate, isVerified]);
 

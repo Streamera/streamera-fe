@@ -939,7 +939,7 @@ const Page = () => {
                     <>
                         <div className="video-frame center">
                             <div className="voting-container" style={{ color: votingTextColor, backgroundColor: votingBackgroundColor, }}>
-                                <span style={{marginBottom: 30}}>{votingText}</span>
+                                <span>{votingText}</span>
                                 <div className="row" style={{ width: 350 }}>
                                     {
                                         votingChoices.map((x, index) => (
@@ -950,8 +950,8 @@ const Page = () => {
                                         ))
                                     }
                                 </div>
-                                <div className="row mt-5">
-                                    <div className="col-6 text-left">Ends: here</div>
+                                <div className="row">
+                                    <div className="col-6 d-flex align-items-end justify-content-start">{dayjs(votingEndAt).format('YYYY-MM-DD HH:mm:ss')}</div>
                                     <div className="col-6 text-right">Total: $99.99</div>
                                 </div>
                             </div>
@@ -1012,7 +1012,7 @@ const Page = () => {
                             /* display backend file if not editing */
                             qrUrl &&
                             !newQrLogoFile &&
-                            <img src={qrUrl} alt="qrCode"/>
+                            <img src={qrUrl} alt="qrCode" className='qr'/>
                         }
 
                         {
