@@ -8,11 +8,13 @@ import { StartStudioParams } from './types';
 import { io, Socket } from 'socket.io-client';
 import _ from 'lodash';
 import Marquee from 'react-fast-marquee';
-import { componentProperty } from '../Overlay/types';
+import { componentProperty } from '../Studio/types';
+import { QRCode } from 'react-qrcode-logo';
 
 const Page = () => {
     const socketRef = useRef<Socket>();
     const { streamerAddress } = useParams();
+    const previousAddress = useRef<string>(""); // is this necessary?
 
     // component theme (class)
     const [ themeState, setThemeState ] = useState({
@@ -240,7 +242,27 @@ const Page = () => {
 
     const QR = () => (
         <div className="qr" style={positionState.qr}>
-            <div className='content' style={styleState.qr}>qr code</div>
+            {/* <div className='content' style={styleState.qr}>
+                <QRCode
+                    value={`https://metamask.app.link/dapp/localhost:3000/pay/${streamerAddress}`}
+                    logoImage={newQrLogo}
+                    logoHeight={50}
+                    logoWidth={50}
+                    id="qr-code"
+                    logoOnLoad={() => {
+                        const canvas: any = document.getElementById("qr-code");
+                        if (canvas) {
+                            canvas.toBlob((blob: Blob) => {
+                                if (streamerAddress === previousAddress.current) {
+                                    return;
+                                }
+                                previousAddress.current = streamerAddress!;
+                                setQrBlob(blob);
+                            });
+                        }
+                    } }
+                    enableCORS />
+            </div> */}
         </div>
     );
 
@@ -252,7 +274,13 @@ const Page = () => {
 
     const Milestone = () => (
         <div className="milestone" style={positionState.milestone}>
-            <div className='content' style={styleState.milestone}>milestone</div>
+            <div className='content' style={styleState.milestone}>
+                    <span style={{marginBottom: 10}}>{propertyState.milestone.title}</span>
+                    <div className="progress-container" style={{ backgroundColor: propertyState.milestone.bar_empty_color }}>
+                        <div className="progress" style={{ backgroundColor: propertyState.milestone.bar_filled_color }}></div>
+                    </div>
+                    <span>{propertyState.milestone.profit} / {propertyState.milestone.target}</span>
+            </div>
         </div>
     );
 
