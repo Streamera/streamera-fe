@@ -5,7 +5,7 @@ import './App.scss';
 import './keyframes.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
-import { Home, Payment, Landing, Profile, Integration, Overlay } from './Pages';
+import { Home, Payment, Landing, Profile, Integration, Overlay, Studio } from './Pages';
 //import { Button } from 'react-bootstrap';
 import { ellipsizeThis } from './common/utils';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
@@ -53,6 +53,7 @@ const routes = [
     { path: '/overlay' },
     { path: '/landing' },
     { path: '/pay/:streamerAddress' },
+    { path: '/studio/:streamerAddress' },
 ];
 
 function App() {
@@ -68,6 +69,7 @@ function App() {
     const [chainName, setChainName] = useState('');
     // const [isMobile, setIsMobile] = useState(false);
     const [shouldRenderHeader, setShouldRenderHeader] = useState(true);
+    const [shouldRenderFooter, setShouldRenderFooter] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
 
     //header will be hidden too
@@ -206,10 +208,17 @@ function App() {
             // no random pages
             navigate('/');
             return;
+        } else if (currentPath === '/studio/:streamerAddress') {
+            setShouldRenderHeader(false);
+            setShouldRenderFooter(false);
+        } else {
+            setShouldRenderHeader(true);
+            setShouldRenderFooter(true);
         }
 
         // navigate back to landing or home if the user is not verified
-        if(!isVerified) {
+        // probably need some fix here for studio page?
+        if(!isVerified && currentPath !== '/studio/:streamerAddress') {
             navigate('/');
             return;
         }
@@ -290,7 +299,7 @@ function App() {
                     supportedTokens,
                 }}
             >
-                <AddressContext.Provider 
+                <AddressContext.Provider
                     value={{
                         address,
                         chainId,
@@ -301,7 +310,6 @@ function App() {
                     {
                         isLoading &&
                         <div className="d-flex align-items-center justify-content-center" style={{ height: '100vh', width: '100vw' }}>
-                            
                         </div>
                     }
                     {
@@ -313,12 +321,13 @@ function App() {
                             <Route path="/integration" element={<Integration />}></Route>
                             <Route path="/overlay" element={<Overlay />}></Route>
                             <Route path="/pay/:streamerAddress" element={<Payment shouldHide={shouldShowSwitcher}/>}></Route>
+                            <Route path="/studio/:streamerAddress" element={<Studio  />}></Route>
                         </Routes>
                     }
                 </AddressContext.Provider>
             </SquidContext.Provider>
 
-			<footer>
+			<footer className={!shouldRenderFooter ? 'd-none' : 'd-flex'}>
                 <span>
 				    Made with ❤️ by the Streamera Team.
                 </span>
