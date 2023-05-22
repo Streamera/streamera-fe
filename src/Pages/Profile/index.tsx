@@ -14,7 +14,7 @@ const Page = () => {
     const [pfpFile, setPfpFile] = useState<File>();
     const [pfp, setPfp] = useState<string>("");
     const [cookies] = useCookies(['signatures']);
-    
+
     //inputs
     const [userDetails, setUserDetails] = useState<UserDetails>({
         id: 0,
@@ -29,6 +29,7 @@ const Page = () => {
         twitch: "",
         tiktok: "",
         youtube: "",
+        quick_amount: []
     });
 
     // for display purposes only
@@ -55,7 +56,7 @@ const Page = () => {
         }
     }, []);
 
-    const onUserDetailsChanged = useCallback((value: string, param: UserDetailsKeys) => {
+    const onUserDetailsChanged = useCallback((value: string, param: UserDetailsKeys, index: number | null = null) => {
         let cloned = cloneObj(userDetails);
         if(!cloned) {
             // not cloned
@@ -67,7 +68,13 @@ const Page = () => {
             return;
         }
 
-        cloned[param] = value;
+        if (param === 'quick_amount' && index !== undefined) {
+            cloned[param][index!] = Number(value);
+        } else {
+            cloned[param] = value as string & number[];
+        }
+
+        console.log(cloned);
 
         if(param === "to_chain") {
             let supportedToken = supportedTokens[value][0]?.address ?? "";
@@ -78,7 +85,7 @@ const Page = () => {
 
     useEffect(() => {
         const getUser = async() => {
-            let res = await axios.post<User[]>('/user/find', { wallet: address });
+            let res = await axios.post<User[]>('/user/find', { wallet: address.toLowerCase() });
             if(!res.data[0]) {
                 return;
             }
@@ -100,7 +107,7 @@ const Page = () => {
             userDetails.instagram = userDetails.instagram ?? "";
 
             setUserDetails(userDetails);
-            
+
             if(userDetails.profile_picture) {
                 setPfp(userDetails.profile_picture);
             }
@@ -118,7 +125,7 @@ const Page = () => {
 
         let symbol = supportedTokens[userDetails.to_chain.toString()].filter(x => x.address === userDetails.to_token_address)[0]?.symbol ?? "";
         setToTokenSymbol(symbol);
-        
+
         let chainName = supportedChains.filter(x => x.chainId.toString() === userDetails.to_chain)[0]?.name ?? "";
         setToChainName(chainName);
     }, [userDetails.to_token_address, userDetails.to_chain, supportedTokens, supportedChains]);
@@ -145,11 +152,11 @@ const Page = () => {
             toast.error('Missing token');
             return;
         }
-        
+
         let omitted = _(userDetails).omitBy(_.isEmpty).omit("id").value();
 
         let formData = new FormData();
-        for(const [key, value] of Object.entries(omitted)) {
+        for(let [key, value] of Object.entries(omitted)) {
 
             if(key === "profile_picture") {
                 continue;
@@ -160,7 +167,11 @@ const Page = () => {
                 continue;
             }
 
-            formData.append(key, value);
+            if(key === "quick_amount") {
+                value = JSON.stringify(value);
+            }
+
+            formData.append(key, value as string | Blob);
         }
 
         formData.append('address', address);
@@ -242,6 +253,7 @@ const Page = () => {
                         <input type="text" className="form-control" placeholder="Youtube" value={userDetails.youtube} onChange={(e) => onUserDetailsChanged(e.target.value, "youtube")}/>
                     </div>
                 </div>
+
                 <div className="col-sm-12 col-md-5">
                     <strong>Donation Settings</strong>
                     <div className="input-group">
@@ -290,11 +302,36 @@ const Page = () => {
                         >
                         </Select>
                     </div>
+                    <div className="input-group">
+                        <div className="input-group-prepend">
+                            <div className="input-group-text">Token</div>
+                        </div>
+                        <Select
+                            style={{ flex: 1, textAlign: 'left' }}
+                            options={supportedTokens[userDetails.to_chain]?.map(x => {
+                                return {
+                                    label: x.symbol,
+                                    value: x.address,
+                                }
+                            })}
+                            onChange={value => { onUserDetailsChanged(value, 'to_token_address'); }}
+                            value={toTokenSymbol}
+                        >
+                        </Select>
+                    </div>
+                    <strong>Quick Amount</strong>
+                    <div className="input-group">
+                        <input defaultValue="3.00" type="number" min={0.01} step={0.01} className="form-control" placeholder="3.00" value={userDetails.quick_amount?.[0]} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 0)}/>
+                        <input defaultValue="10.00" type="number" min={0.01} step={0.01} className="form-control" placeholder="10.00" value={userDetails.quick_amount?.[1]} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 1)}/>
+                        <input defaultValue="25.00" type="number" min={0.01} step={0.01} className="form-control" placeholder="25.00" value={userDetails.quick_amount?.[2]} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 2)}/>
+                        <input defaultValue="50.00" type="number" min={0.01} step={0.01} className="form-control" placeholder="50.00" value={userDetails.quick_amount?.[3]} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 3)}/>
+                    </div>
+
                     <div className="button-container">
-                        <button 
-                            className='save' 
-                            onClick={onSaveClick} 
-                            disabled={!address} 
+                        <button
+                            className='save'
+                            onClick={onSaveClick}
+                            disabled={!address}
                             style={{cursor: address? 'pointer' : 'no-drop'}}
                         >
                             {address? 'Save' : 'Connect to Continue'}

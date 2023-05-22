@@ -11,6 +11,7 @@ export type UserDetails = {
     twitch?: string;
     tiktok?: string;
     youtube?: string;
+    quick_amount: number[];
 }
 
 export type UserDetailsKeys = keyof UserDetails;
