@@ -58,8 +58,8 @@ export function ellipsizeThis(x: string, leftCharLength: number, rightCharLength
  * Returns the new object that has no reference to the old object to avoid mutations.
  * @param obj
  */
-export const cloneObj = <T = any>(obj: {[key: string]: any}) => {
-    return JSON.parse(JSON.stringify(obj)) as T;
+export const cloneObj = <T>(obj: T): T => {
+    return JSON.parse(JSON.stringify(obj));
 }
 
 /**
@@ -118,6 +118,10 @@ export const getBaseUrl = () => {
 
 export const getWsUrl = () => {
     return process.env.REACT_APP_WS_URL!;
+}
+
+export const getSignaturePassword = () => {
+    return process.env.REACT_APP_SIGNATURE_PASSWORD!;
 }
 
 export const copyToClipboard = async (text: string) => {

@@ -120,10 +120,11 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                 <InputNumber defaultValue={0.01} onChange={(value) => { onFromAmountChange(value) }}></InputNumber>
                 <Select
                     className='token-select'
-                    options={Object.entries(supportedTokens).map(([chainName, tokens]) => {
+                    options={Object.entries(supportedTokens).map(([chainId, tokens]) => {
+                        let chainName = supportedChains.filter(x => x.chainId === chainId)[0];
                         let options = tokens.map(x => ({
-                            label: x.name,
-                            value: chainName + "|" + x.address,
+                            label: chainName,
+                            value: chainId + "|" + x.address,
                         }));
 
                         return ({
