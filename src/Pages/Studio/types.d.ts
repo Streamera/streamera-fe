@@ -19,7 +19,7 @@ export type pollProp = {
     title?: string;
     options?: {
         option: string;
-        poll_amount: number;
+        total: number;
     }[];
     total?: number;
     end_at?: string;

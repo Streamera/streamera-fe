@@ -262,7 +262,7 @@ const Page = () => {
                         propertyState.poll.options.map((x, index) => (
                             <div className={'row'} key={`poll-option-${index}-${propertyState.poll.title}`}>
                                 <div className="col-6 text-left">{x.option}</div>
-                                <div className="col-6 text-right">${x.poll_amount.toFixed(2)}</div>
+                                <div className="col-6 text-right">${x.total.toFixed(2)}</div>
                             </div>
                         ))
                     }
