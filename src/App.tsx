@@ -96,6 +96,10 @@ function App() {
             return;
         }
 
+        if(currentPath === '/studio/:streamerAddress') {
+            return;
+        }
+
         if(!cookies) {
             navigate("/");
             return;
@@ -145,8 +149,7 @@ function App() {
     }, []);
 
     const onFinishLoading = useCallback(() => {
-		// setIsLoading(false);
-        // do nothing
+		setIsLoading(false);
     }, []);
 
     // effects
@@ -212,6 +215,7 @@ function App() {
     useEffect(() => {
         if(!currentPath) {
             // no random pages
+            console.log('going back to /')
             navigate('/');
             return;
         } else if (currentPath === '/studio/:streamerAddress') {
@@ -233,6 +237,8 @@ function App() {
             </div>
         )
     } */
+    console.log(currentPath)
+    console.log(isLoading);
 
 	return (
 		<div className="App">

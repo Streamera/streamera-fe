@@ -58,7 +58,10 @@ const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChain
                 if(!window.ethereum || !window.ethereum.isConnected()) {
                     window.ethereum!
                         .request({ method: 'eth_requestAccounts' })
-                        .then((newAccounts: any) => { setAccounts(newAccounts); setIsLoading(false); })
+                        .then((newAccounts: any) => { 
+                            setAccounts(newAccounts); 
+                            setIsLoading(false); 
+                        })
                         .catch(() => { setIsLoading(false); });
                     return;
                 }
