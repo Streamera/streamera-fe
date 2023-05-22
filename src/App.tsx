@@ -217,7 +217,8 @@ function App() {
         }
 
         // navigate back to landing or home if the user is not verified
-        if(!isVerified) {
+        // probably need some fix here for studio page?
+        if(!isVerified && currentPath !== '/studio/:streamerAddress') {
             navigate('/');
             return;
         }

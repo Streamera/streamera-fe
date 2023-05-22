@@ -463,6 +463,10 @@ const Page = () => {
     }, [milestoneStatus, milestoneId, milestoneBackgroundColor, milestoneProgressColor, milestoneProgressMainColor, milestoneText, milestoneTextColor, milestoneTimeframe, address, cookies, activeTab, milestonePosition, milestoneEndAt, milestoneStartAt, milestoneTarget]);
 
     const saveVoting = useCallback(async() => {
+        if (votingChoices.length === 0) {
+            toast.error("Add at least 1 voting choice");
+        }
+
         // 'user_id', 'status', 'title', 'style_id', 'start_at', 'end_at', options
         if(!votingText || !votingId || votingChoices.length === 0 || activeTab !== "voting") {
             return;
@@ -571,7 +575,7 @@ const Page = () => {
             position,
             status,
         } = res.data[0];
-        
+
         setNotificationId(id);
         setNotificationText(!caption || caption.length === 0? "Sample Text" : caption);
         setNotificationBackgroundColor(bg_color? bg_color : "#000000");
@@ -596,7 +600,7 @@ const Page = () => {
             position,
             status,
         } = res.data[0];
-        
+
         setLeaderboardId(id);
         setLeaderboardText(!title || title.length === 0? "Sample Text" : title);
         setLeaderboardTextColor(bg_color? bg_color : "#000000");
@@ -626,7 +630,7 @@ const Page = () => {
             position,
             status,
         } = res.data[0];
-        
+
         setMilestoneId(id);
         setMilestoneText(!title || title.length === 0? "Sample Text" : title);
         setMilestoneProgressMainColor(bar_empty_color? bar_empty_color: "#ffffff");
@@ -658,7 +662,7 @@ const Page = () => {
             position,
             status,
         } = res.data[0];
-        
+
         setVotingId(id);
         setVotingText(!title || title.length === 0? "Sample Text" : title);
         setVotingBackgroundColor(bg_color? bg_color : "#000000");
@@ -721,7 +725,7 @@ const Page = () => {
                 <button className={activeTab === 'voting'? 'active' : ''} onClick={() => setActiveTab('voting')}>Voting</button>
                 <button className={activeTab === 'qrcode'? 'active' : ''} onClick={() => setActiveTab('qrcode')}>QR Code</button>
             </div>
-            
+
             <div className="main-content">
                 <strong>{activeTab.charAt(0).toUpperCase() + activeTab.substring(1, activeTab.length)}</strong>
                 { /** Announcement */}
@@ -884,7 +888,7 @@ const Page = () => {
                         <Switch onChange={onMilestoneActiveChange} checked={milestoneStatus === "active"}></Switch>
 
                         <div className="d-flex flex-column align-items-start mt-3 w-100">
-                            
+
                             <div className="d-flex align-items-center mt-3 w-100">
                                 <strong className='mr-2'>Color</strong>
                                 <input type="color" value={milestoneTextColor} onChange={onMilestoneTextColorChange}/>
@@ -896,17 +900,17 @@ const Page = () => {
                                 <input type="color" value={milestoneProgressColor} onChange={onMilestoneProgressColorChange}/>
                             </div>
                             <strong className='mt-3'>Date Range</strong>
-                            <RangePicker 
-                                showTime 
+                            <RangePicker
+                                showTime
                                 value={[dayjs(milestoneStartAt), dayjs(milestoneEndAt)]}
                                 onCalendarChange={onMilestoneDateRangeChange}
                             />
                             <strong className='mt-3'>Text</strong>
                             <input type="text" className='form-control' style={{ maxWidth: 500 }} value={milestoneText} onChange={onMilestoneTextChange}/>
-                            
+
                             <strong className='mt-3'>Target</strong>
                             <input type="decimal" step={0.01} className='form-control' style={{ maxWidth: 500 }} value={milestoneTarget} onChange={onMilestoneTargetChange}/>
-                            
+
                             <strong className='mt-3'>Timeframe</strong>
                             <Select
                                 className='w-100 text-left'
@@ -964,8 +968,8 @@ const Page = () => {
                                 <input type="color" value={votingBackgroundColor} onChange={onVotingBackgroundColorChange}/>
                             </div>
                             <strong className='mt-3'>Date Range</strong>
-                            <RangePicker 
-                                showTime 
+                            <RangePicker
+                                showTime
                                 value={[dayjs(votingStartAt), dayjs(votingEndAt)]}
                                 onCalendarChange={onVotingDateRangeChange}
                             />
@@ -1014,7 +1018,7 @@ const Page = () => {
                         {
                             /** editing */
                             newQrLogoFile &&
-                            <QRCode 
+                            <QRCode
                                 value={`https://metamask.app.link/dapp/localhost:3000/pay/${address}`}
                                 logoImage={newQrLogo}
                                 logoHeight={50}
@@ -1038,7 +1042,7 @@ const Page = () => {
 
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onQrActiveChange} checked={qrStatus === "active"}></Switch>
-                        
+
                         <strong className='mt-4'>Change Logo</strong>
                         <input type="file" onChange={onQrCodeLogoChanged} accept='image/jpeg, image/png'></input>
 
@@ -1054,10 +1058,10 @@ const Page = () => {
                     </>
                 }
                 <div className="button-container">
-                    <button 
-                        className='save' 
-                        onClick={onSaveClick} 
-                        disabled={!address} 
+                    <button
+                        className='save'
+                        onClick={onSaveClick}
+                        disabled={!address}
                         style={{cursor: address? 'pointer' : 'no-drop'}}
                     >
                         {address? 'Save' : 'Connect to Continue'}
