@@ -56,7 +56,10 @@ const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChain
         if (MetaMaskOnboarding.isMetaMaskInstalled()) {
             setTimeout(() => {
                 if(!window.ethereum || !window.ethereum.isConnected()) {
-                    setIsLoading(false);
+                    window.ethereum!
+                        .request({ method: 'eth_requestAccounts' })
+                        .then((newAccounts: any) => { setAccounts(newAccounts); setIsLoading(false); })
+                        .catch(() => { setIsLoading(false); });
                     return;
                 }
                 
