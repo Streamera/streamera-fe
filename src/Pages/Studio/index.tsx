@@ -6,10 +6,11 @@ import { ellipsizeThis, getWsUrl, sleep } from '../../common/utils';
 import { toast } from 'react-toastify';
 import { StartStudioParams } from './types';
 import { io, Socket } from 'socket.io-client';
-import _ from 'lodash';
+import _, { property } from 'lodash';
 import Marquee from 'react-fast-marquee';
 import { componentProperty } from '../Studio/types';
 import { QRCode } from 'react-qrcode-logo';
+import dayjs from 'dayjs';
 
 const Page = () => {
     const socketRef = useRef<Socket>();
@@ -60,6 +61,121 @@ const Page = () => {
         trigger: {}
      });
 
+     // update component property (text, speed, etc)
+     const updateAttrib = useCallback((module: any, moduleProperty: any) => {
+         const ignoreList = ['id', 'created_at', 'updated_at', 'font_type', 'font_size', 'font_color', 'bg_color', 'bg_image', 'position'];
+ 
+         let newProperty: any = {};
+         _.map(moduleProperty, (prop: string | number, propName: string) => {
+             // only process module in whitelist
+             if (!ignoreList.includes(propName) && propName !== '') {
+                 newProperty[propName] = prop;
+             }
+         });
+ 
+         console.log(`prop`);
+         console.log(newProperty);
+         // set property
+         setPropertyState(prevState => {
+             // creating copy of prev state variable
+             let selected: any = Object.assign({}, prevState);
+             // update the name property, assign a new value
+             selected[module] = newProperty;
+             // return new object
+             return selected;
+         });
+     }, []);
+ 
+     // do not call this individually
+     // child function for updateModule
+     const updateStyles = useCallback((module: any, moduleStyles: any) => {
+         // temporary omit 'bar_empty_color', 'bar_filled_color'
+         const whitelistStyles = ['font_type', 'font_size', 'font_color', 'bg_color', 'bg_image', 'position'];
+ 
+         const styleMapping: {[key: string]: string} = {
+             'font_type': 'fontFamily',
+             'font_size': 'fontSize',
+             'font_color': 'color',
+             'bg_color': 'backgroundColor',
+             'bg_image': 'backgroundImage',
+             'position': 'position'
+         };
+ 
+         const positionMapping: {[key: string]: {justifyContent: string, alignItems: string }} = {
+             'top-left': {
+                 'justifyContent': 'flex-start',
+                 'alignItems': 'flex-start'
+             },
+             'top-center': {
+                 'justifyContent': 'center',
+                 'alignItems': 'flex-start'
+             },
+             'top-right': {
+                 'justifyContent': 'flex-end',
+                 'alignItems': 'flex-start'
+             },
+             'middle-left': {
+                 'justifyContent': 'flex-start',
+                 'alignItems': 'center'
+             },
+             'middle-center': {
+                 'justifyContent': 'center',
+                 'alignItems': 'center'
+             },
+             'middle-right': {
+                 'justifyContent': 'flex-end',
+                 'alignItems': 'center'
+             },
+             'bottom-left': {
+                 'justifyContent': 'flex-start',
+                 'alignItems': 'flex-end'
+             },
+             'bottom-center': {
+                 'justifyContent': 'center',
+                 'alignItems': 'flex-end'
+             },
+             'bottom-right': {
+                 'justifyContent': 'flex-end',
+                 'alignItems': 'flex-end'
+             }
+         };
+ 
+         let newStyle: any = {};
+         let newPosition: any = {};
+         _.map(moduleStyles, (style: string | number, styleName: string) => {
+             // only process module in whitelist
+             if (whitelistStyles.includes(styleName) && styleName !== 'position' && style !== '') {
+                 newStyle[styleMapping[styleName]] = style;
+             } else if (styleName === 'position' && style !== '') {
+                 newPosition = { ...newPosition, ...positionMapping[style] };
+             }
+         });
+ 
+         console.log(`style`);
+         console.log(newStyle);
+         // set style
+         setStyleState(prevState => {
+             // creating copy of prev state variable
+             let selected: any = Object.assign({}, prevState);
+             // update the name property, assign a new value
+             selected[module] = newStyle;
+             // return new object
+             return selected;
+         });
+ 
+         console.log(`module`);
+         console.log(newPosition);
+         // set position
+         setPositionState(prevState => {
+             // creating copy of prev state variable
+             let selected: any = Object.assign({}, prevState);
+             // update the name property, assign a new value
+             selected[module] = newPosition;
+             // return new object
+             return selected;
+         });
+     }, [])
+
     //  parent function for updateStyles
     const updateModule = useCallback((data: any) => {
         // white list module & properties
@@ -73,122 +189,7 @@ const Page = () => {
                 updateAttrib(moduleName, moduleProperty);
             }
         });
-    }, []);
-
-    // update component property (text, speed, etc)
-    const updateAttrib = useCallback((module: any, moduleProperty: any) => {
-        const ignoreList = ['id', 'created_at', 'updated_at', 'font_type', 'font_size', 'font_color', 'bg_color', 'bg_image', 'position'];
-
-        let newProperty: any = {};
-        _.map(moduleProperty, (prop: string | number, propName: string) => {
-            // only process module in whitelist
-            if (!ignoreList.includes(propName) && propName !== '') {
-                newProperty[propName] = prop;
-            }
-        });
-
-        console.log(`prop`);
-        console.log(newProperty);
-        // set property
-        setPropertyState(prevState => {
-            // creating copy of prev state variable
-            let selected: any = Object.assign({}, prevState);
-            // update the name property, assign a new value
-            selected[module] = newProperty;
-            // return new object
-            return selected;
-        });
-    }, []);
-
-    // do not call this individually
-    // child function for updateModule
-    const updateStyles = useCallback((module: any, moduleStyles: any) => {
-        // temporary omit 'bar_empty_color', 'bar_filled_color'
-        const whitelistStyles = ['font_type', 'font_size', 'font_color', 'bg_color', 'bg_image', 'position'];
-
-        const styleMapping: {[key: string]: string} = {
-            'font_type': 'fontFamily',
-            'font_size': 'fontSize',
-            'font_color': 'color',
-            'bg_color': 'backgroundColor',
-            'bg_image': 'backgroundImage',
-            'position': 'position'
-        };
-
-        const positionMapping: {[key: string]: {justifyContent: string, alignItems: string }} = {
-            'top-left': {
-                'justifyContent': 'flex-start',
-                'alignItems': 'flex-start'
-            },
-            'top-center': {
-                'justifyContent': 'center',
-                'alignItems': 'flex-start'
-            },
-            'top-right': {
-                'justifyContent': 'flex-end',
-                'alignItems': 'flex-start'
-            },
-            'middle-left': {
-                'justifyContent': 'flex-start',
-                'alignItems': 'center'
-            },
-            'middle-center': {
-                'justifyContent': 'center',
-                'alignItems': 'center'
-            },
-            'middle-right': {
-                'justifyContent': 'flex-end',
-                'alignItems': 'center'
-            },
-            'bottom-left': {
-                'justifyContent': 'flex-start',
-                'alignItems': 'flex-end'
-            },
-            'bottom-center': {
-                'justifyContent': 'center',
-                'alignItems': 'flex-end'
-            },
-            'bottom-right': {
-                'justifyContent': 'flex-end',
-                'alignItems': 'flex-end'
-            }
-        };
-
-        let newStyle: any = {};
-        let newPosition: any = {};
-        _.map(moduleStyles, (style: string | number, styleName: string) => {
-            // only process module in whitelist
-            if (whitelistStyles.includes(styleName) && styleName !== 'position' && style !== '') {
-                newStyle[styleMapping[styleName]] = style;
-            } else if (styleName == 'position' && style !== '') {
-                newPosition = { ...newPosition, ...positionMapping[style] };
-            }
-        });
-
-        console.log(`style`);
-        console.log(newStyle);
-        // set style
-        setStyleState(prevState => {
-            // creating copy of prev state variable
-            let selected: any = Object.assign({}, prevState);
-            // update the name property, assign a new value
-            selected[module] = newStyle;
-            // return new object
-            return selected;
-        });
-
-        console.log(`module`);
-        console.log(newPosition);
-        // set position
-        setPositionState(prevState => {
-            // creating copy of prev state variable
-            let selected: any = Object.assign({}, prevState);
-            // update the name property, assign a new value
-            selected[module] = newPosition;
-            // return new object
-            return selected;
-        });
-    }, [])
+    }, [ updateAttrib, updateStyles ]);
 
     useEffect(() => {
         // Create the socket connection if it doesn't exist
@@ -202,12 +203,12 @@ const Page = () => {
             });
 
             // upon disconnection
-            socketRef.current.on("disconnect", (reason) => {
+            socketRef.current.on("disconnect", (reason: any) => {
                 console.log(`disconnected due to ${reason}`);
             });
 
             // upon update
-            socketRef.current.on("update", (data) => {
+            socketRef.current.on("update", (data: any) => {
                 updateModule(data);
             });
         }
@@ -220,7 +221,7 @@ const Page = () => {
             // socketRef.current!.off(`update`);
         }
 
-    }, [streamerAddress]);
+    }, [streamerAddress, updateModule]);
 
     const Announcement = () => (
         <div className="announcement" style={positionState.announcement}>
@@ -242,33 +243,35 @@ const Page = () => {
 
     const QR = () => (
         <div className="qr" style={positionState.qr}>
-            {/* <div className='content' style={styleState.qr}>
-                <QRCode
-                    value={`https://metamask.app.link/dapp/localhost:3000/pay/${streamerAddress}`}
-                    logoImage={newQrLogo}
-                    logoHeight={50}
-                    logoWidth={50}
-                    id="qr-code"
-                    logoOnLoad={() => {
-                        const canvas: any = document.getElementById("qr-code");
-                        if (canvas) {
-                            canvas.toBlob((blob: Blob) => {
-                                if (streamerAddress === previousAddress.current) {
-                                    return;
-                                }
-                                previousAddress.current = streamerAddress!;
-                                setQrBlob(blob);
-                            });
-                        }
-                    } }
-                    enableCORS />
-            </div> */}
+            <div className='content' style={styleState.qr}>
+                <img
+                    src={propertyState.qr.qr}
+                    alt="QR Code"
+                />
+            </div>
         </div>
     );
 
     const Poll = () => (
         <div className="poll" style={positionState.poll}>
-            <div className='content' style={styleState.poll}>poll</div>
+            <div className='content' style={styleState.poll}>
+                <strong>{propertyState.poll.title ?? ""}</strong>
+                <div>
+                    {
+                        propertyState.poll.options &&
+                        propertyState.poll.options.map((x, index) => (
+                            <div className={'row'} key={`poll-option-${index}-${propertyState.poll.title}`}>
+                                <div className="col-6 text-left">{x.option}</div>
+                                <div className="col-6 text-right">${x.poll_amount.toFixed(2)}</div>
+                            </div>
+                        ))
+                    }
+                </div>
+                <div className="row">
+                    <div className="col-6 d-flex align-items-end justify-content-start" style={{ fontSize: 12 }}>{dayjs(propertyState.poll.end_at).format('YYYY-MM-DD HH:mm:ss')}</div>
+                    <div className="col-6 text-right">Total: ${propertyState.poll.total?.toFixed(2) ?? "0"}</div>
+                </div>
+            </div>
         </div>
     );
 
@@ -298,12 +301,12 @@ const Page = () => {
 
     return (
         <div className='green-screen'>
-            <Announcement></Announcement>
-            <Poll></Poll>
-            <QR></QR>
-            <Milestone></Milestone>
-            <Leaderboard></Leaderboard>
-            <Trigger></Trigger>
+            <Announcement />
+            <Poll />
+            <QR />
+            <Milestone />
+            <Leaderboard />
+            <Trigger />
         </div>
     );
 }

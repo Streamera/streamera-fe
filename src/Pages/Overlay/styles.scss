@@ -100,8 +100,15 @@
             }
 
             .voting-container {
-                padding: 15px;
+                padding: 10px;
                 border: 1px solid black;
+                height: 30vh;
+                justify-content: space-between;
+                
+                > div > div {
+                    //options
+                    font-size: 0.75em;
+                }
             }
         }
 
@@ -133,6 +140,12 @@
                     background-color: rgb(232, 225, 97);
                 }
             }
+        }
+
+        .qr,
+        #qr-code {
+            height: 20vh;
+            aspect-ratio: 1;
         }
 
         .choices-container {

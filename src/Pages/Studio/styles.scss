@@ -1,20 +1,12 @@
 .green-screen {
     position: fixed;
-    display: flex;
-    top: 0;
-    left: 0;
-    width: 100%;
-    min-height: 100vh;
-    // background-color: #04F404;
-    z-index: 100;
+    height: 100vh;
+    width: 100vw;
 
     .announcement, .qr, .poll, .milestone, .leaderboard, .trigger {
         display: flex;
         position: absolute;
-        flex: 1;
-        min-width: 100%;
-        min-height: 100vh;
-        width: 100%;
+        inset: 0;
         z-index: 101;
         padding: 10px;
     }
@@ -26,9 +18,9 @@
         .content {
             justify-content: center;
             align-items: center;
-            width: 50%;
-            height: 6%;
-            font-size: 2.5em;
+            width: 50vw;
+            padding: 2px;
+            font-size: 1rem;
             background: rgba(255, 0, 0, 0.7);
         }
     }
@@ -36,26 +28,34 @@
     .poll {
         justify-content: flex-start;
         align-items: center;
+
         .content {
-            justify-content: center;
-            align-items: center;
-            width: 10%;
-            height: 300px;
-            font-size: 2.5em;
+            border: 1px solid black;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 25vw;
+            height: 27vh;
+            font-size: 1rem;
             background: rgba(255, 221, 0, 0.7);
+            padding: 10px;
+
+            > div > div > div {
+                // options
+                font-size: 0.75em;
+            }
         }
     }
 
     .qr {
-        justify-content: flex-start;
-        align-items: flex-end;
         .content {
-            justify-content: center;
-            align-items: center;
-            width: 10%;
-            height: 200px;
-            font-size: 2.5em;
             background: rgba(255, 221, 0, 0.7);
+
+            img {
+                height: 20vh;
+                aspect-ratio: 1;
+            }
         }
     }
 
@@ -65,9 +65,9 @@
         .content {
             justify-content: center;
             align-items: center;
-            width: 50%;
+            width: 25vw;
             height: 200px;
-            font-size: 2.5em;
+            font-size: 1rem;
             background: rgba(255, 221, 0, 0.7);
         }
     }
@@ -78,9 +78,10 @@
         .content {
             justify-content: center;
             align-items: center;
-            width: 20%;
-            height: 500px;
-            font-size: 2.5em;
+            width: 25vw;
+            height: 25vh;
+            padding: 5px;
+            font-size: 1rem;
             background: rgba(255, 221, 0, 0.7);
         }
     }
@@ -93,7 +94,7 @@
             align-items: center;
             width: 20%;
             height: 300px;
-            font-size: 2.5em;
+            font-size: 1rem;
             background: rgba(255, 221, 0, 0.7);
         }
     }

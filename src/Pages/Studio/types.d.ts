@@ -17,7 +17,12 @@ export type qrProp = {
 
 export type pollProp = {
     title?: string;
-    options?: string[];
+    options?: {
+        option: string;
+        poll_amount: number;
+    }[];
+    total?: number;
+    end_at?: string;
     status?: string;
 }
 

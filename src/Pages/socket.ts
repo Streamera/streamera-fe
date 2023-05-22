@@ -10,7 +10,7 @@ socket.on("connect", () => {
 });
 
 // upon disconnection
-socket.on("disconnect", (reason) => {
+socket.on("disconnect", (reason: any) => {
     console.log(`disconnected due to ${reason}`);
 });
 
