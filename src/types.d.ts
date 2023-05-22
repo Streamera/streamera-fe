@@ -30,7 +30,7 @@ export type User = {
 }
 
 export type OverlayPosition = 'top-left' | 'top-center' | 'top-right' | 'middle-left' | 'middle-center' | 'middle-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
-
+export type Status = 'active' | 'inactive';
 export interface ElementStyle {
     style_id: number;
     font_type?: string;
@@ -55,18 +55,18 @@ export interface Announcement extends ElementStyle, BasicDataDetails {
     speed: number;
     start_at: string;
     end_at: string;
-    status: 'active' | 'inactive';
+    status: Status;
 }
 export interface Notification extends ElementStyle, BasicDataDetails {
     content: string;
     caption: string;
     type: string;
-    status: 'active' | 'inactive';
+    status: Status;
 }
 export interface Leaderboard extends ElementStyle, BasicDataDetails {
     title: string;
     timeframe: string;
-    status: 'active' | 'inactive';
+    status: Status;
 }
 export interface Milestone extends ElementStyle, BasicDataDetails {
     title: string;
@@ -74,7 +74,7 @@ export interface Milestone extends ElementStyle, BasicDataDetails {
     start_at: string;
     end_at: string;
     timeframe: string;
-    status: 'active' | 'inactive';
+    status: Status;
 }
 export interface VotingOptions {
     id: number;
@@ -85,9 +85,9 @@ export interface Voting extends ElementStyle, BasicDataDetails {
     start_at: string;
     end_at: string;
     options: VotingOptions[];
-    status: 'active' | 'inactive';
+    status: Status;
 }
 export interface QrCode extends ElementStyle, BasicDataDetails {
     qr: string;
-    status: 'active' | 'inactive';
+    status: Status;
 }
