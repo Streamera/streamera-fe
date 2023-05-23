@@ -6,12 +6,12 @@ export type SupportedChain = {
     chainLogo: string;
 }
 
-export type SquidContextData = { 
+export type SquidContextData = {
     squid: Squid | null;
     supportedChains: SupportedChain[];
-    supportedTokens: { 
-        [chains: string]: TokenData[] 
-    }; 
+    supportedTokens: {
+        [chains: string]: TokenData[]
+    };
 }
 
 export type User = {
@@ -27,6 +27,7 @@ export type User = {
     to_token_symbol: string;
     updated_at: string | null;
     wallet: string;
+    quick_amount: string[];
 }
 
 export type OverlayPosition = 'top-left' | 'top-center' | 'top-right' | 'middle-left' | 'middle-center' | 'middle-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
