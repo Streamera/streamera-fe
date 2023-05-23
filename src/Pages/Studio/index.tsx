@@ -1,10 +1,10 @@
 import { useParams } from 'react-router';
 import './styles.scss'
-import { Button, InputNumber, Select } from 'antd';
+import { Button, Image, InputNumber, Select } from 'antd';
 import { useCallback, useContext, useEffect, useRef, useState} from 'react';
-import { ellipsizeThis, getWsUrl, sleep } from '../../common/utils';
+import { cloneObj, ellipsizeThis, getWsUrl, sleep } from '../../common/utils';
 import { toast } from 'react-toastify';
-import { StartStudioParams } from './types';
+import { StartStudioParams, triggerProp } from './types';
 import { io, Socket } from 'socket.io-client';
 import _, { property } from 'lodash';
 import Marquee from 'react-fast-marquee';
@@ -13,8 +13,12 @@ import { QRCode } from 'react-qrcode-logo';
 import { Progress } from 'antd';
 import dayjs from 'dayjs';
 
+const triggerDelay = 3000; // 2s
+const triggerDisappearTime = 7000 + triggerDelay; // 2s
+
 const Page = () => {
     const socketRef = useRef<Socket>();
+    const timeout = useRef<NodeJS.Timeout>();
     const { streamerAddress } = useParams();
     const previousAddress = useRef<string>(""); // is this necessary?
 
@@ -61,6 +65,10 @@ const Page = () => {
         payment: {},
         trigger: {}
      });
+
+     // triggers
+     const [ triggerMessage, setTriggerMessage ] = useState("");
+     const triggers = useRef<string[]>([]);
 
      // update component property (text, speed, etc)
      const updateAttrib = useCallback((module: any, moduleProperty: any) => {
@@ -179,12 +187,43 @@ const Page = () => {
         _.map(data, (moduleProperty, moduleName) => {
             // only process module in whitelist
             if (whitelistModules.includes(moduleName)) {
-                console.log(`Updating ${moduleName}`);
                 updateStyles(moduleName, moduleProperty);
                 updateAttrib(moduleName, moduleProperty);
             }
         });
     }, [ updateAttrib, updateStyles ]);
+
+    useEffect(() => {
+        if(!triggerMessage) {
+            //do nothing
+            return;
+        }
+
+        // has a timer running
+        if(timeout.current) {
+            return;
+        }
+
+        timeout.current = setInterval(() => {
+            // to make trigger refresh
+            setTriggerMessage("");
+
+            setTimeout(() => {
+                if(triggers.current.length === 0) {
+                    // no need to set trigger message when the queue empty
+                    // clear this interval
+                    clearInterval(timeout.current);
+                    timeout.current = undefined;
+                    return;
+                }
+    
+                let cloned = cloneObj(triggers.current);
+                let message = cloned.shift();
+                triggers.current = cloned;
+                setTriggerMessage(message!);
+            }, triggerDelay);
+        }, triggerDisappearTime);
+    }, [ triggerMessage ]);
 
     useEffect(() => {
         // Create the socket connection if it doesn't exist
@@ -201,22 +240,34 @@ const Page = () => {
             socketRef.current.on("disconnect", (reason: any) => {
                 console.log(`disconnected due to ${reason}`);
             });
-
+    
             // upon update
             socketRef.current.on("update", (data: any) => {
                 updateModule(data);
             });
         }
 
+        // on new payment
+        socketRef.current.on('payment', (message: string) => {
+            if(!triggerMessage && triggers.current.length === 0) {
+                // currently not displaying any message and has nothing in queue
+                setTriggerMessage(message);
+                return;
+            }
+
+            // push into queue
+            triggers.current.push(message);
+        });
 
         return () => {
             // cannot off after useRef, else wont get data
             // socketRef.current!.off(`connect`);
             // socketRef.current!.off(`disconnect`);
             // socketRef.current!.off(`update`);
+            socketRef.current!.off(`payment`);
         }
 
-    }, [streamerAddress, updateModule]);
+    }, [streamerAddress, updateModule, triggerMessage]);
 
     const Announcement = () => {
         if(propertyState.announcement.status !== "active") {
@@ -293,7 +344,7 @@ const Page = () => {
                         strokeColor={propertyState.milestone.bar_filled_color}
                         showInfo={false}
                     />
-                    <span>{propertyState.milestone.profit} / {propertyState.milestone.target}</span>
+                    <span>{propertyState.milestone.profit ?? 0} / {propertyState.milestone.target}</span>
             </div>
         </div>);
     };
@@ -312,10 +363,10 @@ const Page = () => {
                     {
                         hasTopDonators &&
                         propertyState.leaderboard.top_donators!.map((x, index) => (
-                            <>
-                                <div className="col-6" key={`top-donator-${index}`}>{x.name}</div>
-                                <div className="col-6" key={`top-donator-amount-${index}`}>${x.amount_usd}</div>
-                            </>
+                            <div className='d-flex' key={`top-donator-${index}`}>
+                                <div className="col-6 text-left">{ellipsizeThis(x.name, 10, 0)}</div>
+                                <div className="col-6 text-right">${x.amount_usd}</div>
+                            </div>
                         ))
                     }
                 </div>
@@ -328,17 +379,15 @@ const Page = () => {
             return null;
         }
 
-        return (<div className="trigger" style={positionState.trigger}>
-            <div className='content' style={styleState.trigger}>
-                {
-                    propertyState.trigger.content?
-                    <img 
-                        src={propertyState.trigger.content}
-                        alt="trigger"
-                    /> :
-                    <></>
-                }
-                <span>{propertyState.trigger.caption}</span>
+        // return <div></div>;
+
+        return (<div className={`trigger ${triggerMessage? '' : 'd-none'}`} style={positionState.trigger}>
+            <div className='content'>
+                <Image 
+                    src={triggerMessage? propertyState.trigger.content : 'http://localhost:3000'}
+                    alt="trigger"
+                /> 
+                <span className='w-100' style={styleState.trigger}>{triggerMessage}</span>
             </div>
         </div>);
     };

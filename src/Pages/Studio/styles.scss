@@ -77,13 +77,13 @@
         justify-content: flex-end;
         align-items: flex-start;
         .content {
-            justify-content: center;
-            align-items: center;
+            border-radius: 10px;
             width: 25vw;
             height: 25vh;
             padding: 5px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             background: rgba(255, 221, 0, 0.7);
+            padding: 10px;
         }
     }
 
