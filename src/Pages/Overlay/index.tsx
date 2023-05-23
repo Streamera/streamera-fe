@@ -748,7 +748,7 @@ const Page = () => {
                             </Marquee>
                         </div>
                         
-                        <div className="theme cyberpunk announcement">
+                        <div className="theme cyberpunk announcement mt-3">
                             <section className="container">
                                 <div className="card-container">
                                     <div className="card-content">
@@ -766,7 +766,7 @@ const Page = () => {
                             </section>
                         </div>
                         
-                        <div className="theme regal announcement">
+                        <div className="theme regal announcement mt-3">
                             <div className="card">
                                 <div className="content">
                                     <div className="back">
@@ -780,6 +780,22 @@ const Page = () => {
                                             </Marquee>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="theme rainbow announcement mt-3 m-auto">
+                            <div className="card">
+                                <div className="bg uwu"></div>
+                                <div className="bg"></div>
+                                <div className="content">
+                                    <Marquee
+                                        speed={announcementTextSpeed}
+                                    >
+                                        <strong className="marquee-text">
+                                            {announcementText}
+                                        </strong>
+                                    </Marquee>
                                 </div>
                             </div>
                         </div>
@@ -924,6 +940,28 @@ const Page = () => {
                             </div>
                         </div>
 
+                        <div className="theme rainbow leaderboard mt-3 m-auto">
+                            <div className="card">
+                                <div className="bg uwu"></div>
+                                <div className="bg"></div>
+                                <div className="content">
+                                    <strong>{leaderboardText}</strong>
+                                    <div className="row mt-5 text-center">
+                                        <div className="col-6">Chad 1</div>
+                                        <div className="col-6">$99</div>
+                                        <div className="col-6">Chad 2</div>
+                                        <div className="col-6">$98</div>
+                                        <div className="col-6">Chad 3</div>
+                                        <div className="col-6">$97</div>
+                                        <div className="col-6">Chad 4</div>
+                                        <div className="col-6">$97</div>
+                                        <div className="col-6">Chad 5</div>
+                                        <div className="col-6">$97</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onLeaderboardActiveChange} checked={leaderboardStatus === "active"}></Switch>
 
@@ -1010,6 +1048,24 @@ const Page = () => {
                                                 />
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="theme rainbow milestone mt-3 m-auto">
+                            <div className="card">
+                                <div className="bg uwu"></div>
+                                <div className="bg"></div>
+                                <div className="content">
+                                    <div className="p-3 w-100">
+                                        <strong>{milestoneText}</strong>
+                                        <Progress
+                                            percent={30}
+                                            trailColor={milestoneProgressMainColor}
+                                            strokeColor={milestoneProgressColor}
+                                            showInfo={false}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -1142,6 +1198,32 @@ const Page = () => {
                                                     <div className="col-6 text-right">Total: $99.99</div>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="theme rainbow voting mt-3 m-auto">
+                            <div className="card">
+                                <div className="bg uwu"></div>
+                                <div className="bg"></div>
+                                <div className="content">
+                                    <div className="p-3 h-100 w-100 d-flex flex-column justify-content-between">
+                                        <strong>{votingText}</strong>
+                                        <div className="row mt-3 text-center">
+                                            {
+                                                votingChoices.map((x, index) => (
+                                                    <>
+                                                        <div className="col-6 text-left" key={`voting-option-${index}`}>{x.option}</div>
+                                                        <div className="col-6 text-right" key={`voting-value-${index}`}>$0.00</div>
+                                                    </>
+                                                ))
+                                            }
+                                        </div>
+                                        <div className="row" style={{fontSize: 12}}>
+                                            <div className="col-6 d-flex align-items-end justify-content-start">{dayjs(votingEndAt).format('YYYY-MM-DD HH:mm:ss')}</div>
+                                            <div className="col-6 text-right">Total: $99.99</div>
                                         </div>
                                     </div>
                                 </div>
