@@ -4,13 +4,14 @@ import { Button, Image, InputNumber, Select } from 'antd';
 import { useCallback, useContext, useEffect, useRef, useState} from 'react';
 import { cloneObj, ellipsizeThis, getWsUrl, sleep } from '../../common/utils';
 import { toast } from 'react-toastify';
-import { StartStudioParams, triggerProp } from './types';
+import { StartStudioParams, TriggerProp } from './types';
 import { io, Socket } from 'socket.io-client';
 import _, { property } from 'lodash';
 import Marquee from 'react-fast-marquee';
-import { componentProperty } from '../Studio/types';
+import { ComponentProperty } from '../Studio/types';
 import { QRCode } from 'react-qrcode-logo';
 import { Progress } from 'antd';
+import {StudioAnnouncement, StudioLeaderboard, StudioMilestone, StudioVoting} from '../../Components/Studio';
 import dayjs from 'dayjs';
 
 const triggerDelay = 3000; // 2s
@@ -45,7 +46,7 @@ const Page = () => {
      });
 
     // component property (text, speed, etc)
-    const [ propertyState, setPropertyState ] = useState<componentProperty>({
+    const [ propertyState, setPropertyState ] = useState<ComponentProperty>({
         qr: {},
         announcement: {},
         leaderboard: {},
@@ -270,22 +271,22 @@ const Page = () => {
     }, [streamerAddress, updateModule, triggerMessage]);
 
     const Announcement = () => {
-        if(propertyState.announcement.status !== "active") {
+        let { status, content, theme, speed } = propertyState.announcement;
+        if(status !== "active") {
             return null;
         }
+        let style = styleState.announcement as any;
+        theme = theme ?? "none";
+
         return (<div className="announcement" style={positionState.announcement}>
-            <div className="content" style={styleState.announcement}>
-                <Marquee
-                    style={{
-                        borderTopLeftRadius: 'inherit',
-                        borderTopRightRadius: 'inherit',
-                    }}
-                    speed={propertyState.announcement?.speed}
-                >
-                    <div className="marquee-text">
-                        {propertyState.announcement?.content}
-                    </div>
-                </Marquee>
+            <div className={`content ${theme === "none"? "" : "themed"}`} style={theme === "none"? style : {}}>
+                <StudioAnnouncement
+                    theme={theme}
+                    text={content ?? ""}
+                    speed={speed ?? 100}
+                    color={style.color} 
+                    bgColor={style.bg_color} 
+                />
             </div>
         </div>);
     };
@@ -305,13 +306,16 @@ const Page = () => {
     };
 
     const Poll = () => {
-        if(propertyState.poll.status !== 'active') {
+        let { status, title, theme, options, end_at } = propertyState.poll;
+        if(status !== 'active') {
             return null;
         }
+        let style = styleState.poll as any;
+        theme = theme ?? "none";
 
         return (<div className="poll" style={positionState.poll}>
-            <div className='content' style={styleState.poll}>
-                <strong>{propertyState.poll.title ?? ""}</strong>
+            <div className={`content ${theme === "none"? "" : "themed"}`} style={theme === "none"? style : {}}>
+                {/* <strong>{propertyState.poll.title ?? ""}</strong>
                 <div>
                     {
                         propertyState.poll.options &&
@@ -326,50 +330,61 @@ const Page = () => {
                 <div className="row">
                     <div className="col-6 d-flex align-items-end justify-content-start" style={{ fontSize: 12 }}>{dayjs(propertyState.poll.end_at).format('YYYY-MM-DD HH:mm:ss')}</div>
                     <div className="col-6 text-right">Total: ${propertyState.poll.total?.toFixed(2) ?? "0"}</div>
-                </div>
+                </div> */}
+                <StudioVoting
+                    theme={theme}
+                    text={title ?? "Polls"}
+                    color={style.color}
+                    bgColor={style.bg_color}
+                    choices={options ?? []}
+                    endAt={end_at!}
+                />
             </div>
         </div>);
     };
 
     const Milestone = () => {
-        if(propertyState.milestone.status !== 'active') {
+        let { status, title, theme, bar_empty_color, bar_filled_color, percent, profit, target, } = propertyState.milestone;
+        if(status !== 'active') {
             return null;
         }
+        let style = styleState.milestone as any;
+        theme = theme ?? "none";
         return (<div className="milestone" style={positionState.milestone}>
-            <div className='content' style={styleState.milestone}>
-                    <span style={{marginBottom: 10}}>{propertyState.milestone.title}</span>
-                    <Progress
-                        percent={propertyState.milestone.percent}
-                        trailColor={propertyState.milestone.bar_empty_color}
-                        strokeColor={propertyState.milestone.bar_filled_color}
-                        showInfo={false}
-                    />
-                    <span>{propertyState.milestone.profit ?? 0} / {propertyState.milestone.target}</span>
+            <div className={`content ${theme === "none"? "" : "themed"}`} style={theme === "none"? style : {}}>
+                <StudioMilestone
+                    theme={theme}
+                    text={title ?? "Milestone"}
+                    progress={percent ?? 0}
+                    current={profit? parseFloat(profit) : 0}
+                    target={target? parseFloat(target) : 0}
+                    color={style.color}
+                    bgColor={style.bg_color}
+                    progressBgColor={bar_empty_color ?? "#000000"}
+                    progressColor={bar_filled_color ?? "#ffffff"}
+                />
             </div>
         </div>);
     };
 
     const Leaderboard = () => {
-        if(propertyState.leaderboard.status !== 'active') {
+        let { status, top_donators, title, theme, } = propertyState.leaderboard;
+        if(status !== 'active') {
             return null;
         }
 
-        let hasTopDonators = propertyState.leaderboard.top_donators && propertyState.leaderboard.top_donators.length > 0;
+        let style = styleState.leaderboard as any;
+        theme = theme ?? "none";
 
         return (<div className="leaderboard" style={positionState.leaderboard}>
-            <div className='content' style={styleState.leaderboard}>
-                <strong>{propertyState.leaderboard.title ?? "Leaderboard"}</strong>
-                <div className="row mt-4">
-                    {
-                        hasTopDonators &&
-                        propertyState.leaderboard.top_donators!.map((x, index) => (
-                            <div className='d-flex' key={`top-donator-${index}`}>
-                                <div className="col-6 text-left">{ellipsizeThis(x.name, 10, 0)}</div>
-                                <div className="col-6 text-right">${x.amount_usd}</div>
-                            </div>
-                        ))
-                    }
-                </div>
+            <div className={`content ${theme === "none"? "" : "themed"}`} style={theme === "none"? style : {}}>
+                <StudioLeaderboard
+                    theme={theme}
+                    text={title ?? "Leaderboard"}
+                    topDonators={top_donators}
+                    color={style.color}
+                    bgColor={style.bg_color}
+                />
             </div>
         </div>);
     };
