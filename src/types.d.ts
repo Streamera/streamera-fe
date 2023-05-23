@@ -78,8 +78,9 @@ export interface Milestone extends ElementStyle, BasicDataDetails {
     status: Status;
 }
 export interface VotingOptions {
-    id: number;
+    id?: number;
     option: string;
+    total?: number;
 }
 export interface Voting extends ElementStyle, BasicDataDetails {
     title: string;
@@ -92,3 +93,6 @@ export interface QrCode extends ElementStyle, BasicDataDetails {
     qr: string;
     status: Status;
 }
+
+// theme component
+export type Theme = "none" | "cyberpunk" | "regal" | "rainbow";

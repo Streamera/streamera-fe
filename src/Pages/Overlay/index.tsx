@@ -1,7 +1,6 @@
 import { ChangeEvent, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import './styles.scss'
 import { OverlayButtonType, Timeframe } from './types';
-import Marquee from 'react-fast-marquee';
 import { toast } from 'react-toastify';
 import { cloneObj } from '../../common/utils';
 import { QRCode } from 'react-qrcode-logo';
@@ -10,7 +9,10 @@ import axios from '../../Services/axios';
 import { useCookies } from 'react-cookie';
 import { Announcement, Leaderboard, Milestone, Notification, OverlayPosition, QrCode, Status, User, Voting, VotingOptions } from '../../types';
 import { Select, DatePicker, Switch } from 'antd';
-import { Progress } from 'antd';
+import StudioAnnouncement from '../../Components/Studio/StudioAnnouncement';
+import StudioLeaderboard from '../../Components/Studio/StudioLeaderboard';
+import StudioMilestone from '../../Components/Studio/StudioMilestone';
+import StudioVoting from '../../Components/Studio/StudioVoting';
 import dayjs from 'dayjs';
 const { RangePicker } = DatePicker;
 
@@ -734,71 +736,14 @@ const Page = () => {
                 {
                     activeTab === "announcement" &&
                     <>
-                        <div className="video-frame">
-                            <Marquee
-                                style={{
-                                    color: announcementColor,
-                                    backgroundColor: announcementBackgroundColor,
-                                }}
-                                speed={announcementTextSpeed}
-                            >
-                                <div className="marquee-text">
-                                    {announcementText}
-                                </div>
-                            </Marquee>
-                        </div>
-                        
-                        <div className="theme cyberpunk announcement mt-3">
-                            <section className="container">
-                                <div className="card-container">
-                                    <div className="card-content">
-                                        <div className="card-title">
-                                            <Marquee
-                                                speed={announcementTextSpeed}
-                                            >
-                                                <div className="marquee-text title">
-                                                    {announcementText}
-                                                </div>
-                                            </Marquee>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                        
-                        <div className="theme regal announcement mt-3">
-                            <div className="card">
-                                <div className="content">
-                                    <div className="back">
-                                        <div className="back-content">
-                                            <Marquee
-                                                speed={announcementTextSpeed}
-                                            >
-                                                <strong className="marquee-text">
-                                                    {announcementText}
-                                                </strong>
-                                            </Marquee>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="theme rainbow announcement mt-3 m-auto">
-                            <div className="card">
-                                <div className="bg uwu"></div>
-                                <div className="bg"></div>
-                                <div className="content">
-                                    <Marquee
-                                        speed={announcementTextSpeed}
-                                    >
-                                        <strong className="marquee-text">
-                                            {announcementText}
-                                        </strong>
-                                    </Marquee>
-                                </div>
-                            </div>
-                        </div>
+                        <StudioAnnouncement 
+                            text={announcementText}
+                            speed={announcementTextSpeed}
+                            color={announcementColor}
+                            bgColor={announcementBackgroundColor}
+                            theme="cyberpunk"
+                            isPreview
+                        />
 
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onAnnouncementActiveChange} checked={announcementStatus === "active"}></Switch>
@@ -874,94 +819,40 @@ const Page = () => {
                 {
                     activeTab === "leaderboard" &&
                     <>
-                        <div className="video-frame center">
-                            <div className="leaderboard-container" style={{ color: leaderboardTextColor, backgroundColor: leaderboardBackgroundColor, }}>
-                                <span style={{marginBottom: 30}}>{leaderboardText}</span>
-                                <div className="row" style={{ width: 250 }}>
-                                    <div className="col-6">Chad 1</div>
-                                    <div className="col-6">$99</div>
-                                    <div className="col-6">Chad 2</div>
-                                    <div className="col-6">$98</div>
-                                    <div className="col-6">Chad 3</div>
-                                    <div className="col-6">$97</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="theme cyberpunk leaderboard">
-                            <section className="container">
-                                <div className="card-container">
-                                    <div className="card-content">
-                                        <div className="card-title">
-                                            <span className="title">{leaderboardText}</span>
-                                        </div>
-                                        <div className="card-footer">
-                                            <span className="title">
-                                                <div className="row text-center">
-                                                    <div className="col-6">Chad 1</div>
-                                                    <div className="col-6">$99</div>
-                                                    <div className="col-6">Chad 2</div>
-                                                    <div className="col-6">$98</div>
-                                                    <div className="col-6">Chad 3</div>
-                                                    <div className="col-6">$97</div>
-                                                    <div className="col-6">Chad 4</div>
-                                                    <div className="col-6">$97</div>
-                                                    <div className="col-6">Chad 5</div>
-                                                    <div className="col-6">$97</div>
-                                                </div>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                        
-                        <div className="theme regal leaderboard">
-                            <div className="card">
-                                <div className="content">
-                                    <div className="back">
-                                        <div className="back-content">
-                                            <strong>{leaderboardText}</strong>
-                                            <div className="row text-center">
-                                                <div className="col-6">Chad 1</div>
-                                                <div className="col-6">$99</div>
-                                                <div className="col-6">Chad 2</div>
-                                                <div className="col-6">$98</div>
-                                                <div className="col-6">Chad 3</div>
-                                                <div className="col-6">$97</div>
-                                                <div className="col-6">Chad 4</div>
-                                                <div className="col-6">$97</div>
-                                                <div className="col-6">Chad 5</div>
-                                                <div className="col-6">$97</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="theme rainbow leaderboard mt-3 m-auto">
-                            <div className="card">
-                                <div className="bg uwu"></div>
-                                <div className="bg"></div>
-                                <div className="content">
-                                    <strong>{leaderboardText}</strong>
-                                    <div className="row mt-5 text-center">
-                                        <div className="col-6">Chad 1</div>
-                                        <div className="col-6">$99</div>
-                                        <div className="col-6">Chad 2</div>
-                                        <div className="col-6">$98</div>
-                                        <div className="col-6">Chad 3</div>
-                                        <div className="col-6">$97</div>
-                                        <div className="col-6">Chad 4</div>
-                                        <div className="col-6">$97</div>
-                                        <div className="col-6">Chad 5</div>
-                                        <div className="col-6">$97</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+                        <StudioLeaderboard
+                            theme='cyberpunk'
+                            text={leaderboardText}
+                            color={leaderboardTextColor}
+                            bgColor={leaderboardBackgroundColor}
+                            topDonators={[
+                                {
+                                    from_user: null,
+                                    name: 'Chad',
+                                    amount_usd: 99
+                                },
+                                {
+                                    from_user: null,
+                                    name: 'Chad1',
+                                    amount_usd: 99
+                                },
+                                {
+                                    from_user: null,
+                                    name: 'Chad2',
+                                    amount_usd: 99
+                                },
+                                {
+                                    from_user: null,
+                                    name: 'Chad3',
+                                    amount_usd: 99
+                                },
+                                {
+                                    from_user: null,
+                                    name: 'Chad4',
+                                    amount_usd: 99
+                                }
+                            ]}
+                            isPreview
+                        />
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onLeaderboardActiveChange} checked={leaderboardStatus === "active"}></Switch>
 
@@ -1001,75 +892,18 @@ const Page = () => {
                 {
                     activeTab === "milestone" &&
                     <>
-                        <div className="video-frame center">
-                            <div className="milestone-container" style={{ color: milestoneTextColor, backgroundColor: milestoneBackgroundColor, width: 350 }}>
-                                <span style={{marginBottom: 10}}>{milestoneText}</span>
-                                <Progress
-                                    percent={30}
-                                    trailColor={milestoneProgressMainColor}
-                                    strokeColor={milestoneProgressColor}
-                                    showInfo={false}
-                                />
-                            </div>
-                        </div>
-                        
-                        <div className="theme cyberpunk milestone">
-                            <section className="container">
-                                <div className="card-container">
-                                    <div className="card-content">
-                                        <div className="card-title">
-                                            <span className="title">{milestoneText}</span>
-                                        </div>
-                                        <div className="card-footer">
-                                            <Progress
-                                                percent={30}
-                                                trailColor={milestoneProgressMainColor}
-                                                strokeColor={milestoneProgressColor}
-                                                showInfo={false}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                        
-                        <div className="theme regal milestone">
-                            <div className="card">
-                                <div className="content">
-                                    <div className="back">
-                                        <div className="back-content">
-                                            <div className="p-3 w-100">
-                                                <strong>{milestoneText}</strong>
-                                                <Progress
-                                                    percent={30}
-                                                    trailColor={milestoneProgressMainColor}
-                                                    strokeColor={milestoneProgressColor}
-                                                    showInfo={false}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="theme rainbow milestone mt-3 m-auto">
-                            <div className="card">
-                                <div className="bg uwu"></div>
-                                <div className="bg"></div>
-                                <div className="content">
-                                    <div className="p-3 w-100">
-                                        <strong>{milestoneText}</strong>
-                                        <Progress
-                                            percent={30}
-                                            trailColor={milestoneProgressMainColor}
-                                            strokeColor={milestoneProgressColor}
-                                            showInfo={false}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <StudioMilestone
+                            theme='cyberpunk'
+                            text={milestoneText}
+                            color={milestoneTextColor}
+                            bgColor={milestoneBackgroundColor}
+                            progress={30}
+                            current={parseFloat(milestoneTarget) * 0.3}
+                            target={parseFloat(milestoneTarget)}
+                            progressColor={milestoneProgressColor}
+                            progressBgColor={milestoneProgressMainColor}
+                            isPreview
+                        />
 
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onMilestoneActiveChange} checked={milestoneStatus === "active"}></Switch>
@@ -1124,111 +958,16 @@ const Page = () => {
                 {
                     activeTab === "voting" &&
                     <>
-                        <div className="video-frame center">
-                            <div className="voting-container" style={{ color: votingTextColor, backgroundColor: votingBackgroundColor, }}>
-                                <span>{votingText}</span>
-                                <div className="row" style={{ width: 350 }}>
-                                    {
-                                        votingChoices.map((x, index) => (
-                                            <>
-                                                <div className="col-6 text-left" key={`voting-option-${index}`}>{x.option}</div>
-                                                <div className="col-6 text-right" key={`voting-value-${index}`}>$0.00</div>
-                                            </>
-                                        ))
-                                    }
-                                </div>
-                                <div className="row">
-                                    <div className="col-6 d-flex align-items-end justify-content-start">{dayjs(votingEndAt).format('YYYY-MM-DD HH:mm:ss')}</div>
-                                    <div className="col-6 text-right">Total: $99.99</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="theme cyberpunk voting">
-                            <section className="container">
-                                <div className="card-container">
-                                    <div className="card-content">
-                                        <div className="card-title">
-                                            <span className="title">{votingText}</span>
-                                        </div>
-                                        <div className="card-body">
-                                            <div className="row w-100">
-                                                {
-                                                    votingChoices.map((x, index) => (
-                                                        <>
-                                                            <div className="col-6 text-left" key={`voting-option-${index}`}>{x.option}</div>
-                                                            <div className="col-6 text-right" key={`voting-value-${index}`}>$0.00</div>
-                                                        </>
-                                                    ))
-                                                }
-                                            </div>
-                                        </div>
-                                        <div className="card-footer">
-                                            <span className="title">
-                                                <div className="row" style={{fontSize: 12}}>
-                                                    <div className="col-6 text-left" style={{fontSize: 10}}><span>{dayjs(votingEndAt).format('YYYY-MM-DD HH:mm:ss')}</span></div>
-                                                    <div className="col-6 text-right"><span>Total: $99.99</span></div>
-                                                </div>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-
-                        <div className="theme regal voting">
-                            <div className="card">
-                                <div className="content">
-                                    <div className="back">
-                                        <div className="back-content">
-                                            <div className="p-3 h-100 w-100 d-flex flex-column justify-content-between">
-                                                <strong>{votingText}</strong>
-                                                <div className="row mt-3 text-center">
-                                                    {
-                                                        votingChoices.map((x, index) => (
-                                                            <>
-                                                                <div className="col-6 text-left" key={`voting-option-${index}`}>{x.option}</div>
-                                                                <div className="col-6 text-right" key={`voting-value-${index}`}>$0.00</div>
-                                                            </>
-                                                        ))
-                                                    }
-                                                </div>
-                                                <div className="row" style={{fontSize: 12}}>
-                                                    <div className="col-6 d-flex align-items-end justify-content-start">{dayjs(votingEndAt).format('YYYY-MM-DD HH:mm:ss')}</div>
-                                                    <div className="col-6 text-right">Total: $99.99</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="theme rainbow voting mt-3 m-auto">
-                            <div className="card">
-                                <div className="bg uwu"></div>
-                                <div className="bg"></div>
-                                <div className="content">
-                                    <div className="p-3 h-100 w-100 d-flex flex-column justify-content-between">
-                                        <strong>{votingText}</strong>
-                                        <div className="row mt-3 text-center">
-                                            {
-                                                votingChoices.map((x, index) => (
-                                                    <>
-                                                        <div className="col-6 text-left" key={`voting-option-${index}`}>{x.option}</div>
-                                                        <div className="col-6 text-right" key={`voting-value-${index}`}>$0.00</div>
-                                                    </>
-                                                ))
-                                            }
-                                        </div>
-                                        <div className="row" style={{fontSize: 12}}>
-                                            <div className="col-6 d-flex align-items-end justify-content-start">{dayjs(votingEndAt).format('YYYY-MM-DD HH:mm:ss')}</div>
-                                            <div className="col-6 text-right">Total: $99.99</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <StudioVoting
+                            theme='cyberpunk'
+                            text={votingText}
+                            color={votingTextColor}
+                            bgColor={votingBackgroundColor}
+                            endAt={votingEndAt}
+                            choices={votingChoices}
+                            total={0}
+                            isPreview
+                        />
 
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onVotingActiveChange}  checked={votingStatus === "active"}></Switch>
@@ -1258,7 +997,7 @@ const Page = () => {
                                     votingChoices.map((x, index) => (
                                         <div className="vote-choice" key={`${x.option}|choices|${index}`}>
                                             <span>{x.option}</span>
-                                            <button className='btn btn-sm btn-danger' onClick={() => { onChoiceDelete(x.id, x.option) }}><i className="fa fa-trash"></i></button>
+                                            <button className='btn btn-sm btn-danger' onClick={() => { onChoiceDelete(x.id ?? 0, x.option) }}><i className="fa fa-trash"></i></button>
                                         </div>
                                     ))
                                 }
