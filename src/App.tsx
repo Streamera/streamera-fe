@@ -237,8 +237,6 @@ function App() {
             </div>
         )
     } */
-    console.log(currentPath)
-    console.log(isLoading);
 
 	return (
 		<div className="App">
