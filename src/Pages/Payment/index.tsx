@@ -110,25 +110,17 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         }
     }, [chain, address, streamerAddress, fromTokenAddress, fromAmount, toChain, chainId, squid, supportedChains]);
 
-    // const onToChainChange = useCallback((value: number) => {
-    //     setToChain(value);
-    // }, []);
-
     const onFromTokenAddressChange = useCallback(async(value: string) => {
-        // update selected token (for coingecko id)
         setFromTokenAddress(value);
 
         // call squid
         const price = await getUsdWorthFromSquid(chainId, value);
-        console.log(price);
-        console.log(fromAmount);
         setFromTokenWorth(`≈ $${(fromAmount * price).toFixed(2)}`);
     }, [chainId, fromAmount, fromTokenAddress]);
 
     const onFromAmountChange = useCallback(async(value: number | null) => {
         value = value ?? 0;
         setFromAmount(value);
-        console.log(`onFromAmountChange`);
 
         // call squid
         const price = await getUsdWorthFromSquid(chainId, fromTokenAddress);
@@ -160,9 +152,9 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         if (selectedUsd > 0) {
             const tokenAmount = Math.round(selectedUsd / price * 10000) / 10000;
             setFromAmount(tokenAmount);
-            console.log(`tokenAmount: ${tokenAmount}`);
-            console.log(`fromAmount: ${fromAmount}`);
-            console.log(`updateUsdToFromAmount`);
+            // console.log(`tokenAmount: ${tokenAmount}`);
+            // console.log(`fromAmount: ${fromAmount}`);
+            // console.log(`updateUsdToFromAmount`);
             setFromTokenWorth(`≈ $${(tokenAmount * price).toFixed(2)}`);
         }
     }, [chainId, fromTokenAddress, fromAmount]);
@@ -203,15 +195,15 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
             }
         }
 
-        // const getUsdWorth = async() => {
-        //     await updateUsdToFromAmount();
-        // }
+        const setUsdWorth = async() => {
+            const price = await getUsdWorthFromSquid(chainId, fromTokenAddress);
+            setFromTokenWorth(`≈ $${(fromAmount * price).toFixed(2)}`);
+        }
 
         getUser();
         updateToChain();
-        // getUsdWorth();
+        setUsdWorth();
 
-        // console.log();
     }, []);
 
     return (
