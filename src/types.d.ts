@@ -42,6 +42,7 @@ export interface ElementStyle {
     bar_empty_color?: string;
     bar_filled_color?: string;
     position?: OverlayPosition;
+    theme?: Theme;
 }
 
 export interface BasicDataDetails {

@@ -1,21 +1,24 @@
+import { Theme } from "../../types";
+
 export type StartStudioParams = {
     address: string;
 }
 
 // import { Announcement, Notification, Leaderboard, Milestone, Voting, QrCode } from "../../types";
 
-export type announcementProp = {
+export type AnnouncementProp = {
     content?: string;
     speed?: number;
     status?: string;
+    theme?: Theme;
 }
 
-export type qrProp = {
+export type QrProp = {
     qr?: string;
     status?: string;
 }
 
-export type pollProp = {
+export type PollProp = {
     title?: string;
     options?: {
         option: string;
@@ -24,6 +27,7 @@ export type pollProp = {
     total?: number;
     end_at?: string;
     status?: string;
+    theme?: Theme;
 }
 
 export type PaymentAggregate = {
@@ -32,14 +36,15 @@ export type PaymentAggregate = {
     amount_usd: number; 
 }
 
-export type leaderboardProp = {
+export type LeaderboardProp = {
     title?: string;
     timeframe?: string;
     status?: string;
     top_donators?: PaymentAggregate[];
+    theme?: Theme;
 }
 
-export type milestoneProp = {
+export type MilestoneProp = {
     title?: string;
     timeframe?: string;
     target?: string;
@@ -50,16 +55,17 @@ export type milestoneProp = {
     status?: string;
     profit?: string;
     percent?: number;
+    theme?: Theme;
 }
 
-export type triggerProp = {
+export type TriggerProp = {
     content?: string;
     caption?: string;
     type?: string;
     status?: string;
 }
 
-export type paymentProp = {
+export type PaymentProp = {
     from_wallet?: string;
     from_chain?: string;
     from_token_symbol?: string;
@@ -76,12 +82,12 @@ export type paymentProp = {
     created_at?: string;
 }
 
-export type componentProperty = {
-    qr: qrProp;
-    announcement: announcementProp;
-    leaderboard: leaderboardProp;
-    poll: pollProp;
-    milestone: milestoneProp;
-    payment: paymentProp;
-    trigger: triggerProp;
+export type ComponentProperty = {
+    qr: QrProp;
+    announcement: AnnouncementProp;
+    leaderboard: LeaderboardProp;
+    poll: PollProp;
+    milestone: MilestoneProp;
+    payment: PaymentProp;
+    trigger: TriggerProp;
 }

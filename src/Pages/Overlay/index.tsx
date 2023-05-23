@@ -7,12 +7,9 @@ import { QRCode } from 'react-qrcode-logo';
 import { AddressContext } from '../../App';
 import axios from '../../Services/axios';
 import { useCookies } from 'react-cookie';
-import { Announcement, Leaderboard, Milestone, Notification, OverlayPosition, QrCode, Status, User, Voting, VotingOptions } from '../../types';
+import { Announcement, Leaderboard, Milestone, Notification, OverlayPosition, QrCode, Status, Theme, User, Voting, VotingOptions } from '../../types';
 import { Select, DatePicker, Switch } from 'antd';
-import StudioAnnouncement from '../../Components/Studio/StudioAnnouncement';
-import StudioLeaderboard from '../../Components/Studio/StudioLeaderboard';
-import StudioMilestone from '../../Components/Studio/StudioMilestone';
-import StudioVoting from '../../Components/Studio/StudioVoting';
+import {StudioAnnouncement, StudioLeaderboard, StudioMilestone, StudioVoting} from '../../Components/Studio';
 import dayjs from 'dayjs';
 const { RangePicker } = DatePicker;
 
@@ -32,6 +29,25 @@ const timeframeOptions = [
     {
         label: 'Daily',
         value: 'daily',
+    },
+];
+
+const themeOptions = [
+    {
+        label: 'None',
+        value: 'none',
+    },
+    {
+        label: 'Cyberpunk',
+        value: 'cyberpunk',
+    },
+    {
+        label: 'Regal',
+        value: 'regal',
+    },
+    {
+        label: 'Rainbow',
+        value: 'rainbow',
     },
 ]
 
@@ -89,6 +105,7 @@ const Page = () => {
     const [ announcementTextSpeed, setAnnouncementTextSpeed ] = useState<number>(100);
     const [ announcementPosition, setAnnouncementPosition ] = useState<OverlayPosition>("middle-center");
     const [ announcementStatus, setAnnouncementStatus ] = useState<Status>("inactive");
+    const [ announcementTheme, setAnnouncementTheme ] = useState<Theme>("none");
 
     // Notification
     const [ notificationId, setNotificationId ] = useState(0);
@@ -108,6 +125,7 @@ const Page = () => {
     const [ leaderboardTimeframe, setLeaderboardTimeframe ] = useState<Timeframe>("alltime");
     const [ leaderboardPosition, setLeaderboardPosition ] = useState<OverlayPosition>("middle-center");
     const [ leaderboardStatus, setLeaderboardStatus ] = useState<Status>("inactive");
+    const [ leaderboardTheme, setLeaderboardTheme ] = useState<Theme>("none");
 
     // Milestone
     const [ milestoneId, setMilestoneId ] = useState(0);
@@ -122,6 +140,7 @@ const Page = () => {
     const [ milestoneStartAt, setMilestoneStartAt ] = useState("");
     const [ milestoneEndAt, setMilestoneEndAt ] = useState("");
     const [ milestoneStatus, setMilestoneStatus ] = useState<Status>("inactive");
+    const [ milestoneTheme, setMilestoneTheme ] = useState<Theme>("none");
 
     // Voting
     const [ votingId, setVotingId ] = useState(0);
@@ -134,6 +153,7 @@ const Page = () => {
     const [ votingStartAt, setVotingStartAt ] = useState("");
     const [ votingEndAt, setVotingEndAt ] = useState("");
     const [ votingStatus, setVotingStatus ] = useState<Status>("inactive");
+    const [ votingTheme, setVotingTheme ] = useState<Theme>("none");
 
     //qr code
     const [ qrId, setQrId ] = useState(0);
@@ -169,6 +189,10 @@ const Page = () => {
 
     const onAnnouncementPositionChange = useCallback((value: OverlayPosition) => {
         setAnnouncementPosition(value);
+    }, []);
+
+    const onAnnouncementThemeChange = useCallback((value: Theme) => {
+        setAnnouncementTheme(value);
     }, []);
 
     const onAnnouncementActiveChange = useCallback((value: boolean) => {
@@ -224,6 +248,10 @@ const Page = () => {
         setLeaderboardPosition(value);
     }, []);
 
+    const onLeaderboardThemeChange = useCallback((value: Theme) => {
+        setLeaderboardTheme(value);
+    }, []);
+
     const onLeaderboardActiveChange = useCallback((value: boolean) => {
         setLeaderboardStatus(value? "active" : "inactive");
     }, []);
@@ -267,6 +295,10 @@ const Page = () => {
         setMilestonePosition(value);
     }, []);
 
+    const onMilestoneThemeChange = useCallback((value: Theme) => {
+        setMilestoneTheme(value);
+    }, []);
+
     const onMilestoneActiveChange = useCallback((value: boolean) => {
         setMilestoneStatus(value? "active" : "inactive");
     }, []);
@@ -294,6 +326,10 @@ const Page = () => {
 
     const onVotingPositionChange = useCallback((value: OverlayPosition) => {
         setVotingPosition(value);
+    }, []);
+
+    const onVotingThemeChange = useCallback((value: Theme) => {
+        setVotingTheme(value);
     }, []);
 
     const onVotingDateRangeChange = useCallback((dateRangeFn: any, dateRangeStrings: any, info: any) => {
@@ -370,15 +406,16 @@ const Page = () => {
             font_color: announcementColor,
             position: announcementPosition,
             status: announcementStatus,
+            theme: announcementTheme,
         });
 
         if(!res.data.success) {
             toast.success("Error saving announcement");
             return;
         }
-        toast.success("Edited");
+        toast.success("Saved");
 
-    }, [activeTab, address, announcementStatus, announcementId, announcementTextSpeed, announcementText, cookies, announcementBackgroundColor, announcementColor, announcementPosition]);
+    }, [activeTab, address, announcementTheme, announcementStatus, announcementId, announcementTextSpeed, announcementText, cookies, announcementBackgroundColor, announcementColor, announcementPosition]);
 
     const saveNotification = useCallback(async() => {
         // 'content', 'caption', 'status', 'type'
@@ -411,7 +448,7 @@ const Page = () => {
             toast.success("Error saving notification");
             return;
         }
-        toast.success("Edited");
+        toast.success("Saved");
     }, [notificationStatus, notificationBackgroundColor, notificationTextColor, notificationId, notificationText, gifFile, address, cookies, activeTab, notificationPosition]);
 
     const saveLeaderboard = useCallback(async() => {
@@ -428,14 +465,15 @@ const Page = () => {
             font_color: leaderboardTextColor,
             position: leaderboardPosition,
             status: leaderboardStatus,
+            theme: leaderboardTheme,
         });
 
         if(!res.data.success) {
             toast.success("Error saving leaderboard");
             return;
         }
-        toast.success("Edited");
-    }, [leaderboardStatus, leaderboardBackgroundColor, leaderboardTextColor, leaderboardTimeframe, leaderboardText, leaderboardId, activeTab, cookies, address, leaderboardPosition]);
+        toast.success("Saved");
+    }, [leaderboardStatus, leaderboardBackgroundColor, leaderboardTheme, leaderboardTextColor, leaderboardTimeframe, leaderboardText, leaderboardId, activeTab, cookies, address, leaderboardPosition]);
 
     const saveMilestone = useCallback(async() => {
         // 'user_id', 'title', 'target', 'style_id', 'start_at', 'end_at', 'timeframe'
@@ -456,14 +494,15 @@ const Page = () => {
             end_at: milestoneEndAt,
             target: milestoneTarget,
             status: milestoneStatus,
+            theme: milestoneTheme,
         });
 
         if(!res.data.success) {
             toast.success("Error saving milestone");
             return;
         }
-        toast.success("Edited");
-    }, [milestoneStatus, milestoneId, milestoneBackgroundColor, milestoneProgressColor, milestoneProgressMainColor, milestoneText, milestoneTextColor, milestoneTimeframe, address, cookies, activeTab, milestonePosition, milestoneEndAt, milestoneStartAt, milestoneTarget]);
+        toast.success("Saved");
+    }, [milestoneStatus, milestoneId, milestoneTheme, milestoneBackgroundColor, milestoneProgressColor, milestoneProgressMainColor, milestoneText, milestoneTextColor, milestoneTimeframe, address, cookies, activeTab, milestonePosition, milestoneEndAt, milestoneStartAt, milestoneTarget]);
 
     const saveVoting = useCallback(async() => {
         // 'user_id', 'status', 'title', 'style_id', 'start_at', 'end_at', options
@@ -486,14 +525,15 @@ const Page = () => {
             start_at: votingStartAt,
             end_at: votingEndAt,
             status: votingStatus,
+            theme: votingTheme,
         });
 
         if(!res.data.success) {
             toast.success("Error saving polls");
             return;
         }
-        toast.success("Edited");
-    }, [votingStatus, votingText, votingChoices, votingId, address, cookies, votingBackgroundColor, votingTextColor, activeTab, votingPosition, votingStartAt, votingEndAt]);
+        toast.success("Saved");
+    }, [votingStatus, votingText, votingChoices, votingTheme, votingId, address, cookies, votingBackgroundColor, votingTextColor, activeTab, votingPosition, votingStartAt, votingEndAt]);
 
     const saveQr = useCallback(async() => {
         if(!qrId || activeTab !== "qrcode") {
@@ -520,7 +560,7 @@ const Page = () => {
             toast.success("Error saving QR Code");
             return;
         }
-        toast.success("Edited");
+        toast.success("Saved");
     }, [qrStatus, activeTab, address, cookies, qrBlob, qrId, qrPosition]);
 
     const onSaveClick = useCallback(() => {
@@ -553,6 +593,7 @@ const Page = () => {
             font_color,
             position,
             status,
+            theme,
         } = res.data[0];
 
         setAnnouncementId(id);
@@ -562,6 +603,7 @@ const Page = () => {
         setAnnouncementColor(font_color? font_color: "#ffffff");
         setAnnouncementPosition(position ?? 'middle-center');
         setAnnouncementStatus(status);
+        setAnnouncementTheme(theme ?? "none");
     }, []);
 
     const getNotification = useCallback(async(user: User) => {
@@ -603,6 +645,7 @@ const Page = () => {
             font_color,
             position,
             status,
+            theme,
         } = res.data[0];
 
         setLeaderboardId(id);
@@ -612,6 +655,7 @@ const Page = () => {
         setLeaderboardTimeframe(timeframe as Timeframe);
         setLeaderboardPosition(position ?? 'middle-center');
         setLeaderboardStatus(status);
+        setLeaderboardTheme(theme ?? "none");
     }, []);
 
     const getMilestone = useCallback(async(user: User) => {
@@ -633,6 +677,7 @@ const Page = () => {
             bar_empty_color,
             position,
             status,
+            theme,
         } = res.data[0];
 
         setMilestoneId(id);
@@ -647,6 +692,7 @@ const Page = () => {
         setMilestoneStartAt(start_at);
         setMilestoneEndAt(end_at);
         setMilestoneStatus(status);
+        setMilestoneTheme(theme ?? "none");
     }, []);
 
     const getVoting = useCallback(async(user: User) => {
@@ -665,6 +711,7 @@ const Page = () => {
             options,
             position,
             status,
+            theme,
         } = res.data[0];
 
         setVotingId(id);
@@ -676,6 +723,7 @@ const Page = () => {
         setVotingStartAt(start_at);
         setVotingEndAt(end_at);
         setVotingStatus(status);
+        setVotingTheme(theme ?? "none");
     }, []);
 
     const getQrCode = useCallback(async(user: User) => {
@@ -741,12 +789,22 @@ const Page = () => {
                             speed={announcementTextSpeed}
                             color={announcementColor}
                             bgColor={announcementBackgroundColor}
-                            theme="cyberpunk"
+                            theme={announcementTheme}
                             isPreview
                         />
 
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onAnnouncementActiveChange} checked={announcementStatus === "active"}></Switch>
+
+                        <strong className='mt-4'>Theme</strong>
+                        <Select
+                            className='w-100 text-left'
+                            style={{ maxWidth: 500 }}
+                            options={themeOptions}
+                            onChange={value => { onAnnouncementThemeChange(value); }}
+                            value={announcementTheme}
+                        >
+                        </Select>
 
                         <div className="d-flex align-items-center mt-3 w-100">
                             <strong className='mr-2'>Text Color</strong>
@@ -820,7 +878,7 @@ const Page = () => {
                     activeTab === "leaderboard" &&
                     <>
                         <StudioLeaderboard
-                            theme='cyberpunk'
+                            theme={leaderboardTheme}
                             text={leaderboardText}
                             color={leaderboardTextColor}
                             bgColor={leaderboardBackgroundColor}
@@ -855,6 +913,16 @@ const Page = () => {
                         />
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onLeaderboardActiveChange} checked={leaderboardStatus === "active"}></Switch>
+
+                        <strong className='mt-4'>Theme</strong>
+                        <Select
+                            className='w-100 text-left'
+                            style={{ maxWidth: 500 }}
+                            options={themeOptions}
+                            onChange={value => { onLeaderboardThemeChange(value); }}
+                            value={leaderboardTheme}
+                        >
+                        </Select>
 
                         <div className="d-flex flex-column align-items-start mt-3 w-100">
                             <div className="d-flex align-items-center mt-3 w-100">
@@ -893,7 +961,7 @@ const Page = () => {
                     activeTab === "milestone" &&
                     <>
                         <StudioMilestone
-                            theme='cyberpunk'
+                            theme={milestoneTheme}
                             text={milestoneText}
                             color={milestoneTextColor}
                             bgColor={milestoneBackgroundColor}
@@ -907,6 +975,16 @@ const Page = () => {
 
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onMilestoneActiveChange} checked={milestoneStatus === "active"}></Switch>
+
+                        <strong className='mt-4'>Theme</strong>
+                        <Select
+                            className='w-100 text-left'
+                            style={{ maxWidth: 500 }}
+                            options={themeOptions}
+                            onChange={value => { onMilestoneThemeChange(value); }}
+                            value={milestoneTheme}
+                        >
+                        </Select>
 
                         <div className="d-flex flex-column align-items-start mt-3 w-100">
 
@@ -959,7 +1037,7 @@ const Page = () => {
                     activeTab === "voting" &&
                     <>
                         <StudioVoting
-                            theme='cyberpunk'
+                            theme={votingTheme}
                             text={votingText}
                             color={votingTextColor}
                             bgColor={votingBackgroundColor}
@@ -971,6 +1049,16 @@ const Page = () => {
 
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onVotingActiveChange}  checked={votingStatus === "active"}></Switch>
+
+                        <strong className='mt-4'>Theme</strong>
+                        <Select
+                            className='w-100 text-left'
+                            style={{ maxWidth: 500 }}
+                            options={themeOptions}
+                            onChange={value => { onVotingThemeChange(value); }}
+                            value={votingTheme}
+                        >
+                        </Select>
 
                         <div className="d-flex flex-column align-items-start mt-3 w-100">
                             <div className="d-flex align-items-center mt-3 w-100">
