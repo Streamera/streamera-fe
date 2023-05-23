@@ -321,10 +321,10 @@ const Page = () => {
                     </div>
                     <strong>Quick Amount</strong>
                     <div className="input-group">
-                        <input defaultValue="3.00" type="number" min={0.01} step={0.01} className="form-control" placeholder="3.00" value={userDetails.quick_amount?.[0]} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 0)}/>
-                        <input defaultValue="10.00" type="number" min={0.01} step={0.01} className="form-control" placeholder="10.00" value={userDetails.quick_amount?.[1]} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 1)}/>
-                        <input defaultValue="25.00" type="number" min={0.01} step={0.01} className="form-control" placeholder="25.00" value={userDetails.quick_amount?.[2]} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 2)}/>
-                        <input defaultValue="50.00" type="number" min={0.01} step={0.01} className="form-control" placeholder="50.00" value={userDetails.quick_amount?.[3]} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 3)}/>
+                        <input type="number" min={0.01} step={0.01} className="form-control" placeholder="3.00" value={userDetails.quick_amount?.[0] ?? 3} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 0)}/>
+                        <input type="number" min={0.01} step={0.01} className="form-control" placeholder="10.00" value={userDetails.quick_amount?.[1] ?? 10} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 1)}/>
+                        <input type="number" min={0.01} step={0.01} className="form-control" placeholder="25.00" value={userDetails.quick_amount?.[2] ?? 25} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 2)}/>
+                        <input type="number" min={0.01} step={0.01} className="form-control" placeholder="50.00" value={userDetails.quick_amount?.[3] ?? 50} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 3)}/>
                     </div>
 
                     <div className="button-container">

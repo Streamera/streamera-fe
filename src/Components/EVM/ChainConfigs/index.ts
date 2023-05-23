@@ -29,7 +29,7 @@ export const POLYGON_TEST: ChainConfig = {
     id: '0x13881',
     numericId: 80001,
     // rpc: 'https://rpc-mumbai.matic.today/',
-    rpc: 'https://polygontestapi.terminet.io/rpc',
+    rpc: 'https://polygon-testnet.public.blastapi.io/',
     // rpc: 'https://rpc-mumbai.maticvigil.com/',
     nativeCurrency: {
         name: 'MATIC',

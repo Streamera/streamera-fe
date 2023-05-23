@@ -43,6 +43,30 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
     let { supportedChains, supportedTokens, squid } = useContext(SquidContext);
     let { chain, chainId, address } = useContext(AddressContext);
 
+
+    const getUsdWorthFromSquid = useCallback(async(cid: number, tadd: string) => {
+        let res = await axios.get(`https://testnet.api.0xsquid.com/v1/token-price?chainId=${cid}&tokenAddress=${tadd}`);
+
+        if(!res.data?.price) {
+            return;
+        }
+        return res.data.price;
+    }, []);
+
+    const updateUsdToFromAmount = useCallback(async(selectedUsd: number) => {
+        // call squid
+        const price = await getUsdWorthFromSquid(chainId, fromTokenAddress);
+
+        if (selectedUsd > 0) {
+            const tokenAmount = Math.round(selectedUsd / price * 10000) / 10000;
+            setFromAmount(tokenAmount);
+            // console.log(`tokenAmount: ${tokenAmount}`);
+            // console.log(`fromAmount: ${fromAmount}`);
+            // console.log(`updateUsdToFromAmount`);
+            setFromTokenWorth(`≈ $${(tokenAmount * price).toFixed(2)}`);
+        }
+    }, [chainId, fromTokenAddress, getUsdWorthFromSquid]);
+
     const onPayClick = useCallback(async() => {
         if(!streamerAddress) {
             return;
@@ -108,7 +132,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
             console.log(e)
             toast.error(e.message as string);
         }
-    }, [chain, address, streamerAddress, fromTokenAddress, fromAmount, toChain, chainId, squid, supportedChains]);
+    }, [chain, address, streamerAddress, fromTokenAddress, fromAmount, toChain, chainId, squid, supportedChains, userDetails]);
 
     const onFromTokenAddressChange = useCallback(async(value: string) => {
         setFromTokenAddress(value);
@@ -116,7 +140,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         // call squid
         const price = await getUsdWorthFromSquid(chainId, value);
         setFromTokenWorth(`≈ $${(fromAmount * price).toFixed(2)}`);
-    }, [chainId, fromAmount, fromTokenAddress]);
+    }, [chainId, fromAmount, getUsdWorthFromSquid]);
 
     const onFromAmountChange = useCallback(async(value: number | null) => {
         value = value ?? 0;
@@ -125,7 +149,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         // call squid
         const price = await getUsdWorthFromSquid(chainId, fromTokenAddress);
         setFromTokenWorth(`≈ $${(value * price).toFixed(2)}`);
-    }, [chainId, fromAmount, fromTokenAddress]);
+    }, [chainId, fromTokenAddress, getUsdWorthFromSquid]);
 
     // fromChainLogo does not refresh (Need Fix!)
     // for from chain logo display (sender)
@@ -134,30 +158,6 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         const fromChainName = availableChainLogo.includes(Number(chainId)) ? chainId : 'other';
         setFromChainLogo(`/Chains/${fromChainName}.png`);
     }, [chainId]);
-
-
-    const getUsdWorthFromSquid = useCallback(async(cid: number, tadd: string) => {
-        let res = await axios.get(`https://testnet.api.0xsquid.com/v1/token-price?chainId=${cid}&tokenAddress=${tadd}`);
-
-        if(!res.data?.price) {
-            return;
-        }
-        return res.data.price;
-    }, []);
-
-    const updateUsdToFromAmount = useCallback(async(selectedUsd: number) => {
-        // call squid
-        const price = await getUsdWorthFromSquid(chainId, fromTokenAddress);
-
-        if (selectedUsd > 0) {
-            const tokenAmount = Math.round(selectedUsd / price * 10000) / 10000;
-            setFromAmount(tokenAmount);
-            // console.log(`tokenAmount: ${tokenAmount}`);
-            // console.log(`fromAmount: ${fromAmount}`);
-            // console.log(`updateUsdToFromAmount`);
-            setFromTokenWorth(`≈ $${(tokenAmount * price).toFixed(2)}`);
-        }
-    }, [chainId, fromTokenAddress, fromAmount]);
 
     useEffect(() => {
         // console.log(supportedTokens);
@@ -204,7 +204,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         updateToChain();
         setUsdWorth();
 
-    }, []);
+    }, [ chainId, fromAmount, fromTokenAddress, getUsdWorthFromSquid, streamerAddress, supportedChains, supportedTokens, updateToChain]);
 
     return (
         <div className={`payment-page ${shouldHide? 'd-none' : ''}`}>
@@ -217,7 +217,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                             <i className='fa fa-user'></i>
                         }
                         <div className="card-details">
-                        {ellipsizeThis(streamerAddress!, 2, 4)}&nbsp;<img height={'15px'} width={'15px'} src={userDetails.chain_logo} />
+                        {ellipsizeThis(streamerAddress!, 2, 4)}&nbsp;<img height={'15px'} width={'15px'} src={userDetails.chain_logo} alt="suffix"/>
                         </div>
                     </div>
                 </div>
@@ -244,7 +244,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                         <strong className='mt-0 mb-1'>Tip</strong>
                         <div className="input-container mb-2">
                             <Select
-                                    suffixIcon={<img height={'15px'} width={'15px'} src={fromChainLogo} />}
+                                    suffixIcon={<img height={'15px'} width={'15px'} src={fromChainLogo} alt="suffix"/>}
                                     className='token-select'
                                     defaultValue={"0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"}
                                     defaultActiveFirstOption={true}
