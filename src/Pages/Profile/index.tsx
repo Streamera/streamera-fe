@@ -22,6 +22,7 @@ const Page = () => {
         display_name: "",
         to_chain: "",
         to_token_address: "",
+        to_token_symbol: "",
         profile_picture: "",
         facebook: "",
         instagram: "",
@@ -74,9 +75,14 @@ const Page = () => {
             cloned[param] = value as string & number[];
         }
 
-        console.log(cloned);
+        if (param === 'to_token_symbol') {
+            const symbol = supportedTokens[userDetails.to_chain.toString()].find(x => x.address === userDetails.to_token_address)?.symbol ?? "";
 
-        if(param === "to_chain") {
+            console.log(`symbol: ${symbol}`);
+            cloned[param] = symbol;
+        }
+
+        if (param === "to_chain") {
             let supportedToken = supportedTokens[value][0]?.address ?? "";
             cloned["to_token_address"] = supportedToken;
         }
@@ -123,7 +129,7 @@ const Page = () => {
             return;
         }
 
-        let symbol = supportedTokens[userDetails.to_chain.toString()].filter(x => x.address === userDetails.to_token_address)[0]?.symbol ?? "";
+        let symbol = supportedTokens[userDetails.to_chain.toString()].find(x => x.address === userDetails.to_token_address)?.symbol ?? "";
         setToTokenSymbol(symbol);
 
         let chainName = supportedChains.filter(x => x.chainId.toString() === userDetails.to_chain)[0]?.name ?? "";
@@ -180,6 +186,9 @@ const Page = () => {
         if(pfpFile) {
             formData.append('profile_picture', pfpFile);
         }
+
+        // // Display the key/value pairs
+        // new Response(formData).text().then(console.log)
 
         let res = await axios({
             url: `/user/update/${userDetails.id}`,
@@ -297,28 +306,15 @@ const Page = () => {
                                     value: x.address,
                                 }
                             })}
-                            onChange={value => { onUserDetailsChanged(value, 'to_token_address'); }}
+                            onChange={value => {
+                                onUserDetailsChanged(value, 'to_token_address');
+                                onUserDetailsChanged(value, 'to_token_symbol');
+                            }}
                             value={toTokenSymbol}
                         >
                         </Select>
                     </div>
-                    <div className="input-group">
-                        <div className="input-group-prepend">
-                            <div className="input-group-text">Token</div>
-                        </div>
-                        <Select
-                            style={{ flex: 1, textAlign: 'left' }}
-                            options={supportedTokens[userDetails.to_chain]?.map(x => {
-                                return {
-                                    label: x.symbol,
-                                    value: x.address,
-                                }
-                            })}
-                            onChange={value => { onUserDetailsChanged(value, 'to_token_address'); }}
-                            value={toTokenSymbol}
-                        >
-                        </Select>
-                    </div>
+
                     <strong>Quick Amount</strong>
                     <div className="input-group">
                         <input type="number" min={0.01} step={0.01} className="form-control" placeholder="3.00" value={userDetails.quick_amount?.[0] ?? 3} onChange={(e) => onUserDetailsChanged(e.target.value, "quick_amount", 0)}/>
