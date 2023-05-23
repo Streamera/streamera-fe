@@ -72,7 +72,7 @@ const Page = () => {
                 wallet: address,
                 signature
             });
-    
+
             let isVerified = verifyRes.data && verifyRes.data.length > 0;
             if(!isVerified) {
                 toast.error('Verification failed!');
@@ -111,6 +111,8 @@ const Page = () => {
                 params: [msg, address, pw],
             });
 
+            console.log(signature);
+
         } catch (err) {
             console.log(err);
             setIsVerified(false);
@@ -128,21 +130,21 @@ const Page = () => {
 
         await verifyAddress(signature);
         return;
-        
+
     }, [ address, registerAddress, verifyAddress ]);
 
     return (
         <div className='home-page'>
             {
                 isLoading &&
-                <div className="d-flex align-items-center justify-content-center" style={{ height: '100vh', width: '100vw' }}>           
+                <div className="d-flex align-items-center justify-content-center" style={{ height: '100vh', width: '100vw' }}>
                     <i className="fa fa-spinner fa-spin fa-4x"></i>
                 </div>
             }
             {
                 !isLoading &&
                 !isVerified &&
-                <div className="d-flex align-items-center justify-content-center" style={{ height: '100vh', width: '100vw' }}>           
+                <div className="d-flex align-items-center justify-content-center" style={{ height: '100vh', width: '100vw' }}>
                     <button onClick={onVerifyClick}>Verify to Continue</button>
                 </div>
 

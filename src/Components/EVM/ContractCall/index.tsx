@@ -44,9 +44,9 @@ export default class ContractCall {
         }
 
         // change to wrapped version
-        fromTokenAddress = !isFromNative? fromTokenAddress : this.chainConfig.wrappedNativeTokenAddress!;
+        fromTokenAddress = isFromNative && !isBridgeSwap? this.chainConfig.wrappedNativeTokenAddress! : fromTokenAddress;
         toTokenAddress = !isToNative || isBridgeSwap /* if is bridge swap then we are using the 0xeee address */? toTokenAddress : this.chainConfig.wrappedNativeTokenAddress!;
-        let fromToken = new ethers.Contract(fromTokenAddress, ERC20.abi, this.signer); 
+        let fromToken = new ethers.Contract(fromTokenAddress, ERC20.abi, this.signer);
 
         // if not from native then we need to get approvals and check token balance
         if(!isFromNative) {
@@ -68,20 +68,22 @@ export default class ContractCall {
             }
         }
 
-        const allowed = await fromToken.allowance(sender, this.chainConfig.streameraAddress);
+        if (!isFromNative) {
+            const allowed = await fromToken.allowance(sender, this.chainConfig.streameraAddress);
 
-        // do not reapprove if got enough allowance
-        if (Number(allowed) < adjustedAmount) {
-            let approveTx = await fromToken.approve(this.chainConfig.streameraAddress, ethers.constants.MaxUint256);
-            await approveTx.wait(1);
+            // do not reapprove if got enough allowance
+            if (Number(allowed) < adjustedAmount) {
+                let approveTx = await fromToken.approve(this.chainConfig.streameraAddress, ethers.constants.MaxUint256);
+                await approveTx.wait(1);
+            }
         }
 
-        return { 
-            adjustedAmount, 
-            adjustedFromTokenAddress: fromTokenAddress, 
-            adjustedToTokenAddress: toTokenAddress, 
-            isFromNative, 
-            isToNative 
+        return {
+            adjustedAmount,
+            adjustedFromTokenAddress: fromTokenAddress,
+            adjustedToTokenAddress: toTokenAddress,
+            isFromNative,
+            isToNative
         };
     }
 
@@ -103,10 +105,10 @@ export default class ContractCall {
         } = await this._approveOrGetApproval(callParam);
 
         const swap = await this.streamera.localSwap(
-                                                this.chainConfig.dexAddress, 
-                                                adjustedFromTokenAddress, 
-                                                adjustedToTokenAddress, 
-                                                adjustedAmount.toString(), 
+                                                this.chainConfig.dexAddress,
+                                                adjustedFromTokenAddress,
+                                                adjustedToTokenAddress,
+                                                adjustedAmount.toString(),
                                                 recipient,
                                                 isToNative,
                                                 {
@@ -184,24 +186,24 @@ export default class ContractCall {
 
         /* console.log('send')
         console.log({
-            router: sqRouter, 
-            fromToken: !isFromNative? fromTokenAddress : this.nativeTokenAddress, 
-            sqCallData, 
-            fromAmount: adjustedAmount.toString(), 
-            gas: { 
-                gasLimit: sqGasLimit, 
-                value: sendNativeAmount 
+            router: sqRouter,
+            fromToken: !isFromNative? fromTokenAddress : this.nativeTokenAddress,
+            sqCallData,
+            fromAmount: adjustedAmount.toString(),
+            gas: {
+                gasLimit: sqGasLimit,
+                value: sendNativeAmount
             }
         }) */
         //execute tx
         const swap = await this.streamera.squidSwap(
-                                    sqRouter, 
+                                    sqRouter,
                                     !isFromNative? fromTokenAddress : this.nativeTokenAddress, // we use 0xeee if it's from native
-                                    sqCallData, 
-                                    adjustedAmount.toString(), 
-                                    { 
-                                        gasLimit: sqGasLimit, 
-                                        value: sendNativeAmount 
+                                    sqCallData,
+                                    adjustedAmount.toString(),
+                                    {
+                                        gasLimit: sqGasLimit,
+                                        value: sendNativeAmount
                                     }
                                 );
         const tx = await swap.wait(1);
