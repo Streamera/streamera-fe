@@ -1,10 +1,10 @@
 import { useParams } from 'react-router';
 import './styles.scss'
-import { Button, InputNumber, Select } from 'antd';
+import { Button, Image, InputNumber, Select } from 'antd';
 import { useCallback, useContext, useEffect, useRef, useState} from 'react';
-import { ellipsizeThis, getWsUrl, sleep } from '../../common/utils';
+import { cloneObj, ellipsizeThis, getWsUrl, sleep } from '../../common/utils';
 import { toast } from 'react-toastify';
-import { StartStudioParams } from './types';
+import { StartStudioParams, triggerProp } from './types';
 import { io, Socket } from 'socket.io-client';
 import _, { property } from 'lodash';
 import Marquee from 'react-fast-marquee';
@@ -13,8 +13,12 @@ import { QRCode } from 'react-qrcode-logo';
 import { Progress } from 'antd';
 import dayjs from 'dayjs';
 
+const triggerDelay = 3000; // 2s
+const triggerDisappearTime = 7000 + triggerDelay; // 2s
+
 const Page = () => {
     const socketRef = useRef<Socket>();
+    const timeout = useRef<NodeJS.Timeout>();
     const { streamerAddress } = useParams();
     const previousAddress = useRef<string>(""); // is this necessary?
 
@@ -62,6 +66,10 @@ const Page = () => {
         trigger: {}
      });
 
+     // triggers
+     const [ triggerMessage, setTriggerMessage ] = useState("");
+     const triggers = useRef<string[]>([]);
+
      // update component property (text, speed, etc)
      const updateAttrib = useCallback((module: any, moduleProperty: any) => {
          const ignoreList = ['id', 'created_at', 'updated_at', 'font_type', 'font_size', 'font_color', 'bg_color', 'bg_image', 'position'];
@@ -74,8 +82,6 @@ const Page = () => {
              }
          });
  
-         console.log(`prop`);
-         console.log(newProperty);
          // set property
          setPropertyState(prevState => {
              // creating copy of prev state variable
@@ -152,8 +158,6 @@ const Page = () => {
              }
          });
  
-         console.log(`style`);
-         console.log(newStyle);
          // set style
          setStyleState(prevState => {
              // creating copy of prev state variable
@@ -164,8 +168,6 @@ const Page = () => {
              return selected;
          });
  
-         console.log(`module`);
-         console.log(newPosition);
          // set position
          setPositionState(prevState => {
              // creating copy of prev state variable
@@ -180,17 +182,48 @@ const Page = () => {
     //  parent function for updateStyles
     const updateModule = useCallback((data: any) => {
         // white list module & properties
-        const whitelistModules = [ 'qr', 'announcement', 'leaderboard', 'poll', 'milestone', 'payment' ];
+        const whitelistModules = [ 'qr', 'announcement', 'leaderboard', 'poll', 'milestone', 'payment', 'trigger' ];
 
         _.map(data, (moduleProperty, moduleName) => {
             // only process module in whitelist
             if (whitelistModules.includes(moduleName)) {
-                console.log(`Updating ${moduleName}`);
                 updateStyles(moduleName, moduleProperty);
                 updateAttrib(moduleName, moduleProperty);
             }
         });
     }, [ updateAttrib, updateStyles ]);
+
+    useEffect(() => {
+        if(!triggerMessage) {
+            //do nothing
+            return;
+        }
+
+        // has a timer running
+        if(timeout.current) {
+            return;
+        }
+
+        timeout.current = setInterval(() => {
+            // to make trigger refresh
+            setTriggerMessage("");
+
+            setTimeout(() => {
+                if(triggers.current.length === 0) {
+                    // no need to set trigger message when the queue empty
+                    // clear this interval
+                    clearInterval(timeout.current);
+                    timeout.current = undefined;
+                    return;
+                }
+    
+                let cloned = cloneObj(triggers.current);
+                let message = cloned.shift();
+                triggers.current = cloned;
+                setTriggerMessage(message!);
+            }, triggerDelay);
+        }, triggerDisappearTime);
+    }, [ triggerMessage ]);
 
     useEffect(() => {
         // Create the socket connection if it doesn't exist
@@ -207,25 +240,40 @@ const Page = () => {
             socketRef.current.on("disconnect", (reason: any) => {
                 console.log(`disconnected due to ${reason}`);
             });
-
+    
             // upon update
             socketRef.current.on("update", (data: any) => {
                 updateModule(data);
             });
         }
 
+        // on new payment
+        socketRef.current.on('payment', (message: string) => {
+            if(!triggerMessage && triggers.current.length === 0) {
+                // currently not displaying any message and has nothing in queue
+                setTriggerMessage(message);
+                return;
+            }
+
+            // push into queue
+            triggers.current.push(message);
+        });
 
         return () => {
             // cannot off after useRef, else wont get data
             // socketRef.current!.off(`connect`);
             // socketRef.current!.off(`disconnect`);
             // socketRef.current!.off(`update`);
+            socketRef.current!.off(`payment`);
         }
 
-    }, [streamerAddress, updateModule]);
+    }, [streamerAddress, updateModule, triggerMessage]);
 
-    const Announcement = () => (
-        <div className="announcement" style={positionState.announcement}>
+    const Announcement = () => {
+        if(propertyState.announcement.status !== "active") {
+            return null;
+        }
+        return (<div className="announcement" style={positionState.announcement}>
             <div className="content" style={styleState.announcement}>
                 <Marquee
                     style={{
@@ -239,22 +287,29 @@ const Page = () => {
                     </div>
                 </Marquee>
             </div>
-        </div>
-    );
+        </div>);
+    };
 
-    const QR = () => (
-        <div className="qr" style={positionState.qr}>
+    const QR = () => {
+        if(propertyState.qr.status !== "active") {
+            return null;
+        }
+        return (<div className="qr" style={positionState.qr}>
             <div className='content' style={styleState.qr}>
                 <img
                     src={propertyState.qr.qr}
                     alt="QR Code"
                 />
             </div>
-        </div>
-    );
+        </div>);
+    };
 
-    const Poll = () => (
-        <div className="poll" style={positionState.poll}>
+    const Poll = () => {
+        if(propertyState.poll.status !== 'active') {
+            return null;
+        }
+
+        return (<div className="poll" style={positionState.poll}>
             <div className='content' style={styleState.poll}>
                 <strong>{propertyState.poll.title ?? ""}</strong>
                 <div>
@@ -273,11 +328,14 @@ const Page = () => {
                     <div className="col-6 text-right">Total: ${propertyState.poll.total?.toFixed(2) ?? "0"}</div>
                 </div>
             </div>
-        </div>
-    );
+        </div>);
+    };
 
-    const Milestone = () => (
-        <div className="milestone" style={positionState.milestone}>
+    const Milestone = () => {
+        if(propertyState.milestone.status !== 'active') {
+            return null;
+        }
+        return (<div className="milestone" style={positionState.milestone}>
             <div className='content' style={styleState.milestone}>
                     <span style={{marginBottom: 10}}>{propertyState.milestone.title}</span>
                     <Progress
@@ -286,22 +344,53 @@ const Page = () => {
                         strokeColor={propertyState.milestone.bar_filled_color}
                         showInfo={false}
                     />
-                    <span>{propertyState.milestone.profit} / {propertyState.milestone.target}</span>
+                    <span>{propertyState.milestone.profit ?? 0} / {propertyState.milestone.target}</span>
             </div>
-        </div>
-    );
+        </div>);
+    };
 
-    const Leaderboard = () => (
-        <div className="leaderboard" style={positionState.leaderboard}>
-            <div className='content' style={styleState.leaderboard}>leaderboard</div>
-        </div>
-    );
+    const Leaderboard = () => {
+        if(propertyState.leaderboard.status !== 'active') {
+            return null;
+        }
 
-    const Trigger = () => (
-        <div className="trigger" style={positionState.trigger}>
-            <div className='content' style={styleState.trigger}>trigger</div>
-        </div>
-    );
+        let hasTopDonators = propertyState.leaderboard.top_donators && propertyState.leaderboard.top_donators.length > 0;
+
+        return (<div className="leaderboard" style={positionState.leaderboard}>
+            <div className='content' style={styleState.leaderboard}>
+                <strong>{propertyState.leaderboard.title ?? "Leaderboard"}</strong>
+                <div className="row mt-4">
+                    {
+                        hasTopDonators &&
+                        propertyState.leaderboard.top_donators!.map((x, index) => (
+                            <div className='d-flex' key={`top-donator-${index}`}>
+                                <div className="col-6 text-left">{ellipsizeThis(x.name, 10, 0)}</div>
+                                <div className="col-6 text-right">${x.amount_usd}</div>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
+        </div>);
+    };
+
+    const Trigger = () => {
+        if(propertyState.trigger.status !== 'active') {
+            return null;
+        }
+
+        // return <div></div>;
+
+        return (<div className={`trigger ${triggerMessage? '' : 'd-none'}`} style={positionState.trigger}>
+            <div className='content'>
+                <Image 
+                    src={triggerMessage? propertyState.trigger.content : 'http://localhost:3000'}
+                    alt="trigger"
+                /> 
+                <span className='w-100' style={styleState.trigger}>{triggerMessage}</span>
+            </div>
+        </div>);
+    };
 
     return (
         <div className='green-screen'>
