@@ -765,6 +765,24 @@ const Page = () => {
                                 </div>
                             </section>
                         </div>
+                        
+                        <div className="theme regal announcement">
+                            <div className="card">
+                                <div className="content">
+                                    <div className="back">
+                                        <div className="back-content">
+                                            <Marquee
+                                                speed={announcementTextSpeed}
+                                            >
+                                                <strong className="marquee-text">
+                                                    {announcementText}
+                                                </strong>
+                                            </Marquee>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onAnnouncementActiveChange} checked={announcementStatus === "active"}></Switch>
@@ -881,6 +899,30 @@ const Page = () => {
                                 </div>
                             </section>
                         </div>
+                        
+                        <div className="theme regal leaderboard">
+                            <div className="card">
+                                <div className="content">
+                                    <div className="back">
+                                        <div className="back-content">
+                                            <strong>{leaderboardText}</strong>
+                                            <div className="row text-center">
+                                                <div className="col-6">Chad 1</div>
+                                                <div className="col-6">$99</div>
+                                                <div className="col-6">Chad 2</div>
+                                                <div className="col-6">$98</div>
+                                                <div className="col-6">Chad 3</div>
+                                                <div className="col-6">$97</div>
+                                                <div className="col-6">Chad 4</div>
+                                                <div className="col-6">$97</div>
+                                                <div className="col-6">Chad 5</div>
+                                                <div className="col-6">$97</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onLeaderboardActiveChange} checked={leaderboardStatus === "active"}></Switch>
@@ -951,6 +993,26 @@ const Page = () => {
                                     </div>
                                 </div>
                             </section>
+                        </div>
+                        
+                        <div className="theme regal milestone">
+                            <div className="card">
+                                <div className="content">
+                                    <div className="back">
+                                        <div className="back-content">
+                                            <div className="p-3 w-100">
+                                                <strong>{milestoneText}</strong>
+                                                <Progress
+                                                    percent={30}
+                                                    trailColor={milestoneProgressMainColor}
+                                                    strokeColor={milestoneProgressColor}
+                                                    showInfo={false}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <strong className='mt-4'>Active</strong>
@@ -1033,9 +1095,39 @@ const Page = () => {
                                         <div className="card-title">
                                             <span className="title">{votingText}</span>
                                         </div>
+                                        <div className="card-body">
+                                            <div className="row w-100">
+                                                {
+                                                    votingChoices.map((x, index) => (
+                                                        <>
+                                                            <div className="col-6 text-left" key={`voting-option-${index}`}>{x.option}</div>
+                                                            <div className="col-6 text-right" key={`voting-value-${index}`}>$0.00</div>
+                                                        </>
+                                                    ))
+                                                }
+                                            </div>
+                                        </div>
                                         <div className="card-footer">
                                             <span className="title">
-                                                <div className="row text-center">
+                                                <div className="row" style={{fontSize: 12}}>
+                                                    <div className="col-6 text-left" style={{fontSize: 10}}><span>{dayjs(votingEndAt).format('YYYY-MM-DD HH:mm:ss')}</span></div>
+                                                    <div className="col-6 text-right"><span>Total: $99.99</span></div>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div className="theme regal voting">
+                            <div className="card">
+                                <div className="content">
+                                    <div className="back">
+                                        <div className="back-content">
+                                            <div className="p-3 h-100 w-100 d-flex flex-column justify-content-between">
+                                                <strong>{votingText}</strong>
+                                                <div className="row mt-3 text-center">
                                                     {
                                                         votingChoices.map((x, index) => (
                                                             <>
@@ -1045,11 +1137,15 @@ const Page = () => {
                                                         ))
                                                     }
                                                 </div>
-                                            </span>
+                                                <div className="row" style={{fontSize: 12}}>
+                                                    <div className="col-6 d-flex align-items-end justify-content-start">{dayjs(votingEndAt).format('YYYY-MM-DD HH:mm:ss')}</div>
+                                                    <div className="col-6 text-right">Total: $99.99</div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </section>
+                            </div>
                         </div>
 
                         <strong className='mt-4'>Active</strong>
