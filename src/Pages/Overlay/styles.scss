@@ -55,9 +55,15 @@
                 justify-content: center;
             }
 
-            .marquee-text {
-                padding: 5px;
-                width: 100%;
+            .marquee-container {
+                margin: 5px;
+                width: calc(100% - 10px);
+                border-radius: inherit;
+
+                .marquee-text {
+                    padding: 5px;
+                    width: 100%;
+                }
             }
 
             .notification-container,

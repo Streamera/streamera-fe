@@ -10,6 +10,7 @@ import axios from '../../Services/axios';
 import { useCookies } from 'react-cookie';
 import { Announcement, Leaderboard, Milestone, Notification, OverlayPosition, QrCode, Status, User, Voting, VotingOptions } from '../../types';
 import { Select, DatePicker, Switch } from 'antd';
+import { Progress } from 'antd';
 import dayjs from 'dayjs';
 const { RangePicker } = DatePicker;
 
@@ -738,8 +739,6 @@ const Page = () => {
                                 style={{
                                     color: announcementColor,
                                     backgroundColor: announcementBackgroundColor,
-                                    borderTopLeftRadius: 'inherit',
-                                    borderTopRightRadius: 'inherit',
                                 }}
                                 speed={announcementTextSpeed}
                             >
@@ -747,6 +746,24 @@ const Page = () => {
                                     {announcementText}
                                 </div>
                             </Marquee>
+                        </div>
+                        
+                        <div className="theme cyberpunk announcement">
+                            <section className="container">
+                                <div className="card-container">
+                                    <div className="card-content">
+                                        <div className="card-title">
+                                            <Marquee
+                                                speed={announcementTextSpeed}
+                                            >
+                                                <div className="marquee-text title">
+                                                    {announcementText}
+                                                </div>
+                                            </Marquee>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
 
                         <strong className='mt-4'>Active</strong>
@@ -837,6 +854,34 @@ const Page = () => {
                             </div>
                         </div>
 
+                        <div className="theme cyberpunk leaderboard">
+                            <section className="container">
+                                <div className="card-container">
+                                    <div className="card-content">
+                                        <div className="card-title">
+                                            <span className="title">{leaderboardText}</span>
+                                        </div>
+                                        <div className="card-footer">
+                                            <span className="title">
+                                                <div className="row text-center">
+                                                    <div className="col-6">Chad 1</div>
+                                                    <div className="col-6">$99</div>
+                                                    <div className="col-6">Chad 2</div>
+                                                    <div className="col-6">$98</div>
+                                                    <div className="col-6">Chad 3</div>
+                                                    <div className="col-6">$97</div>
+                                                    <div className="col-6">Chad 4</div>
+                                                    <div className="col-6">$97</div>
+                                                    <div className="col-6">Chad 5</div>
+                                                    <div className="col-6">$97</div>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+
                         <strong className='mt-4'>Active</strong>
                         <Switch onChange={onLeaderboardActiveChange} checked={leaderboardStatus === "active"}></Switch>
 
@@ -877,12 +922,35 @@ const Page = () => {
                     activeTab === "milestone" &&
                     <>
                         <div className="video-frame center">
-                            <div className="milestone-container" style={{ color: milestoneTextColor, backgroundColor: milestoneBackgroundColor, }}>
+                            <div className="milestone-container" style={{ color: milestoneTextColor, backgroundColor: milestoneBackgroundColor, width: 350 }}>
                                 <span style={{marginBottom: 10}}>{milestoneText}</span>
-                                <div className="progress-container" style={{ backgroundColor: milestoneProgressMainColor }}>
-                                    <div className="progress" style={{ backgroundColor: milestoneProgressColor }}></div>
-                                </div>
+                                <Progress
+                                    percent={30}
+                                    trailColor={milestoneProgressMainColor}
+                                    strokeColor={milestoneProgressColor}
+                                    showInfo={false}
+                                />
                             </div>
+                        </div>
+                        
+                        <div className="theme cyberpunk milestone">
+                            <section className="container">
+                                <div className="card-container">
+                                    <div className="card-content">
+                                        <div className="card-title">
+                                            <span className="title">{milestoneText}</span>
+                                        </div>
+                                        <div className="card-footer">
+                                            <Progress
+                                                percent={30}
+                                                trailColor={milestoneProgressMainColor}
+                                                strokeColor={milestoneProgressColor}
+                                                showInfo={false}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
 
                         <strong className='mt-4'>Active</strong>
@@ -956,6 +1024,32 @@ const Page = () => {
                                     <div className="col-6 text-right">Total: $99.99</div>
                                 </div>
                             </div>
+                        </div>
+                        
+                        <div className="theme cyberpunk voting">
+                            <section className="container">
+                                <div className="card-container">
+                                    <div className="card-content">
+                                        <div className="card-title">
+                                            <span className="title">{votingText}</span>
+                                        </div>
+                                        <div className="card-footer">
+                                            <span className="title">
+                                                <div className="row text-center">
+                                                    {
+                                                        votingChoices.map((x, index) => (
+                                                            <>
+                                                                <div className="col-6 text-left" key={`voting-option-${index}`}>{x.option}</div>
+                                                                <div className="col-6 text-right" key={`voting-value-${index}`}>$0.00</div>
+                                                            </>
+                                                        ))
+                                                    }
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
 
                         <strong className='mt-4'>Active</strong>
