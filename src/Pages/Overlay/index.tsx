@@ -16,7 +16,7 @@ const { RangePicker } = DatePicker;
 const timeframeOptions = [
     {
         label: 'All Time',
-        value: 'all-time',
+        value: 'alltime',
     },
     {
         label: 'Monthly',
@@ -102,7 +102,7 @@ const Page = () => {
     const [ leaderboardText, setLeaderboardText ] = useState<string>("Leaderboard");
     const [ leaderboardTextColor, setLeaderboardTextColor ] = useState<string>("#000000");
     const [ leaderboardBackgroundColor, setLeaderboardBackgroundColor ] = useState<string>("#ffffff");
-    const [ leaderboardTimeframe, setLeaderboardTimeframe ] = useState<Timeframe>("all-time");
+    const [ leaderboardTimeframe, setLeaderboardTimeframe ] = useState<Timeframe>("alltime");
     const [ leaderboardPosition, setLeaderboardPosition ] = useState<OverlayPosition>("middle-center");
     const [ leaderboardStatus, setLeaderboardStatus ] = useState<Status>("inactive");
 
@@ -113,7 +113,7 @@ const Page = () => {
     const [ milestoneBackgroundColor, setMilestoneBackgroundColor ] = useState<string>("#ffffff");
     const [ milestoneProgressMainColor, setMilestoneProgressMainColor ] = useState<string>("#000000");
     const [ milestoneProgressColor, setMilestoneProgressColor ] = useState<string>("#ffffff");
-    const [ milestoneTimeframe, setMilestoneTimeframe ] = useState<Timeframe>("all-time");
+    const [ milestoneTimeframe, setMilestoneTimeframe ] = useState<Timeframe>("alltime");
     const [ milestonePosition, setMilestonePosition ] = useState<OverlayPosition>("middle-center");
     const [ milestoneTarget, setMilestoneTarget ] = useState("0");
     const [ milestoneStartAt, setMilestoneStartAt ] = useState("");
@@ -463,12 +463,13 @@ const Page = () => {
     }, [milestoneStatus, milestoneId, milestoneBackgroundColor, milestoneProgressColor, milestoneProgressMainColor, milestoneText, milestoneTextColor, milestoneTimeframe, address, cookies, activeTab, milestonePosition, milestoneEndAt, milestoneStartAt, milestoneTarget]);
 
     const saveVoting = useCallback(async() => {
-        if (votingChoices.length === 0) {
-            toast.error("Add at least 1 voting choice");
+        // 'user_id', 'status', 'title', 'style_id', 'start_at', 'end_at', options
+        if(!votingText || !votingId || activeTab !== "voting") {
+            return;
         }
 
-        // 'user_id', 'status', 'title', 'style_id', 'start_at', 'end_at', options
-        if(!votingText || !votingId || votingChoices.length === 0 || activeTab !== "voting") {
+        if (votingChoices.length === 0) {
+            toast.error("Add at least 1 voting choice");
             return;
         }
 

@@ -26,10 +26,17 @@ export type pollProp = {
     status?: string;
 }
 
+export type PaymentAggregate = {
+    from_user: number | null;
+    name: string;
+    amount_usd: number; 
+}
+
 export type leaderboardProp = {
     title?: string;
     timeframe?: string;
     status?: string;
+    top_donators?: PaymentAggregate[];
 }
 
 export type milestoneProp = {

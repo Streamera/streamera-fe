@@ -74,8 +74,6 @@ const Page = () => {
              }
          });
  
-         console.log(`prop`);
-         console.log(newProperty);
          // set property
          setPropertyState(prevState => {
              // creating copy of prev state variable
@@ -152,8 +150,6 @@ const Page = () => {
              }
          });
  
-         console.log(`style`);
-         console.log(newStyle);
          // set style
          setStyleState(prevState => {
              // creating copy of prev state variable
@@ -164,8 +160,6 @@ const Page = () => {
              return selected;
          });
  
-         console.log(`module`);
-         console.log(newPosition);
          // set position
          setPositionState(prevState => {
              // creating copy of prev state variable
@@ -180,7 +174,7 @@ const Page = () => {
     //  parent function for updateStyles
     const updateModule = useCallback((data: any) => {
         // white list module & properties
-        const whitelistModules = [ 'qr', 'announcement', 'leaderboard', 'poll', 'milestone', 'payment' ];
+        const whitelistModules = [ 'qr', 'announcement', 'leaderboard', 'poll', 'milestone', 'payment', 'trigger' ];
 
         _.map(data, (moduleProperty, moduleName) => {
             // only process module in whitelist
@@ -224,8 +218,11 @@ const Page = () => {
 
     }, [streamerAddress, updateModule]);
 
-    const Announcement = () => (
-        <div className="announcement" style={positionState.announcement}>
+    const Announcement = () => {
+        if(propertyState.announcement.status !== "active") {
+            return null;
+        }
+        return (<div className="announcement" style={positionState.announcement}>
             <div className="content" style={styleState.announcement}>
                 <Marquee
                     style={{
@@ -239,22 +236,29 @@ const Page = () => {
                     </div>
                 </Marquee>
             </div>
-        </div>
-    );
+        </div>);
+    };
 
-    const QR = () => (
-        <div className="qr" style={positionState.qr}>
+    const QR = () => {
+        if(propertyState.qr.status !== "active") {
+            return null;
+        }
+        return (<div className="qr" style={positionState.qr}>
             <div className='content' style={styleState.qr}>
                 <img
                     src={propertyState.qr.qr}
                     alt="QR Code"
                 />
             </div>
-        </div>
-    );
+        </div>);
+    };
 
-    const Poll = () => (
-        <div className="poll" style={positionState.poll}>
+    const Poll = () => {
+        if(propertyState.poll.status !== 'active') {
+            return null;
+        }
+
+        return (<div className="poll" style={positionState.poll}>
             <div className='content' style={styleState.poll}>
                 <strong>{propertyState.poll.title ?? ""}</strong>
                 <div>
@@ -273,11 +277,14 @@ const Page = () => {
                     <div className="col-6 text-right">Total: ${propertyState.poll.total?.toFixed(2) ?? "0"}</div>
                 </div>
             </div>
-        </div>
-    );
+        </div>);
+    };
 
-    const Milestone = () => (
-        <div className="milestone" style={positionState.milestone}>
+    const Milestone = () => {
+        if(propertyState.milestone.status !== 'active') {
+            return null;
+        }
+        return (<div className="milestone" style={positionState.milestone}>
             <div className='content' style={styleState.milestone}>
                     <span style={{marginBottom: 10}}>{propertyState.milestone.title}</span>
                     <Progress
@@ -288,20 +295,53 @@ const Page = () => {
                     />
                     <span>{propertyState.milestone.profit} / {propertyState.milestone.target}</span>
             </div>
-        </div>
-    );
+        </div>);
+    };
 
-    const Leaderboard = () => (
-        <div className="leaderboard" style={positionState.leaderboard}>
-            <div className='content' style={styleState.leaderboard}>leaderboard</div>
-        </div>
-    );
+    const Leaderboard = () => {
+        if(propertyState.leaderboard.status !== 'active') {
+            return null;
+        }
 
-    const Trigger = () => (
-        <div className="trigger" style={positionState.trigger}>
-            <div className='content' style={styleState.trigger}>trigger</div>
-        </div>
-    );
+        let hasTopDonators = propertyState.leaderboard.top_donators && propertyState.leaderboard.top_donators.length > 0;
+
+        return (<div className="leaderboard" style={positionState.leaderboard}>
+            <div className='content' style={styleState.leaderboard}>
+                <strong>{propertyState.leaderboard.title ?? "Leaderboard"}</strong>
+                <div className="row mt-4">
+                    {
+                        hasTopDonators &&
+                        propertyState.leaderboard.top_donators!.map((x, index) => (
+                            <>
+                                <div className="col-6" key={`top-donator-${index}`}>{x.name}</div>
+                                <div className="col-6" key={`top-donator-amount-${index}`}>${x.amount_usd}</div>
+                            </>
+                        ))
+                    }
+                </div>
+            </div>
+        </div>);
+    };
+
+    const Trigger = () => {
+        if(propertyState.trigger.status !== 'active') {
+            return null;
+        }
+
+        return (<div className="trigger" style={positionState.trigger}>
+            <div className='content' style={styleState.trigger}>
+                {
+                    propertyState.trigger.content?
+                    <img 
+                        src={propertyState.trigger.content}
+                        alt="trigger"
+                    /> :
+                    <></>
+                }
+                <span>{propertyState.trigger.caption}</span>
+            </div>
+        </div>);
+    };
 
     return (
         <div className='green-screen'>
