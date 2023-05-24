@@ -49,7 +49,6 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
 
     // need to set after getting data from backend
     // using select value for now
-    let [ toChain, setToChain ] = useState<number>(-1);
 
     let { supportedChains, supportedTokens, squid } = useContext(SquidContext);
     let { chain, chainId, address } = useContext(AddressContext);
@@ -99,6 +98,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         setShowLoader(true);
 
         let contractCall = new ContractCall(chain);
+        let toChain = Number(userDetails.to_chain);
 
         // same chain
         if(toChain === chainId) {
@@ -109,12 +109,8 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                     sender: address,
                     recipient: streamerAddress,
                     fromTokenAddress: fromTokenAddress,
-                    //fromTokenAddress: '0x337610d27c682E347C9cD60BD4b3b107C9d34dDd',
                     fromTokenAmount: fromAmount.toString(),
-
-                    // get from backend
                     toTokenAddress: userDetails.to_token_address,
-                    //toTokenAddress: '0x337610d27c682E347C9cD60BD4b3b107C9d34dDd',
                 });
 
                 console.log(tx);
@@ -128,7 +124,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                     from_amount: (ethers.utils.parseUnits(fromAmount.toString(), fromTokenData?.decimals)).toString(),
                     to_user: userDetails.id,
                     to_wallet: streamerAddress.toLowerCase(),
-                    to_chain: Number(userDetails.to_chain),
+                    to_chain: toChain,
                     to_token_symbol: userDetails.to_token_symbol!,
                     to_token_address: userDetails.to_token_address,
                     // to_amount: string,
@@ -166,16 +162,9 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                 recipient: streamerAddress,
                 fromChain: chainId,
                 fromTokenAddress: fromTokenAddress,
-                //fromTokenAddress: '0x337610d27c682E347C9cD60BD4b3b107C9d34dDd',
                 fromTokenAmount: fromAmount.toString(),
-
-                // get from backend
-                toChain: 43113, //avax
-                toTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
-
-                // get from backend
-                // aUSDC in avax fuji
-                //toTokenAddress: '0x57f1c63497aee0be305b8852b354cec793da43bb',
+                toChain,
+                toTokenAddress: userDetails.to_token_address,
             });
 
             console.log(tx);
@@ -205,7 +194,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
             console.log(e)
             toast.error(e.message as string);
         }
-    }, [InsertPayment, fromTokenData, fromTokenWorth, chain, address, streamerAddress, fromTokenAddress, fromAmount, toChain, chainId, squid, supportedChains, userDetails]);
+    }, [InsertPayment, fromTokenData, fromTokenWorth, chain, address, streamerAddress, fromTokenAddress, fromAmount, chainId, squid, supportedChains, userDetails]);
 
     const onFromTokenAddressChange = useCallback(async(value: string) => {
         const token = supportedTokens[chainId]?.find((x) => x.address === value)!;
@@ -381,7 +370,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                     </div>
                     <div className="text-title">
                         <Button type="primary" size={'large'} className='tip-button' onClick={onPayClick}>
-                            <i className="fas fa-gift"></i>&nbsp; Tips Now
+                            <i className="fas fa-gift"></i>&nbsp; Tip Now
                         </Button>
                     </div>
                 </div>
