@@ -116,6 +116,10 @@ export const getBaseUrl = () => {
     return process.env.REACT_APP_BASE_URL!;
 }
 
+export const getDappDomain = () => {
+    return process.env.REACT_APP_DAPP_DOMAIN!;
+}
+
 export const getWsUrl = () => {
     return process.env.REACT_APP_WS_URL!;
 }
