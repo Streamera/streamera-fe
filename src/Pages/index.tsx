@@ -1,6 +1,6 @@
 import Home from './Home';
 import Landing from './Landing';
-import Payment from './Pay';
+import Payment from './Payment';
 import Profile from './Profile';
 import Integration from './Integration';
 import Overlay from './Overlay';
