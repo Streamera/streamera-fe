@@ -1,0 +1,19 @@
+.position-input {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    width: 200px;
+    height: 200px;
+    gap: 5px;
+
+    > button {
+        &.active {
+            background-color: #1677ff;
+        }
+
+        background-color: rgba(0,0,0,0.1);
+        border: none;
+        height: 100%;
+        width: 100%;
+        border-radius: 10px;
+    }
+}
