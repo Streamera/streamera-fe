@@ -1,14 +1,13 @@
 import { ChainConfig } from "./types";
 import { ethers } from 'ethers';
-// import { EvmChain } from '@axelar-network/axelarjs-sdk'; // add back in when necessary
 
 // chains
 export const BSC_TEST: ChainConfig = {
     name: 'BNB Chain',
-    shortName: 'BSC TEST',
+    shortName: 'BSC',
     id: ethers.utils.hexlify(97),
     numericId: 97,
-    // evmChain: EvmChain.BINANCE,
+    evmChain: 'binance',
     rpc: 'https://data-seed-prebsc-2-s1.binance.org:8545',
     nativeCurrency: {
         name: 'BNB',
@@ -24,7 +23,7 @@ export const BSC_TEST: ChainConfig = {
 export const POLYGON_TEST: ChainConfig = {
     name: 'Polygon',
     shortName: 'MUMBAI',
-    // evmChain: EvmChain.POLYGON,
+    evmChain: 'polygon',
     // id: ethers.utils.hexlify(80001),
     id: '0x13881',
     numericId: 80001,
@@ -41,7 +40,7 @@ export const POLYGON_TEST: ChainConfig = {
 export const AVAX_TEST: ChainConfig = {
     name: 'Avalanche C-Chain Testnet',
     shortName: 'AVAX',
-    // evmChain: EvmChain.AVALANCHE,
+    evmChain: 'avalanche',
     id: '0xa869',
     numericId: 43113,
     rpc: 'https://api.avax-test.network/ext/bc/C/rpc',
@@ -55,7 +54,7 @@ export const AVAX_TEST: ChainConfig = {
 export const ETH: ChainConfig = {
     name: 'Ethereum',
     shortName: 'ETH',
-    // evmChain: EvmChain.ETHEREUM,
+    evmChain: 'ethereum',
     id: ethers.utils.hexlify(1),
     numericId: 1,
     rpc: '',
@@ -68,7 +67,7 @@ export const ETH: ChainConfig = {
 export const BSC: ChainConfig = {
     name: 'BNB Chain',
     shortName: 'BSC',
-    // evmChain: EvmChain.BINANCE,
+    evmChain: 'binance',
     id: ethers.utils.hexlify(56),
     numericId: 56,
     rpc: 'https://bsc-dataseed1.binance.org',
@@ -82,7 +81,7 @@ export const BSC: ChainConfig = {
 export const AVAX: ChainConfig = {
     name: 'Avalanche C-Chain',
     shortName: 'AVAX',
-    // evmChain: EvmChain.AVALANCHE,
+    evmChain: 'avalanche',
     id: '0xa86a',
     numericId: 43114,
     rpc: 'https://api.avax.network/ext/bc/C/rpc',
@@ -96,7 +95,7 @@ export const AVAX: ChainConfig = {
 export const POLYGON: ChainConfig = {
     name: 'Polygon',
     shortName: 'Polygon',
-    // evmChain: EvmChain.POLYGON,
+    evmChain: 'polygon',
     id: ethers.utils.hexlify(137),
     numericId: 137,
     rpc: 'https://polygon-rpc.com',
@@ -110,6 +109,7 @@ export const POLYGON: ChainConfig = {
 export const ARB: ChainConfig = {
     name: 'Arbitrum One',
     shortName: 'ARB',
+    evmChain: 'arbitrium',
     id: ethers.utils.hexlify(42161),
     numericId: 42161,
     rpc: 'https://arb1.arbitrum.io/rpc',
@@ -123,6 +123,7 @@ export const ARB: ChainConfig = {
 export const ARB_TEST: ChainConfig = {
     name: 'Arbitrum Goerli',
     shortName: 'ARB',
+    evmChain: 'arbitrium',
     id: ethers.utils.hexlify(421613),
     numericId: 421613,
     rpc: 'https://arbitrum-goerli.public.blastapi.io',
@@ -162,7 +163,7 @@ export const CRO: ChainConfig = {
 export const FTM: ChainConfig = {
     name: 'Fantom Opera',
     shortName: 'FTM',
-    // evmChain: EvmChain.FANTOM,
+    evmChain: 'fantom',
     id: ethers.utils.hexlify(250),
     numericId: 250,
     rpc: 'https://rpc.ftm.tools',
@@ -215,7 +216,7 @@ export const GNO: ChainConfig = {
 export const AURORA: ChainConfig = {
     name: 'Aurora Mainnet',
     shortName: 'AURORA',
-    // evmChain: EvmChain.AURORA,
+    evmChain: 'aurora',
     id: ethers.utils.hexlify(1313161554),
     numericId: 1313161554,
     rpc: 'https://mainnet.aurora.dev',
@@ -346,7 +347,7 @@ export const MOVR: ChainConfig = {
 export const GLMR: ChainConfig = {
     name: 'Moonbeam',
     shortName: 'GLMR',
-   //  evmChain: EvmChain.MOONBEAM,
+    evmChain: 'moonbeam',
     id: ethers.utils.hexlify(1284),
     numericId: 1284,
     rpc: 'https://rpc.api.moonbeam.network',
@@ -386,6 +387,7 @@ export const GOERLI: ChainConfig = {
 export const MOONBASE_ALPHA: ChainConfig = {
     name: 'Moonbase Alpha Tesnet',
     shortName: 'Moonbase',
+    evmChain: 'moonbase',
     id: ethers.utils.hexlify(1287),
     numericId: 1287,
     rpc: 'https://moonbase-alpha.public.blastapi.io',
@@ -412,6 +414,7 @@ export const FILECOIN_TESTNET: ChainConfig = {
 export const FANTOM_TESTNET: ChainConfig = {
     name: 'Fantom Testnet',
     shortName: 'Fantom Testnet',
+    evmChain: 'fantom',
     id: ethers.utils.hexlify(4002),
     numericId: 4002,
     rpc: 'https://rpc.ankr.com/fantom_testnet',

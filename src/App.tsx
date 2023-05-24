@@ -5,7 +5,7 @@ import './App.scss';
 import './keyframes.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
-import { Home, Payment, Landing, Profile, Integration, Overlay, Studio } from './Pages';
+import { Home, Payment, Landing, Profile, Integration, Overlay, Studio, History } from './Pages';
 //import { Button } from 'react-bootstrap';
 import { ellipsizeThis } from './common/utils';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
@@ -54,6 +54,7 @@ const routes = [
     { path: '/landing' },
     { path: '/pay/:streamerAddress' },
     { path: '/studio/:streamerAddress' },
+    { path: '/history' },
 ];
 
 function App() {
@@ -84,7 +85,7 @@ function App() {
 
     //mutable chain id cause dont wanna set into infinite loop
     let currentChain = useRef("");
-    
+
 
 	// chain event handlers
     const handleNewAccount = useCallback(async (address: string) => {
@@ -324,7 +325,8 @@ function App() {
                             <Route path="/integration" element={<Integration />}></Route>
                             <Route path="/overlay" element={<Overlay />}></Route>
                             <Route path="/pay/:streamerAddress" element={<Payment shouldHide={shouldShowSwitcher}/>}></Route>
-                            <Route path="/studio/:streamerAddress" element={<Studio  />}></Route>
+                            <Route path="/studio/:streamerAddress" element={<Studio />}></Route>
+                            <Route path="/history" element={<History />}></Route>
                         </Routes>
                     }
                 </AddressContext.Provider>
