@@ -3,9 +3,10 @@ import './styles.scss'
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Card } from 'react-bootstrap';
+import { Empty } from 'antd';
 
 import { useCallback, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../../Services/axios';
 import { HistoryDataRaw, HistoryData, PaymentData } from './types';
 import { ellipsizeThis, getBaseUrl } from '../../common/utils';
 import _ from 'lodash';
@@ -20,17 +21,17 @@ const Page = () => {
     let { chain, chainId, address } = useContext(AddressContext);
     let [ history, setHistory ] = useState<HistoryData>({ send: [], receive: [] });
 
-    useEffect(() => {
-        getTxs();
-    }, [address]);
-
     const getTxs = useCallback(async() => {
-        let res = await axios.get<HistoryDataRaw>(`${getBaseUrl()}/payment/history/${address.toLowerCase()}`);
+        let res = await axios.get<HistoryDataRaw>(`/payment/history/${address.toLowerCase()}`);
 
         if (_.has(res.data, 'data')) {
             setHistory(res.data.data!);
         }
-    }, [])
+    }, [address])
+
+    useEffect(() => {
+        getTxs();
+    }, [address, getTxs]);
 
     const onChange = useCallback((key: string) => {
         console.log(key);
@@ -39,12 +40,12 @@ const Page = () => {
     const SentTxs = useCallback(() => {
         let component: JSX.Element[] = [];
         return component;
-    }, [address]);
+    }, []);
 
     const ReceivedTxs = useCallback(() => {
         let component: JSX.Element[] = [];
         return component;
-    }, [address]);
+    }, []);
 
     const HistoryLog = useCallback((data: PaymentData[]) => {
         let component: JSX.Element[] = [];
@@ -141,28 +142,42 @@ const Page = () => {
         }
 
         return <>{component}</>
-    }, [address]);
+    }, []);
 
     return (
         <div className={'history-page'}>
             <div className='history-container'>
                 <Tabs
-                defaultActiveKey="send"
-                id="history-tab"
-                className="history-tab mb-3"
-                fill
+                    defaultActiveKey="send"
+                    id="history-tab"
+                    className="history-tab mb-3"
+                    fill
                 >
                     <Tab eventKey="send" title={<span><i className='fas fa-paper-plane'></i> Send</span>}>
                         {/* sent tx */}
-                        <div className='history-log'>
-                            { HistoryLog(history.send) }
+                        <div className={`history-log ${history.send.length === 0? 'empty' : ''}`}>
+                            { 
+                                history.send.length > 0 &&
+                                HistoryLog(history.send)
+                            }
+                            { 
+                                history.send.length === 0 &&
+                                <Empty />
+                            }
                         </div>
                     </Tab>
 
                     <Tab eventKey="receive" title={<span><i className="fas fa-wallet"></i> Receive</span>}>
                         {/* received tx */}
-                        <div className='history-log'>
-                            { HistoryLog(history.receive) }
+                        <div className={`history-log ${history.receive.length === 0? 'empty' : ''}`}>
+                            { 
+                                history.receive.length > 0 &&
+                                HistoryLog(history.receive)
+                            }
+                            { 
+                                history.receive.length === 0 &&
+                                <Empty />
+                            }
                         </div>
                     </Tab>
 

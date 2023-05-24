@@ -5,6 +5,85 @@
     padding-top: 100px;
     padding-bottom: 100px;
 
+    .upload-button {
+        border-radius: 5px;
+        height: 30px;
+        background-color: white;
+        border: 1px solid #dedede;
+        color: #3e3e3e;
+        transition: color 0.25s ease, border-color 0.25s ease;
+
+        &:hover {
+            color: #1777ff;
+            border-color: #1777ff;
+        }
+
+        > span {
+            margin-left: 10px;
+        }
+    }
+
+    button.delete {
+        width: 150px;
+        height: 50px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        background: red;
+        border: none;
+        border-radius: 5px;
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+        background: #e62222;
+    }
+    
+    button.delete, button.delete span {
+        transition: 200ms;
+    }
+    
+    button.delete .text {
+        transform: translateX(35px);
+        color: white;
+        font-weight: bold;
+    }
+    
+    button.delete .icon {
+        position: absolute;
+        border-left: 1px solid #c41b1b;
+        transform: translateX(110px);
+        height: 40px;
+        width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    button.delete svg {
+        width: 15px;
+        fill: #eee;
+    }
+    
+    button.delete:hover {
+        background: #ff3636;
+    }
+    
+    button.delete:hover .text {
+        color: transparent;
+    }
+    
+    button.delete:hover .icon {
+        width: 150px;
+        border-left: none;
+        transform: translateX(0);
+    }
+    
+    button.delete:focus {
+        outline: none;
+    }
+    
+    button.delete:active .icon svg {
+        transform: scale(0.8);
+    }
+
     .nav-container {
         width: 20%;
 
@@ -37,7 +116,7 @@
 
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
 
         box-shadow: 2px 2px 5px 0 rgba(0,0,0,0.5);
 
@@ -45,7 +124,6 @@
             margin-top: 20px;
             width: 100%;
             height: 40vh;
-            border: 1px solid black;
             border-radius: 10px;
             position: relative;
 
@@ -167,13 +245,15 @@
         .choices-container {
             display: flex;
             flex-direction: row;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 550px;
             margin-top: 10px;
 
             .vote-choice {
                 display: flex;
                 align-items: center;
                 padding: 10px;
-                border: 1px solid black;
                 border-radius: 10px;
                 margin-right: 10px;
 

@@ -27,10 +27,10 @@ const Component = ({
                                 <div className="row w-100">
                                     {
                                         choices.map((x, index) => (
-                                            <>
-                                                <div className="col-6 text-left" key={`voting-option-${index}`}>{x.option}</div>
-                                                <div className="col-6 text-right" key={`voting-value-${index}`}>${(x.total ?? 0).toFixed(2)}</div>
-                                            </>
+                                            <div className='w-100 d-flex' key={`voting-option-${index}`}>
+                                                <div className="col-6 text-left">{x.option}</div>
+                                                <div className="col-6 text-right">${(x.total ?? 0).toFixed(2)}</div>
+                                            </div>
                                         ))
                                     }
                                 </div>
@@ -63,10 +63,10 @@ const Component = ({
                                     <div className="row mt-3 text-center">
                                         {
                                             choices.map((x, index) => (
-                                                <>
-                                                    <div className="col-6 text-left" key={`voting-option-${index}`}>{x.option}</div>
-                                                    <div className="col-6 text-right" key={`voting-value-${index}`}>${(x.total ?? 0).toFixed(2)}</div>
-                                                </>
+                                                <div className='w-100 d-flex' key={`voting-option-${index}`}>
+                                                    <div className="col-6 text-left">{x.option}</div>
+                                                    <div className="col-6 text-right">${(x.total ?? 0).toFixed(2)}</div>
+                                                </div>
                                             ))
                                         }
                                     </div>
@@ -95,10 +95,10 @@ const Component = ({
                             <div className="row mt-3 text-center">
                                 {
                                     choices.map((x, index) => (
-                                        <>
-                                            <div className="col-6 text-left" key={`voting-option-${index}`}>{x.option}</div>
-                                            <div className="col-6 text-right" key={`voting-value-${index}`}>${(x.total ?? 0).toFixed(2)}</div>
-                                        </>
+                                        <div className='w-100 d-flex' key={`voting-option-${index}`}>
+                                            <div className="col-6 text-left">{x.option}</div>
+                                            <div className="col-6 text-right">${(x.total ?? 0).toFixed(2)}</div>
+                                        </div>
                                     ))
                                 }
                             </div>
@@ -122,10 +122,10 @@ const Component = ({
                         <div className="row" style={{ width: 350 }}>
                             {
                                 choices.map((x, index) => (
-                                    <>
-                                        <div className="col-6 text-left" key={`voting-option-${index}`}>{x.option}</div>
-                                        <div className="col-6 text-right" key={`voting-value-${index}`}>$0.00</div>
-                                    </>
+                                    <div className='w-100 d-flex' key={`voting-option-${index}`}>
+                                        <div className="col-6 text-left">{x.option}</div>
+                                        <div className="col-6 text-right">${(x.total ?? 0).toFixed(2)}</div>
+                                    </div>
                                 ))
                             }
                         </div>

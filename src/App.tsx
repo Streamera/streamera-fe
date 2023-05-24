@@ -336,9 +336,14 @@ function App() {
                 <span>
 				    Made with ❤️ by the Streamera Team.
                 </span>
-                <span>
-                    Twitter and stuff
-                </span>
+                <div className='button-with-tooltip'>
+                    <ul className="wrapper">
+                        <li className="icon github">
+                            <span className="tooltip">Github</span>
+                            <a href='https://github.com/Streamera' target='_blank' rel="noopener noreferrer"><i className="fab fa-github"></i></a>
+                        </li>
+                    </ul>
+                </div>
 			</footer>
 
 			<ToastContainer
