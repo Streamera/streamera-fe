@@ -95,7 +95,6 @@ const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChain
             window.ethereum!.on('accountsChanged', onAccountsChanged);
 
             const onChainChanged = (hexId: unknown) => {
-                toast.success('new chain: ' + hexId);
                 setChain(hexId as string);
             };
             window.ethereum!.on('chainChanged', onChainChanged);
