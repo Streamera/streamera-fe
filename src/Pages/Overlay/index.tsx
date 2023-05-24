@@ -2,7 +2,7 @@ import { ChangeEvent, useCallback, useContext, useEffect, useRef, useState } fro
 import './styles.scss'
 import { OverlayButtonType, Timeframe } from './types';
 import { toast } from 'react-toastify';
-import { cloneObj } from '../../common/utils';
+import { cloneObj, getDappDomain } from '../../common/utils';
 import { QRCode } from 'react-qrcode-logo';
 import { AddressContext } from '../../App';
 import axios from '../../Services/axios';
@@ -1222,7 +1222,7 @@ const Page = () => {
                             /** editing */
                             newQrLogoFile &&
                             <QRCode
-                                value={`https://metamask.app.link/dapp/localhost:3000/pay/${address}`}
+                                value={`https://metamask.app.link/dapp/${getDappDomain()}/pay/${address}`}
                                 logoImage={newQrLogo}
                                 logoHeight={50}
                                 logoWidth={50}

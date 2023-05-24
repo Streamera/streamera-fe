@@ -399,7 +399,7 @@ const Page = () => {
         return (<div className={`trigger ${triggerMessage? '' : 'd-none'}`} style={positionState.trigger}>
             <div className='content'>
                 <Image 
-                    src={triggerMessage? propertyState.trigger.content : 'http://localhost:3000'}
+                    src={triggerMessage? propertyState.trigger.content : ''}
                     alt="trigger"
                 /> 
                 <span className='w-100' style={styleState.trigger}>{triggerMessage}</span>
