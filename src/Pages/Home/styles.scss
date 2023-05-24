@@ -39,4 +39,135 @@
             } */
         }
     }
+
+    .link-pie {
+        transform: scale(3);
+        font-size: 8px;
+
+        a {
+            text-decoration: none;
+        }
+
+        .main {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+          }
+          
+          .up {
+            display: flex;
+            flex-direction: row;
+            gap: 1em;
+          }
+          
+          .down {
+            display: flex;
+            flex-direction: row;
+            gap: 1em;
+          }
+          
+          .card1 {
+            display: flex;
+            align-items: center;
+            width: 90px;
+            height: 90px;
+            outline: none;
+            border: none;
+            background: white;
+            border-radius: 90px 5px 5px 5px;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+            transition: .2s ease-in-out;
+            padding-left: 30px;
+            padding-top: 30px;
+          }
+          
+          
+          .card2 {
+            display: flex;
+            align-items: center;
+            width: 90px;
+            height: 90px;
+            outline: none;
+            border: none;
+            background: white;
+            border-radius: 5px 90px 5px 5px;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+            transition: .2s ease-in-out;
+            padding-left: 15px;
+            padding-top: 30px;
+          }
+          
+          
+          .card3 {
+            display: flex;
+            align-items: center;
+            width: 90px;
+            height: 90px;
+            outline: none;
+            border: none;
+            background: white;
+            border-radius: 5px 5px 5px 90px;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+            transition: .2s ease-in-out;
+            padding-left: 20px;
+            padding-bottom: 30px;
+          }
+          
+          
+          .card4 {
+            display: flex;
+            align-items: center;
+            width: 90px;
+            height: 90px;
+            outline: none;
+            border: none;
+            background: white;
+            border-radius: 5px 5px 90px 5px;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+            transition: .2s ease-in-out;
+            padding-left: 15px;
+            padding-bottom: 30px;
+          }
+          
+          
+          .card1:hover {
+            cursor: pointer;
+            scale: 1.1;
+            background-color: #03A9F4;
+          }
+          
+          .card1:hover .instagram {
+            fill: white;
+          }
+          
+          .card2:hover {
+            cursor: pointer;
+            scale: 1.1;
+            background-color: #03A9F4;
+          }
+          
+          .card2:hover .twitter {
+            fill: white;
+          }
+          
+          .card3:hover {
+            cursor: pointer;
+            scale: 1.1;
+            background-color: #03A9F4;
+          }
+          
+          .card3:hover .github {
+            fill: white;
+          }
+          
+          .card4:hover {
+            cursor: pointer;
+            scale: 1.1;
+            background-color: #03A9F4;
+          }
+          
+          .card4:hover .discord {
+            fill: white;
+          }
+    }
 }
