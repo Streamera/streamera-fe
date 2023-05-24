@@ -72,14 +72,24 @@ const Page = () => {
         try {
             let verifyRes = await axios.post('/user/find', {
                 wallet: address,
-                signature
+                signature: signature
             });
 
             let isVerified = verifyRes.data && verifyRes.data.length > 0;
             if(!isVerified) {
-                toast.error('Verification failed!');
-                setIsLoading(false);
-                return;
+                // check if user exist and signature empty?
+                // if empty update it with the current signature
+                let isSignatureEmpty = await axios.post('/user/verify', {
+                    wallet: address,
+                    signature: signature
+                });
+
+                // user trying to spoof signature
+                if (!isSignatureEmpty) {
+                    toast.error('Verification failed!');
+                    setIsLoading(false);
+                    return;
+                }
             }
 
             // path = / for all paths
