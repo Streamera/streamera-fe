@@ -1,3 +1,5 @@
+export type PaymentStatus = 'pending' | 'success' | 'failed';
+
 export type PaymentData = {
     from_user: number | null;
     from_wallet: string;
@@ -18,4 +20,8 @@ export type PaymentData = {
 export type PaymentReturn = {
     success: boolean;
     data: { id: string | number };
+}
+
+export type PaymentStatusData = {
+    status: PaymentStatus;
 }

@@ -33,19 +33,7 @@ const Page = () => {
         getTxs();
     }, [address, getTxs]);
 
-    const onChange = useCallback((key: string) => {
-        console.log(key);
-    }, []);
-
-    const SentTxs = useCallback(() => {
-        let component: JSX.Element[] = [];
-        return component;
-    }, []);
-
-    const ReceivedTxs = useCallback(() => {
-        let component: JSX.Element[] = [];
-        return component;
-    }, []);
+    }, [])
 
     const HistoryLog = useCallback((data: PaymentData[]) => {
         let component: JSX.Element[] = [];
