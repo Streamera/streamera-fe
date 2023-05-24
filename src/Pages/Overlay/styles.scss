@@ -55,9 +55,15 @@
                 justify-content: center;
             }
 
-            .marquee-text {
-                padding: 5px;
-                width: 100%;
+            .marquee-container {
+                margin: 5px;
+                width: calc(100% - 10px);
+                border-radius: inherit;
+
+                .marquee-text {
+                    padding: 5px;
+                    width: 100%;
+                }
             }
 
             .notification-container,
@@ -68,7 +74,7 @@
                 display: flex;
                 flex-direction: column;
                 border-radius: 10px;
-                padding: 20px;
+                padding: 10px;
 
                 > img {
                     width: 200px;
@@ -100,8 +106,25 @@
             }
 
             .voting-container {
-                padding: 15px;
+                padding: 10px;
                 border: 1px solid black;
+                height: 30vh;
+                justify-content: space-between;
+                
+                > div > div {
+                    //options
+                    font-size: 0.75em;
+                }
+            }
+
+            .notification-container {
+                img {
+                    height: 25vh;
+                }
+
+                span {
+                    max-width: 25vh;
+                }
             }
         }
 
@@ -133,6 +156,12 @@
                     background-color: rgb(232, 225, 97);
                 }
             }
+        }
+
+        .qr,
+        #qr-code {
+            height: 20vh;
+            aspect-ratio: 1;
         }
 
         .choices-container {

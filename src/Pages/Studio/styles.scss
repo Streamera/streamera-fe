@@ -1,0 +1,133 @@
+.green-screen {
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+
+    > .announcement, 
+    > .qr, 
+    > .poll, 
+    > .milestone, 
+    > .leaderboard, 
+    > .trigger {
+        display: flex;
+        position: absolute;
+        inset: 0;
+        z-index: 101;
+        padding: 10px;
+    }
+
+    > .announcement {
+        justify-content: center;
+        align-items: flex-start;
+
+        > .content {
+            justify-content: center;
+            align-items: center;
+            width: 50vw;
+            padding: 2px;
+            font-size: 1rem;
+
+            &.themed {
+                width: unset;
+                padding: unset;
+            }
+        }
+    }
+
+    > .poll {
+        justify-content: flex-start;
+        align-items: center;
+
+        > .content {
+            border: 1px solid black;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 25vw;
+            height: 27vh;
+            font-size: 1rem;
+            padding: 10px;
+
+            &.themed {
+                width: unset;
+                height: unset;
+                padding: unset;
+                border: unset;
+                border-radius: unset;
+            }
+
+            > div > div > div {
+                // options
+                font-size: 0.75em;
+            }
+        }
+    }
+
+    > .qr {
+        > .content {
+
+            img {
+                height: 20vh;
+                aspect-ratio: 1;
+            }
+        }
+    }
+
+    > .milestone {
+        justify-content: center;
+        align-items: flex-end;
+        > .content {
+            justify-content: center;
+            align-items: center;
+            width: 25vw;
+            font-size: 1rem;
+            padding: 10px 50px;
+            border-radius: 5px;
+
+            &.themed {
+                width: unset;
+                padding: unset;
+            }
+        }
+    }
+
+    > .leaderboard {
+        justify-content: flex-end;
+        align-items: flex-start;
+        > .content {
+            border-radius: 10px;
+            width: 25vw;
+            height: 25vh;
+            padding: 5px;
+            font-size: 0.9rem;
+            padding: 10px;
+
+            &.themed {
+                width: unset;
+                padding: unset;
+                height: unset;
+            }
+        }
+    }
+
+    > .trigger {
+        justify-content: center;
+        align-items: center;
+        > .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+
+            img {
+                height: 25vh;
+            }
+
+            span {
+                max-width: 25vh;
+            }
+        }
+    }
+}

@@ -5,7 +5,7 @@ import './App.scss';
 import './keyframes.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
-import { Home, Payment, Landing, Profile, Integration, Overlay } from './Pages';
+import { Home, Payment, Landing, Profile, Integration, Overlay, Studio, History } from './Pages';
 //import { Button } from 'react-bootstrap';
 import { ellipsizeThis } from './common/utils';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
@@ -13,6 +13,7 @@ import { useCurrentPath } from './Hooks/UseCurrentPath';
 import { Squid, TokenData } from '@0xsquid/sdk';
 import { Link } from 'react-router-dom';
 import { SquidContextData, SupportedChain } from './types';
+import { useCookies } from 'react-cookie';
 import _ from 'lodash';
 
 const { BSC_TEST, POLYGON_TEST, BSC, POLYGON } = ChainConfigs;
@@ -52,10 +53,15 @@ const routes = [
     { path: '/overlay' },
     { path: '/landing' },
     { path: '/pay/:streamerAddress' },
+    { path: '/studio/:streamerAddress' },
+    { path: '/history' },
 ];
 
 function App() {
+    const [cookies, /* setCookie, removeCookie */] = useCookies([ 'signatures' ]);
+
     const [address, setAddress] = useState('');
+    const [isVerified, setIsVerified] = useState(false);
     const [supportedChains, setSupportedChains] = useState<SupportedChain[]>([]);
     const [supportedTokens, setSupportedTokens] = useState<{ [chain: string]: TokenData[] }>({});
 
@@ -64,6 +70,7 @@ function App() {
     const [chainName, setChainName] = useState('');
     // const [isMobile, setIsMobile] = useState(false);
     const [shouldRenderHeader, setShouldRenderHeader] = useState(true);
+    const [shouldRenderFooter, setShouldRenderFooter] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
 
     //header will be hidden too
@@ -79,14 +86,43 @@ function App() {
     //mutable chain id cause dont wanna set into infinite loop
     let currentChain = useRef("");
 
+
 	// chain event handlers
-    const handleNewAccount = useCallback((address: string) => {
+    const handleNewAccount = useCallback(async (address: string) => {
         setIsLoading(false);
         setAddress(address);
 
-        if(address === "") {
+        // no need to verify payment page
+        if(currentPath === '/pay/:streamerAddress') {
+            return;
         }
-    }, []);
+
+        if(currentPath === '/studio/:streamerAddress') {
+            return;
+        }
+
+        if(!cookies) {
+            navigate("/");
+            return;
+        }
+
+        if(!address) {
+            navigate("/");
+            return;
+        }
+
+        let signatures = cookies['signatures'];
+        let signature = signatures?.[address];
+
+        // doesn't have signature, surely not verified, show button
+        if(!signature) {
+            navigate("/");
+            return;
+        }
+
+        // we will check signature in backend
+        setIsVerified(true);
+    }, [ currentPath, cookies, navigate ]);
 
     const handleChainChange = useCallback(async (chain: string) => {
         currentChain.current = chain;
@@ -113,11 +149,11 @@ function App() {
         toast.error('Portal fluids gone bad');
     }, []);
 
-    const onFinishLoading = () => {
+    const onFinishLoading = useCallback(() => {
 		setIsLoading(false);
-    }
+    }, []);
 
-    // initial loading
+    // effects
     useEffect(() => {
         const initSquid = async () => {
             if(isSquidInit.current) {
@@ -146,18 +182,18 @@ function App() {
         }
 
         let supportedChains: SupportedChain[] = [];
-        let supportedTokens: { [chain: string]: TokenData[] } = {};
+        let supportedTokens: { [chainId: string]: TokenData[] } = {};
 
         let uniqueIds: string[] = [];
         squid.tokens.forEach(token => {
             let chainConfig = _.find(ChainConfigs, { numericId: token.chainId });
             let chainName = chainConfig?.name ?? token.chainId.toString();
 
-            if(!supportedTokens[chainName]) {
-                supportedTokens[chainName] = [];
+            if(!supportedTokens[token.chainId.toString()]) {
+                supportedTokens[token.chainId.toString()] = [];
             }
 
-            supportedTokens[chainName].push(token);
+            supportedTokens[token.chainId.toString()].push(token);
 
             // only one chain per option
             if(uniqueIds.includes(token.chainId.toString())) {
@@ -180,10 +216,17 @@ function App() {
     useEffect(() => {
         if(!currentPath) {
             // no random pages
+            console.log('going back to /')
             navigate('/');
             return;
+        } else if (currentPath === '/studio/:streamerAddress') {
+            setShouldRenderHeader(false);
+            setShouldRenderFooter(false);
+        } else {
+            setShouldRenderHeader(true);
+            setShouldRenderFooter(true);
         }
-    }, [currentPath, navigate]);
+    }, [currentPath, navigate, isVerified]);
 
     /* if (!window.ethereum) {
         return (
@@ -260,26 +303,36 @@ function App() {
                     supportedTokens,
                 }}
             >
-                <AddressContext.Provider 
+                <AddressContext.Provider
                     value={{
                         address,
                         chainId,
                         chain,
-                        chainName
+                        chainName,
                     }}
                 >
-                    <Routes>
-                        <Route path="/" element={address? <Home /> : <Landing />}></Route>
-                        <Route path="/landing" element={<Landing />}></Route>
-                        <Route path="/profile" element={<Profile />}></Route>
-                        <Route path="/integration" element={<Integration />}></Route>
-                        <Route path="/overlay" element={<Overlay />}></Route>
-                        <Route path="/pay/:streamerAddress" element={<Payment shouldHide={shouldShowSwitcher}/>}></Route>
-                    </Routes>
+                    {
+                        isLoading &&
+                        <div className="d-flex align-items-center justify-content-center" style={{ height: '100vh', width: '100vw' }}>
+                        </div>
+                    }
+                    {
+                        !isLoading &&
+                        <Routes>
+                            <Route path="/" element={address? <Home /> : <Landing />}></Route>
+                            <Route path="/landing" element={<Landing />}></Route>
+                            <Route path="/profile" element={<Profile />}></Route>
+                            <Route path="/integration" element={<Integration />}></Route>
+                            <Route path="/overlay" element={<Overlay />}></Route>
+                            <Route path="/pay/:streamerAddress" element={<Payment shouldHide={shouldShowSwitcher}/>}></Route>
+                            <Route path="/studio/:streamerAddress" element={<Studio />}></Route>
+                            <Route path="/history" element={<History />}></Route>
+                        </Routes>
+                    }
                 </AddressContext.Provider>
             </SquidContext.Provider>
 
-			<footer>
+			<footer className={!shouldRenderFooter ? 'd-none' : 'd-flex'}>
                 <span>
 				    Made with ❤️ by the Streamera Team.
                 </span>
