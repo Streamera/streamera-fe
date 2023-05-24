@@ -9,6 +9,7 @@ import { getSignaturePassword } from '../../common/utils';
 import { useCookies } from 'react-cookie';
 import { toast } from 'react-toastify';
 import { ExpandOutlined, ReadOutlined, ApiOutlined, ProfileOutlined, } from '@ant-design/icons';
+import { Button } from 'antd';
 
 const Page = () => {
     const { address } = useContext(AddressContext);
@@ -112,8 +113,6 @@ const Page = () => {
                 params: [msg, address, pw],
             });
 
-            console.log(signature);
-
         } catch (err) {
             console.log(err);
             setIsVerified(false);
@@ -146,7 +145,7 @@ const Page = () => {
                 !isLoading &&
                 !isVerified &&
                 <div className="d-flex align-items-center justify-content-center" style={{ height: '100vh', width: '100vw' }}>
-                    <button onClick={onVerifyClick}>Verify to Continue</button>
+                    <Button onClick={onVerifyClick}>Verify to Continue</Button>
                 </div>
 
             }

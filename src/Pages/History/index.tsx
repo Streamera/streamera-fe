@@ -6,7 +6,7 @@ import { Card } from 'react-bootstrap';
 import { Empty } from 'antd';
 
 import { useCallback, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../../Services/axios';
 import { HistoryDataRaw, HistoryData, PaymentData } from './types';
 import { ellipsizeThis, getBaseUrl } from '../../common/utils';
 import _ from 'lodash';
@@ -22,7 +22,7 @@ const Page = () => {
     let [ history, setHistory ] = useState<HistoryData>({ send: [], receive: [] });
 
     const getTxs = useCallback(async() => {
-        let res = await axios.get<HistoryDataRaw>(`${getBaseUrl()}/payment/history/${address.toLowerCase()}`);
+        let res = await axios.get<HistoryDataRaw>(`/payment/history/${address.toLowerCase()}`);
 
         if (_.has(res.data, 'data')) {
             setHistory(res.data.data!);
