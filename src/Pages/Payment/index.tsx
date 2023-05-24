@@ -121,7 +121,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
 
                 await InsertPayment({
                     from_user: null,
-                    from_wallet: address,
+                    from_wallet: address.toLowerCase(),
                     from_chain: chainId,
                     from_token_symbol: fromTokenData?.symbol!,
                     from_token_address: fromTokenAddress,
@@ -182,7 +182,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
 
             await InsertPayment({
                 from_user: null,
-                from_wallet: address,
+                from_wallet: address.toLowerCase(),
                 from_chain: chainId,
                 from_token_symbol: fromTokenData?.symbol!,
                 from_token_address: fromTokenAddress,
@@ -208,7 +208,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
     }, [chain, address, streamerAddress, fromTokenAddress, fromAmount, toChain, chainId, squid, supportedChains, userDetails]);
 
     const onFromTokenAddressChange = useCallback(async(value: string) => {
-        const token = supportedTokens[chainId].find((x) => x.address === value)!;
+        const token = supportedTokens[chainId]?.find((x) => x.address === value)!;
 
         setFromTokenData(token);
         setFromTokenAddress(value);
@@ -312,7 +312,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         updateToChain();
         setUsdWorth();
 
-        const token = supportedTokens[chainId].find((x) => x.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')!;
+        const token = supportedTokens[chainId]?.find((x) => x.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')!;
         setFromTokenData(token);
 
     }, [ chainId, fromAmount, fromTokenAddress, getUsdWorthFromSquid, streamerAddress, supportedChains, supportedTokens, updateToChain, fromTokenData]);
