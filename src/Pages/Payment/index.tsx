@@ -10,7 +10,7 @@ import { UserDetails } from '../Profile/types';
 import axios from '../../Services/axios';
 import { User } from '../../types';
 import dayjs from 'dayjs';
-import { PaymentData, PaymentReturn } from './types';
+import { PaymentData, PaymentReturn, PaymentStatusData } from './types';
 import { TokenData } from '@0xsquid/sdk';
 import { ethers } from 'ethers';
 
@@ -22,7 +22,7 @@ const loadText: string[] = [
 
 const Page = ({ shouldHide } : { shouldHide: boolean }) => {
     let { streamerAddress } = useParams();
-    let [ loaderText, setLoaderText ] = useState<string>(loadText[0]);
+    let [ loaderText, setLoaderText ] = useState<string | JSX.Element>(loadText[0]);
     let [ showLoader, setShowLoader ] = useState<boolean>(false);
     let [ fromAmount, setFromAmount ] = useState<number>(0.01);
     let [ fromTokenWorth, setFromTokenWorth ] = useState<string>(`≈ $0.00`);
@@ -85,7 +85,11 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
     );
 
     const InsertPayment = useCallback(async(data: PaymentData) => {
-        await axios.post<PaymentReturn[]>('/payment', data);
+        return await axios.post<PaymentReturn>('/payment', data);
+    }, []);
+
+    const UpdatePayment = useCallback(async(id: number, data: PaymentStatusData) => {
+        await axios.post<PaymentReturn[]>(`/payment/update/${id}`, data);
     }, []);
 
     const onPayClick = useCallback(async() => {
@@ -115,7 +119,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
 
                 console.log(tx);
 
-                await InsertPayment({
+                const payment = await InsertPayment({
                     from_user: null,
                     from_wallet: address.toLowerCase(),
                     from_chain: chainId,
@@ -131,8 +135,13 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                     tx_hash: tx.transactionHash,
                     usd_worth: fromTokenWorth.replace('≈ $', '')
                 });
-                toast.success(SuccessBridgeToast(tx.transactionHash));
+
                 setShowLoader(false);
+                if (tx.status !== 1) {
+                    await UpdatePayment(Number(payment.data.data.id), { status: 'failed' });
+                    toast.error(SuccessBridgeToast(tx.transactionHash));
+                } else {
+                    toast.success(SuccessBridgeToast(tx.transactionHash), { autoClose: 15000, pauseOnHover: true, closeOnClick: false });                }
             }
 
             catch (e: any) {
@@ -169,7 +178,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
 
             console.log(tx);
 
-            await InsertPayment({
+            const payment = await InsertPayment({
                 from_user: null,
                 from_wallet: address.toLowerCase(),
                 from_chain: chainId,
@@ -185,8 +194,14 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                 tx_hash: tx.transactionHash,
                 usd_worth: fromTokenWorth.replace('≈ $', '')
             });
-            toast.success(SuccessBridgeToast(tx.transactionHash));
+
             setShowLoader(false);
+            if (tx.status !== 1) {
+                await UpdatePayment(Number(payment.data.data.id), { status: 'failed' });
+                toast.error(SuccessBridgeToast(tx.transactionHash));
+            } else {
+                toast.success(SuccessBridgeToast(tx.transactionHash), { autoClose: 15000, pauseOnHover: true, closeOnClick: false });
+            }
         }
 
         catch (e: any) {
@@ -194,7 +209,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
             console.log(e)
             toast.error(e.message as string);
         }
-    }, [InsertPayment, fromTokenData, fromTokenWorth, chain, address, streamerAddress, fromTokenAddress, fromAmount, chainId, squid, supportedChains, userDetails]);
+    }, [InsertPayment, UpdatePayment, fromTokenData, fromTokenWorth, chain, address, streamerAddress, fromTokenAddress, fromAmount, chainId, squid, supportedChains, userDetails]);
 
     const onFromTokenAddressChange = useCallback(async(value: string) => {
         const token = supportedTokens[chainId]?.find((x) => x.address === value)!;
@@ -257,11 +272,12 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
     };
 
     useEffect(() => {
-        // console.log(supportedTokens);
-        // console.log(supportedChains);
         const getUser = async() => {
             let res = await axios.post<User[]>('/user/find', { wallet: streamerAddress!.toLowerCase() });
             if(!res.data[0]) {
+                setShowLoader(true);
+                const jsxElement = <div>Wallet does not exist<br /><a href="/home">Back to home</a></div>;
+                setLoaderText(jsxElement);
                 return;
             }
 
