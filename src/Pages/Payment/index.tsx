@@ -205,7 +205,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
             console.log(e)
             toast.error(e.message as string);
         }
-    }, [chain, address, streamerAddress, fromTokenAddress, fromAmount, toChain, chainId, squid, supportedChains, userDetails]);
+    }, [InsertPayment, fromTokenData, fromTokenWorth, chain, address, streamerAddress, fromTokenAddress, fromAmount, toChain, chainId, squid, supportedChains, userDetails]);
 
     const onFromTokenAddressChange = useCallback(async(value: string) => {
         const token = supportedTokens[chainId]?.find((x) => x.address === value)!;
@@ -216,7 +216,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         // call squid
         const price = await getUsdWorthFromSquid(chainId, value);
         setFromTokenWorth(`≈ $${(fromAmount * price).toFixed(2)}`);
-    }, [chainId, fromAmount, getUsdWorthFromSquid]);
+    }, [chainId, fromAmount, getUsdWorthFromSquid, supportedTokens]);
 
     const onFromAmountChange = useCallback(async(value: number | null) => {
         value = value ?? 0;
@@ -255,7 +255,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                             </div>
                             <div className="content">
                                 <div className="circle">
-                                    <img className='loader' style={{width: 'auto', height: '150px'}} src={`/Loader/loading${webpIndex}.webp`} />
+                                    <img className='loader' style={{width: 'auto', height: '150px'}} alt="loading" src={`/Loader/loading${webpIndex}.webp`} />
                                     <div className="crescent">
                                     </div>
                                 </div>
