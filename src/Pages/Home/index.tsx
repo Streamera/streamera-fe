@@ -167,28 +167,28 @@ const Page = () => {
                         <div className="up">
                             <Link to="/overlay">
                                 <button className="card1">
-                                    <ExpandOutlined rev={1} className='mr-2'/>
+                                    <ExpandOutlined className='mr-2'/>
                                     <span>Overlay</span>
                                 </button>
                             </Link>
                             <Link to="/history">
                                 <button className="card2">
                                     <span>History</span>
-                                    <ReadOutlined rev={1} className='ml-2'/>
+                                    <ReadOutlined className='ml-2'/>
                                 </button>
                             </Link>
                         </div>
                         <div className="down">
                             <Link to="/integration">
                                 <button className="card3">
-                                    <ApiOutlined rev={1} className='mr-2'/>
+                                    <ApiOutlined className='mr-2'/>
                                     <span>Integration</span>
                                 </button>
                             </Link>
                             <Link to="/profile">
                                 <button className="card4">
                                     <span>Profile</span>
-                                    <ProfileOutlined rev={1} className='ml-2'/>
+                                    <ProfileOutlined className='ml-2'/>
                                 </button>
                             </Link>
                         </div>

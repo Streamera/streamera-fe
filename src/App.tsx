@@ -35,7 +35,7 @@ const allowedChains = isTestnet ? [
 export const AddressContext = createContext({
     address: "",
     chain: "",
-    chainId: -1,
+    chainId: 0,
     chainName: "",
 });
 
@@ -66,7 +66,7 @@ function App() {
     const [supportedTokens, setSupportedTokens] = useState<{ [chain: string]: TokenData[] }>({});
 
     const [chain, setChain] = useState('');
-    const [chainId, setChainId] = useState(-1);
+    const [chainId, setChainId] = useState(0);
     const [chainName, setChainName] = useState('');
     // const [isMobile, setIsMobile] = useState(false);
     const [shouldRenderLogo, setShouldRenderLogo] = useState(true);
@@ -131,9 +131,9 @@ function App() {
 
         let chainConfig = allowedChains.filter(x => x.id === chain)[0];
         let chainName = chainConfig?.shortName ?? '';
-        let chainId = chainConfig?.numericId ?? -1;
+        let chainId = chainConfig?.numericId ?? 0;
         setChainName(chainName.toLowerCase());
-        setChainId(typeof(chainId) === 'number'? chainId : -1);
+        setChainId(typeof(chainId) === 'number'? chainId : 0);
 
         setShouldShowSwitcher(
             currentPath === '/pay/:streamerAddress'

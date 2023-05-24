@@ -1,7 +1,7 @@
 import { useParams } from 'react-router';
 import './styles.scss'
 import { Button, Input, InputNumber, Select, Tooltip } from 'antd';
-import { useCallback, useContext, useState, useEffect } from 'react';
+import { useCallback, useContext, useState, useEffect, useRef } from 'react';
 import { AddressContext, SquidContext } from '../../App';
 import { ellipsizeThis } from '../../common/utils';
 import ContractCall from '../../Components/EVM/ContractCall';
@@ -21,14 +21,16 @@ const loadText: string[] = [
 ]
 
 const Page = ({ shouldHide } : { shouldHide: boolean }) => {
-    let { streamerAddress } = useParams();
-    let [ loaderText, setLoaderText ] = useState<string>(loadText[0]);
-    let [ showLoader, setShowLoader ] = useState<boolean>(false);
-    let [ fromAmount, setFromAmount ] = useState<number>(0.01);
-    let [ fromTokenWorth, setFromTokenWorth ] = useState<string>(`≈ $0.00`);
-    let [ fromTokenAddress, setFromTokenAddress ] = useState<string>("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
-    let [ fromTokenData, setFromTokenData ] = useState<TokenData | null>(null);
-    let [ fromChainLogo, setFromChainLogo ] = useState<string>("");
+    const { streamerAddress } = useParams();
+    const [ loaderText, setLoaderText ] = useState<string>(loadText[0]);
+    const [ showLoader, setShowLoader ] = useState<boolean>(false);
+    const [ fromAmount, setFromAmount ] = useState<number>(0.01);
+    const [ fromTokenWorth, setFromTokenWorth ] = useState<string>(`≈ $0.00`);
+    const [ fromTokenAddress, setFromTokenAddress ] = useState<string>("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
+    const [ fromTokenData, setFromTokenData ] = useState<TokenData | null>(null);
+    const [ fromChainLogo, setFromChainLogo ] = useState<string>("");
+    const [ hasError, setHasError ] = useState(false);
+
     const [userDetails, setUserDetails] = useState<UserDetails>({
         id: 0,
         name: "",
@@ -47,11 +49,8 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
     });
     const [pfp, setPfp] = useState<string>("");
 
-    // need to set after getting data from backend
-    // using select value for now
-
-    let { supportedChains, supportedTokens, squid } = useContext(SquidContext);
-    let { chain, chainId, address } = useContext(AddressContext);
+    const { supportedChains, supportedTokens, squid } = useContext(SquidContext);
+    const { chain, chainId, address } = useContext(AddressContext);
 
 
     const getUsdWorthFromSquid = useCallback(async(cid: number, tadd: string) => {
@@ -70,9 +69,6 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         if (selectedUsd > 0) {
             const tokenAmount = Math.round(selectedUsd / price * 10000) / 10000;
             setFromAmount(tokenAmount);
-            // console.log(`tokenAmount: ${tokenAmount}`);
-            // console.log(`fromAmount: ${fromAmount}`);
-            // console.log(`updateUsdToFromAmount`);
             setFromTokenWorth(`≈ $${(tokenAmount * price).toFixed(2)}`);
         }
     }, [chainId, fromTokenAddress, getUsdWorthFromSquid]);
@@ -216,13 +212,16 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         setFromTokenWorth(`≈ $${(value * price).toFixed(2)}`);
     }, [chainId, fromTokenAddress, getUsdWorthFromSquid]);
 
-    // fromChainLogo does not refresh (Need Fix!)
     // for from chain logo display (sender)
-    const updateToChain = useCallback(() => {
+    const updateFromChain = useCallback(() => {
         // set from chain logo (sender)
         const fromChainName = availableChainLogo.includes(Number(chainId)) ? chainId : 'other';
         setFromChainLogo(`/Chains/${fromChainName}.png`);
-    }, [chainId]);
+
+        const fromTokenAddress = supportedTokens[chainId]?.[0].address ?? "";
+        setFromTokenAddress(fromTokenAddress)
+
+    }, [chainId, supportedTokens]);
 
     // overlay loader
     const OverlayLoader = () => {
@@ -256,9 +255,8 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         )
     };
 
+    // when streamer address changes
     useEffect(() => {
-        // console.log(supportedTokens);
-        // console.log(supportedChains);
         const getUser = async() => {
             let res = await axios.post<User[]>('/user/find', { wallet: streamerAddress!.toLowerCase() });
             if(!res.data[0]) {
@@ -291,20 +289,46 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                 setPfp(userDetails.profile_picture);
             }
         }
+        getUser();
+    }, [ streamerAddress, supportedChains, supportedTokens ]);
+
+    useEffect(() => {
+        // empty chain
+        if(!chainId) {
+            return;
+        }
+
+        if(!supportedTokens[chainId]) {
+            toast.error('Chain not supported');
+            setHasError(true);
+            return;
+        }
 
         const setUsdWorth = async() => {
+            if(!fromTokenAddress) {
+                // missing token
+                return;
+            }
             const price = await getUsdWorthFromSquid(chainId, fromTokenAddress);
             setFromTokenWorth(`≈ $${(fromAmount * price).toFixed(2)}`);
         }
 
-        getUser();
-        updateToChain();
+        updateFromChain();
         setUsdWorth();
 
-        const token = supportedTokens[chainId]?.find((x) => x.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')!;
-        setFromTokenData(token);
 
-    }, [ chainId, fromAmount, fromTokenAddress, getUsdWorthFromSquid, streamerAddress, supportedChains, supportedTokens, updateToChain, fromTokenData]);
+        let token = supportedTokens[chainId]?.find((x) => x.address === fromTokenAddress);
+        if(!token) {
+            token = supportedTokens[chainId]?.[0];
+        }
+        setFromTokenData(token);
+        setHasError(false);
+
+    }, [ chainId, fromAmount, fromTokenAddress, getUsdWorthFromSquid, streamerAddress, supportedChains, supportedTokens, updateFromChain, fromTokenData]);
+
+    useEffect(() => {
+        
+    }, [ chainId ]);
 
     return (
         <div className={`payment-page ${shouldHide? 'd-none' : ''}`}>
@@ -338,14 +362,15 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                         <br />
                         <strong className='mt-3'>Quick Amount</strong>
                         <div className="input-container mb-0">
-                            <Button onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[0])} size={'middle'}>${userDetails.quick_amount?.[0]?.toFixed(2)}</Button>
-                            <Button onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[1])} size={'middle'}>${userDetails.quick_amount?.[1]?.toFixed(2)}</Button>
-                            <Button onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[2])} size={'middle'}>${userDetails.quick_amount?.[2]?.toFixed(2)}</Button>
-                            <Button onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[3])} size={'middle'}>${userDetails.quick_amount?.[3]?.toFixed(2)}</Button>
+                            <Button disabled={hasError} onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[0])} size={'middle'}>${userDetails.quick_amount?.[0]?.toFixed(2)}</Button>
+                            <Button disabled={hasError} onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[1])} size={'middle'}>${userDetails.quick_amount?.[1]?.toFixed(2)}</Button>
+                            <Button disabled={hasError} onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[2])} size={'middle'}>${userDetails.quick_amount?.[2]?.toFixed(2)}</Button>
+                            <Button disabled={hasError} onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[3])} size={'middle'}>${userDetails.quick_amount?.[3]?.toFixed(2)}</Button>
                         </div>
                         <strong className='mt-0 mb-1'>Tip</strong>
                         <div className="input-container mb-2">
                             <Select
+                                    disabled={hasError}
                                     suffixIcon={<img height={'15px'} width={'15px'} src={fromChainLogo} alt="suffix"/>}
                                     className='token-select'
                                     defaultValue={"0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"}
@@ -358,6 +383,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                                 >
                             </Select>
                             <InputNumber
+                                disabled={hasError}
                                 style={{ width: 250 }}
                                 // prefix={<PayCircleOutlined className="site-form-item-icon" />}
                                 addonAfter={fromTokenWorth}
@@ -369,7 +395,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                         </div>
                     </div>
                     <div className="text-title">
-                        <Button type="primary" size={'large'} className='tip-button' onClick={onPayClick}>
+                        <Button type="primary" size={'large'} className='tip-button' onClick={onPayClick} disabled={hasError}>
                             <i className="fas fa-gift"></i>&nbsp; Tip Now
                         </Button>
                     </div>
