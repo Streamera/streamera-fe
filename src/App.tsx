@@ -69,6 +69,7 @@ function App() {
     const [chainId, setChainId] = useState(-1);
     const [chainName, setChainName] = useState('');
     // const [isMobile, setIsMobile] = useState(false);
+    const [shouldRenderLogo, setShouldRenderLogo] = useState(true);
     const [shouldRenderHeader, setShouldRenderHeader] = useState(true);
     const [shouldRenderFooter, setShouldRenderFooter] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
@@ -219,12 +220,19 @@ function App() {
             console.log('going back to /')
             navigate('/');
             return;
-        } else if (currentPath === '/studio/:streamerAddress' || currentPath === '/pay/:streamerAddress') {
+        } else if (currentPath === '/studio/:streamerAddress') {
             setShouldRenderHeader(false);
+            setShouldRenderFooter(false);
+            setShouldRenderLogo(true);
+
+        } else if (currentPath === '/pay/:streamerAddress'){
+            setShouldRenderHeader(true);
+            setShouldRenderLogo(false);
             setShouldRenderFooter(false);
         } else {
             setShouldRenderHeader(true);
             setShouldRenderFooter(true);
+            setShouldRenderLogo(true);
         }
     }, [currentPath, navigate, isVerified]);
 
@@ -242,7 +250,10 @@ function App() {
 	return (
 		<div className="App">
 			<header className={`pc ${!shouldRenderHeader || shouldShowSwitcher? 'd-none' : 'd-flex'} w-100`}>
-				<Link to="/"><img src="/Media/Icons/logo.png" alt="logo" className='logo'/></Link>
+                {
+                    shouldRenderLogo &&
+                    <Link to="/"><img src="/Media/Icons/logo.png" alt="logo" className='logo'/></Link>
+                }
 
 				{/** Connectors */}
 				<div className={`connector-container`}>

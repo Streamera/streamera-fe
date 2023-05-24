@@ -370,7 +370,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                     </div>
                     <div className="text-title">
                         <Button type="primary" size={'large'} className='tip-button' onClick={onPayClick}>
-                            <i className="fas fa-gift"></i>&nbsp; Tips Now
+                            <i className="fas fa-gift"></i>&nbsp; Tip Now
                         </Button>
                     </div>
                 </div>
