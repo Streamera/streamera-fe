@@ -219,7 +219,7 @@ function App() {
             console.log('going back to /')
             navigate('/');
             return;
-        } else if (currentPath === '/studio/:streamerAddress') {
+        } else if (currentPath === '/studio/:streamerAddress' || currentPath === '/pay/:streamerAddress') {
             setShouldRenderHeader(false);
             setShouldRenderFooter(false);
         } else {
