@@ -3,7 +3,12 @@
     height: 100vh;
     width: 100vw;
 
-    .announcement, .qr, .poll, .milestone, .leaderboard, .trigger {
+    > .announcement, 
+    > .qr, 
+    > .poll, 
+    > .milestone, 
+    > .leaderboard, 
+    > .trigger {
         display: flex;
         position: absolute;
         inset: 0;
@@ -11,25 +16,29 @@
         padding: 10px;
     }
 
-    .announcement {
+    > .announcement {
         justify-content: center;
         align-items: flex-start;
 
-        .content {
+        > .content {
             justify-content: center;
             align-items: center;
             width: 50vw;
             padding: 2px;
             font-size: 1rem;
-            background: rgba(255, 0, 0, 0.7);
+
+            &.themed {
+                width: unset;
+                padding: unset;
+            }
         }
     }
 
-    .poll {
+    > .poll {
         justify-content: flex-start;
         align-items: center;
 
-        .content {
+        > .content {
             border: 1px solid black;
             border-radius: 10px;
             display: flex;
@@ -38,8 +47,15 @@
             width: 25vw;
             height: 27vh;
             font-size: 1rem;
-            background: rgba(255, 221, 0, 0.7);
             padding: 10px;
+
+            &.themed {
+                width: unset;
+                height: unset;
+                padding: unset;
+                border: unset;
+                border-radius: unset;
+            }
 
             > div > div > div {
                 // options
@@ -48,9 +64,8 @@
         }
     }
 
-    .qr {
-        .content {
-            background: rgba(255, 221, 0, 0.7);
+    > .qr {
+        > .content {
 
             img {
                 height: 20vh;
@@ -59,38 +74,47 @@
         }
     }
 
-    .milestone {
+    > .milestone {
         justify-content: center;
         align-items: flex-end;
-        .content {
+        > .content {
             justify-content: center;
             align-items: center;
             width: 25vw;
             font-size: 1rem;
-            background: rgba(255, 221, 0, 0.7);
             padding: 10px 50px;
             border-radius: 5px;
+
+            &.themed {
+                width: unset;
+                padding: unset;
+            }
         }
     }
 
-    .leaderboard {
+    > .leaderboard {
         justify-content: flex-end;
         align-items: flex-start;
-        .content {
+        > .content {
             border-radius: 10px;
             width: 25vw;
             height: 25vh;
             padding: 5px;
             font-size: 0.9rem;
-            background: rgba(255, 221, 0, 0.7);
             padding: 10px;
+
+            &.themed {
+                width: unset;
+                padding: unset;
+                height: unset;
+            }
         }
     }
 
-    .trigger {
+    > .trigger {
         justify-content: center;
         align-items: center;
-        .content {
+        > .content {
             display: flex;
             flex-direction: column;
             justify-content: center;

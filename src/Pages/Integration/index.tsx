@@ -48,7 +48,7 @@ const Page = () => {
             return;
         }
 
-        toast.success("Edited");
+        toast.success("Saved");
     }, [ webhook, cookies, address ]);
 
     const onTest = useCallback(async() => {
