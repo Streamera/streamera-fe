@@ -11,7 +11,6 @@ export default class ContractCall {
     provider: ethers.providers.JsonRpcProvider;
     chainConfig: ChainConfig;
     signer: ethers.providers.JsonRpcSigner;
-    streamera: Contract;
     nativeTokenAddress: string;
 
     constructor(chainId: string) {
@@ -20,7 +19,6 @@ export default class ContractCall {
         this.chainConfig = chain;
         this.provider = new ethers.providers.Web3Provider(window.ethereum as any);
         this.signer = this.provider.getSigner();
-        this.streamera = new ethers.Contract(chain.streameraAddress, Streamera.abi, this.signer);
 
         // default address set to 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
         this.nativeTokenAddress = chain.nativeTokenAddress ?? '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
@@ -92,6 +90,10 @@ export default class ContractCall {
             throw Error("No DEXs available!");
         }
 
+        if(!this.chainConfig.streameraAddress) {
+            throw Error("Unsupported Streamera Chain!");
+        }
+
         let {
             recipient,
         } = callParam;
@@ -104,17 +106,18 @@ export default class ContractCall {
             isToNative,
         } = await this._approveOrGetApproval(callParam);
 
-        const swap = await this.streamera.localSwap(
+        let streamera = new ethers.Contract(this.chainConfig.streameraAddress, Streamera.abi, this.signer);
+        const swap = await streamera.localSwap(
                                                 this.chainConfig.dexAddress,
                                                 adjustedFromTokenAddress,
                                                 adjustedToTokenAddress,
                                                 adjustedAmount.toString(),
                                                 recipient,
                                                 isToNative,
-                                                {
-                                                    value: isFromNative? ethers.BigNumber.from(adjustedAmount.toString()) : ethers.BigNumber.from('0'),
-                                                }
-                                            );
+                                            {
+                                                value: isFromNative? ethers.BigNumber.from(adjustedAmount.toString()) : ethers.BigNumber.from('0'),
+                                            }
+                                        );
 
         const tx = await swap.wait(1);
         console.log(`local swap done`);
@@ -122,6 +125,11 @@ export default class ContractCall {
     }
 
     bridgeSwap = async(callParam: BridgeCallParam) => {
+        if(!this.chainConfig.streameraAddress) {
+            throw Error("Unsupported Streamera Chain!");
+        }
+
+
         let {
             squid,
             recipient,
@@ -196,7 +204,8 @@ export default class ContractCall {
             }
         }) */
         //execute tx
-        const swap = await this.streamera.squidSwap(
+        let streamera = new ethers.Contract(this.chainConfig.streameraAddress, Streamera.abi, this.signer);
+        const swap = await streamera.squidSwap(
                                     sqRouter,
                                     !isFromNative? fromTokenAddress : this.nativeTokenAddress, // we use 0xeee if it's from native
                                     sqCallData,

@@ -15,17 +15,20 @@ import { Link } from 'react-router-dom';
 import { SquidContextData, SupportedChain } from './types';
 import { useCookies } from 'react-cookie';
 import _ from 'lodash';
+import { ARB_TEST, CELO_TEST, FANTOM_TESTNET, GOERLI, MOONBASE_ALPHA } from './Components/EVM/ChainConfigs';
 
 const { BSC_TEST, POLYGON_TEST, BSC, POLYGON } = ChainConfigs;
 const isTestnet = process.env.REACT_APP_CHAIN_ENV === "testnet";
 
 // assign chain info based on env
-const BscChain = isTestnet ? BSC_TEST : BSC;
-const PolygonChain = isTestnet ? POLYGON_TEST : POLYGON;
-
 const allowedChains = isTestnet ? [
     BSC_TEST,
-    POLYGON_TEST
+    POLYGON_TEST,
+    ARB_TEST,
+    CELO_TEST,
+    GOERLI,
+    FANTOM_TESTNET,
+    MOONBASE_ALPHA,
 ] : [
     BSC,
     POLYGON
@@ -143,11 +146,11 @@ function App() {
     }, [currentPath, address]);
 
     const handleUserRejection = useCallback(() => {
-        toast.error('You sure?');
+        toast.error('User rejected');
     }, []);
 
     const handleUnknownError = useCallback(() => {
-        toast.error('Portal fluids gone bad');
+        toast.error('Error occured');
     }, []);
 
     const onFinishLoading = useCallback(() => {
@@ -257,22 +260,40 @@ function App() {
 
 				{/** Connectors */}
 				<div className={`connector-container`}>
-					<EVMConnector
-						handleNewAccount={handleNewAccount}
-						handleChainChange={handleChainChange}
-						onFinishLoading={onFinishLoading}
-						className={`${isLoading? 'loading' : ''} metamask-connector`}
-					>
-						<div className={`metamask-btn ${address? 'disabled' : ''}`}>
-							<img src="/metamask-logo.png" alt="metamask-logo"></img>
-							<div className='metamask-text'>
-								<span>{
-									!window.ethereum? 'Get Metamask' :
-									(address? ellipsizeThis(address, 6, 0) : 'Connect')
-								}</span>
-							</div>
-						</div>
-					</EVMConnector>
+                    <EVMConnector
+                        handleNewAccount={handleNewAccount}
+                        handleChainChange={handleChainChange}
+                        onFinishLoading={onFinishLoading}
+                        className={`${isLoading? 'loading' : ''} metamask-connector ${!address && currentPath !== "/pay/:streamerAddress"? 'logged-out' : ''}`}
+                    >
+                        <>
+                            {
+                                !address &&
+                                currentPath !== "/pay/:streamerAddress" &&
+                                <div className="button-parrot">
+                                    Connect
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                </div>
+                            }
+                            {
+                                (address || currentPath === "/pay/:streamerAddress") &&
+                                <div className={`metamask-btn ${address? 'disabled' : ''}`}>
+                                    <img src="/metamask-logo.png" alt="metamask-logo"></img>
+                                    <div className='metamask-text'>
+                                        <span>{
+                                            !window.ethereum? 'Get Metamask' :
+                                            (address? ellipsizeThis(address, 6, 0) : 'Connect')
+                                        }</span>
+                                    </div>
+                                </div>
+                            }
+                        </>
+                    </EVMConnector>
 
 					{/* <span className={`logo-text ${address? 'd-block' : 'd-none'}`}>{ellipsizeThis(address, 5, 5)}</span> */}
 				</div>
@@ -282,27 +303,22 @@ function App() {
                 shouldShowSwitcher &&
                 address &&
                 <div className='chain-chooser-container'>
-                    <h1>Currently only supports these chains</h1>
-                    <EVMSwitcher
-                        targetChain={BscChain}
-                        handleChainChange={handleChainChange}
-                        handleUserRejection={handleUserRejection}
-                        handleUnknownError={handleUnknownError}
-                        className={'navigate-button ' + (chain === BscChain.id? 'active' : '')}
-                        currentChainId={chain}
-                    >
-                        <span>BSC</span>
-                    </EVMSwitcher>
-                    <EVMSwitcher
-                        targetChain={PolygonChain}
-                        handleChainChange={handleChainChange}
-                        handleUserRejection={handleUserRejection}
-                        handleUnknownError={handleUnknownError}
-                        className={'navigate-button ' + (chain === PolygonChain.id? 'active' : '')}
-                        currentChainId={chain}
-                    >
-                        <span>Polygon</span>
-                    </EVMSwitcher>
+                    <span>Currently only supports these chains</span>
+                    {
+                        allowedChains.map(x => (
+                            <EVMSwitcher
+                                targetChain={x}
+                                handleChainChange={handleChainChange}
+                                handleUserRejection={handleUserRejection}
+                                handleUnknownError={handleUnknownError}
+                                className={'navigate-button ' + (chain === x.id? 'active' : '')}
+                                currentChainId={chain}
+                            >
+                                <span>{x.name}</span>
+                            </EVMSwitcher>
+
+                        ))
+                    }
                 </div>
             }
 
