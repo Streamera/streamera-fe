@@ -35,7 +35,6 @@ const Page = ({ allowedChains }: { allowedChains: ChainConfig[] }) => {
     });
 
     // for display purposes only
-    const [toTokenSymbol, setToTokenSymbol] = useState("");
     const [toChainName, setToChainName] = useState("");
 
     const { address } = useContext(AddressContext);
@@ -82,6 +81,11 @@ const Page = ({ allowedChains }: { allowedChains: ChainConfig[] }) => {
             cloned[param] = value.toString();
         }
 
+        if(param === "to_token_address" || param === "to_chain") {
+            let symbol = supportedTokens[cloned.to_chain.toString()].find(x => x.address === cloned.to_token_address)?.symbol ?? "";
+            cloned["to_token_symbol"] = symbol;
+        }
+
         setUserDetails(cloned);
     }, [ userDetails, supportedTokens ]);
 
@@ -120,13 +124,6 @@ const Page = ({ allowedChains }: { allowedChains: ChainConfig[] }) => {
 
     // change to token symbol
     useEffect(() => {
-        if(!supportedTokens[userDetails.to_chain.toString()]) {
-            setToTokenSymbol("");
-            return;
-        }
-
-        let symbol = supportedTokens[userDetails.to_chain.toString()].find(x => x.address === userDetails.to_token_address)?.symbol ?? "";
-        setToTokenSymbol(symbol);
 
         let chainName = supportedChains.filter(x => x.chainId.toString() === userDetails.to_chain.toString())[0]?.name ?? "";
         setToChainName(chainName);
@@ -150,7 +147,7 @@ const Page = ({ allowedChains }: { allowedChains: ChainConfig[] }) => {
             return;
         }
 
-        if(!toTokenSymbol) {
+        if(!userDetails.to_token_symbol) {
             toast.error('Missing token');
             return;
         }
@@ -202,7 +199,7 @@ const Page = ({ allowedChains }: { allowedChains: ChainConfig[] }) => {
 
         toast.success("Updated");
         return;
-    }, [address, userDetails, cookies, toTokenSymbol, pfpFile]);
+    }, [address, userDetails, cookies, pfpFile]);
 
     return (
         <div className='profile-page'>
@@ -305,7 +302,7 @@ const Page = ({ allowedChains }: { allowedChains: ChainConfig[] }) => {
                             onChange={value => {
                                 onUserDetailsChanged(value, 'to_token_address');
                             }}
-                            value={toTokenSymbol}
+                            value={userDetails.to_token_symbol}
                         >
                         </Select>
                     </div>
