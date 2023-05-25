@@ -54,12 +54,19 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
 
 
     const getUsdWorthFromSquid = useCallback(async(cid: number, tadd: string) => {
-        let res = await axios.get(`https://testnet.api.0xsquid.com/v1/token-price?chainId=${cid}&tokenAddress=${tadd}`);
-
-        if(!res.data?.price) {
-            return;
+        try {
+            let res = await axios.get(`https://testnet.api.0xsquid.com/v1/token-price?chainId=${cid}&tokenAddress=${tadd}`);
+    
+            if(!res.data?.price) {
+                return;
+            }
+            return res.data.price;
         }
-        return res.data.price;
+
+        catch {
+            toast.error('Unable to get price!');
+            return 0;
+        }
     }, []);
 
     const updateUsdToFromAmount = useCallback(async(selectedUsd: number) => {
@@ -385,15 +392,15 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                         <br />
                         <strong className='mt-3'>Quick Amount</strong>
                         <div className="input-container mb-0">
-                            <Button disabled={hasError} onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[0])} size={'middle'}>${userDetails.quick_amount?.[0]?.toFixed(2)}</Button>
-                            <Button disabled={hasError} onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[1])} size={'middle'}>${userDetails.quick_amount?.[1]?.toFixed(2)}</Button>
-                            <Button disabled={hasError} onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[2])} size={'middle'}>${userDetails.quick_amount?.[2]?.toFixed(2)}</Button>
-                            <Button disabled={hasError} onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[3])} size={'middle'}>${userDetails.quick_amount?.[3]?.toFixed(2)}</Button>
+                            <Button disabled={!address || hasError} onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[0])} size={'middle'}>${userDetails.quick_amount?.[0]?.toFixed(2)}</Button>
+                            <Button disabled={!address ||hasError} onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[1])} size={'middle'}>${userDetails.quick_amount?.[1]?.toFixed(2)}</Button>
+                            <Button disabled={!address ||hasError} onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[2])} size={'middle'}>${userDetails.quick_amount?.[2]?.toFixed(2)}</Button>
+                            <Button disabled={!address ||hasError} onClick={() => updateUsdToFromAmount(userDetails.quick_amount?.[3])} size={'middle'}>${userDetails.quick_amount?.[3]?.toFixed(2)}</Button>
                         </div>
                         <strong className='mt-0 mb-1'>Tip</strong>
                         <div className="input-container mb-2">
                             <Select
-                                    disabled={hasError}
+                                    disabled={!address ||hasError}
                                     suffixIcon={<img height={'15px'} width={'15px'} src={fromChainLogo} alt="suffix"/>}
                                     className='token-select'
                                     defaultValue={"0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"}
@@ -406,7 +413,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                                 >
                             </Select>
                             <InputNumber
-                                disabled={hasError}
+                                disabled={!address ||hasError}
                                 style={{ width: 250 }}
                                 // prefix={<PayCircleOutlined className="site-form-item-icon" />}
                                 addonAfter={fromTokenWorth}
@@ -418,8 +425,8 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                         </div>
                     </div>
                     <div className="text-title">
-                        <Button type="primary" size={'large'} className='tip-button' onClick={onPayClick} disabled={hasError}>
-                            <i className="fas fa-gift"></i>&nbsp; Tip Now
+                        <Button type="primary" size={'large'} className='tip-button' onClick={onPayClick} disabled={!address || hasError}>
+                            <i className="fas fa-gift"></i>&nbsp;{address? 'Tip Now' : 'Not Connected'}
                         </Button>
                     </div>
                 </div>

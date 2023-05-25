@@ -15,7 +15,7 @@ import { Link } from 'react-router-dom';
 import { SquidContextData, SupportedChain } from './types';
 import { useCookies } from 'react-cookie';
 import _ from 'lodash';
-import { ARB_TEST, CELO_TEST, FANTOM_TESTNET, GOERLI, MOONBASE_ALPHA } from './Components/EVM/ChainConfigs';
+import { ARB_TEST, FANTOM_TESTNET, GOERLI, MOONBASE_ALPHA } from './Components/EVM/ChainConfigs';
 
 const { BSC_TEST, POLYGON_TEST, BSC, POLYGON } = ChainConfigs;
 const isTestnet = process.env.REACT_APP_CHAIN_ENV === "testnet";
@@ -25,7 +25,7 @@ const allowedChains = isTestnet ? [
     BSC_TEST,
     POLYGON_TEST,
     ARB_TEST,
-    CELO_TEST,
+    // CELO_TEST,
     GOERLI,
     FANTOM_TESTNET,
     MOONBASE_ALPHA,
@@ -313,6 +313,7 @@ function App() {
                                 handleUnknownError={handleUnknownError}
                                 className={'navigate-button ' + (chain === x.id? 'active' : '')}
                                 currentChainId={chain}
+                                key={`chain-${x.id}`}
                             >
                                 <span>{x.name}</span>
                             </EVMSwitcher>
@@ -348,7 +349,7 @@ function App() {
                         <Routes>
                             <Route path="/" element={address? <Home /> : <Landing />}></Route>
                             <Route path="/landing" element={<Landing />}></Route>
-                            <Route path="/profile" element={<Profile />}></Route>
+                            <Route path="/profile" element={<Profile allowedChains={allowedChains} />}></Route>
                             <Route path="/integration" element={<Integration />}></Route>
                             <Route path="/overlay" element={<Overlay />}></Route>
                             <Route path="/pay/:streamerAddress" element={<Payment shouldHide={shouldShowSwitcher}/>}></Route>
