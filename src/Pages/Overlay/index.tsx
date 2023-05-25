@@ -1329,7 +1329,7 @@ const Page = () => {
                                     className='mt-2 btn btn-info'
                                     disabled={!address}
                                     onClick={() => {
-                                        navigator.clipboard.writeText(`${getDappDomain()}/pay/${address}`);
+                                        navigator.clipboard.writeText(`//${getDappDomain()}/pay/${address}`);
                                         toast.success(`Copied URL`)
                                     }}
                                 >
@@ -1338,7 +1338,7 @@ const Page = () => {
                                 &nbsp;
                                 <a
                                     className='mt-2 btn btn-warning'
-                                    href={`${getDappDomain()}/pay/${address}`}
+                                    href={`//${getDappDomain()}/pay/${address}`}
                                     target={`_blank`}
                                 >
                                     Open in new tab
