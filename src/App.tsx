@@ -257,22 +257,39 @@ function App() {
 
 				{/** Connectors */}
 				<div className={`connector-container`}>
-					<EVMConnector
-						handleNewAccount={handleNewAccount}
-						handleChainChange={handleChainChange}
-						onFinishLoading={onFinishLoading}
-						className={`${isLoading? 'loading' : ''} metamask-connector`}
-					>
-						<div className={`metamask-btn ${address? 'disabled' : ''}`}>
-							<img src="/metamask-logo.png" alt="metamask-logo"></img>
-							<div className='metamask-text'>
-								<span>{
-									!window.ethereum? 'Get Metamask' :
-									(address? ellipsizeThis(address, 6, 0) : 'Connect')
-								}</span>
-							</div>
-						</div>
-					</EVMConnector>
+                    <EVMConnector
+                        handleNewAccount={handleNewAccount}
+                        handleChainChange={handleChainChange}
+                        onFinishLoading={onFinishLoading}
+                        className={`${isLoading? 'loading' : ''} metamask-connector ${!address? 'logged-out' : ''}`}
+                    >
+                        <>
+                            {
+                                !address &&
+                                <div className="button-parrot">
+                                    Connect
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                </div>
+                            }
+                            {
+                                address &&
+                                <div className={`metamask-btn ${address? 'disabled' : ''}`}>
+                                    <img src="/metamask-logo.png" alt="metamask-logo"></img>
+                                    <div className='metamask-text'>
+                                        <span>{
+                                            !window.ethereum? 'Get Metamask' :
+                                            (address? ellipsizeThis(address, 6, 0) : 'Connect')
+                                        }</span>
+                                    </div>
+                                </div>
+                            }
+                        </>
+                    </EVMConnector>
 
 					{/* <span className={`logo-text ${address? 'd-block' : 'd-none'}`}>{ellipsizeThis(address, 5, 5)}</span> */}
 				</div>
