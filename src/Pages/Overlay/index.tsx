@@ -1285,14 +1285,14 @@ const Page = () => {
                                 If it doesn't appear, make sure OBS has been updated to the latest version.
                             </p>
 
-                            <input type="text" id="studio-url" className="studio-url" value={`${getDappDomain()}/studio/${address}`} readOnly />
+                            <input type="text" id="studio-url" className="studio-url" value={`${document.location.protocol}//${getDappDomain()}/studio/${address}`} readOnly />
 
                             <div className='studio-action'>
                                 <button
                                     className='mt-2 btn btn-info studio-copy'
                                     disabled={!address}
                                     onClick={() => {
-                                        navigator.clipboard.writeText(`${getDappDomain()}/studio/${address}`);
+                                        navigator.clipboard.writeText(`${document.location.protocol}//${getDappDomain()}/studio/${address}`);
                                         toast.success(`Copied URL`)
                                     }}
                                 >
@@ -1301,7 +1301,7 @@ const Page = () => {
                                 &nbsp;
                                 <a
                                     className='mt-2 btn btn-warning studio-open'
-                                    href={`${getDappDomain()}/studio/${address}`}
+                                    href={`${document.location.protocol}//${getDappDomain()}/studio/${address}`}
                                     target={`_blank`}
                                 >
                                     Open in new tab
@@ -1322,14 +1322,14 @@ const Page = () => {
                             <br />
                             <br />
 
-                            <input type="text" id="pay-url" className="pay-url" value={`${getDappDomain()}/pay/${address}`} readOnly />
+                            <input type="text" id="pay-url" className="pay-url" value={`${document.location.protocol}//${getDappDomain()}/pay/${address}`} readOnly />
 
                             <div className='studio-action'>
                                 <button
                                     className='mt-2 btn btn-info'
                                     disabled={!address}
                                     onClick={() => {
-                                        navigator.clipboard.writeText(`//${getDappDomain()}/pay/${address}`);
+                                        navigator.clipboard.writeText(`${document.location.protocol}//${getDappDomain()}/pay/${address}`);
                                         toast.success(`Copied URL`)
                                     }}
                                 >
@@ -1338,7 +1338,7 @@ const Page = () => {
                                 &nbsp;
                                 <a
                                     className='mt-2 btn btn-warning'
-                                    href={`//${getDappDomain()}/pay/${address}`}
+                                    href={`${document.location.protocol}//${getDappDomain()}/pay/${address}`}
                                     target={`_blank`}
                                 >
                                     Open in new tab
