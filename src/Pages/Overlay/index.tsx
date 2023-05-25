@@ -793,7 +793,7 @@ const Page = () => {
 
     const sendTrigger = useCallback(async() => {
         await axios.post<QrCode[]>('/trigger/demo', { user_id: userState!.id });
-    }, []);
+    }, [userState]);
 
     // useEffects
     useEffect(() => {
