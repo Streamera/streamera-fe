@@ -1,6 +1,6 @@
 import { useParams } from 'react-router';
 import './styles.scss'
-import { Button, Input, InputNumber, Select, Tooltip } from 'antd';
+import { Button, Input, InputNumber, Select, Tooltip, Alert, Space } from 'antd';
 import { useCallback, useContext, useState, useEffect, useRef } from 'react';
 import { AddressContext, SquidContext } from '../../App';
 import { ellipsizeThis } from '../../common/utils';
@@ -56,7 +56,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
     const getUsdWorthFromSquid = useCallback(async(cid: number, tadd: string) => {
         try {
             let res = await axios.get(`https://testnet.api.0xsquid.com/v1/token-price?chainId=${cid}&tokenAddress=${tadd}`);
-    
+
             if(!res.data?.price) {
                 return;
             }
@@ -306,7 +306,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         getUser();
     }, [ streamerAddress, supportedChains, supportedTokens ]);
 
-    //when chainId changes 
+    //when chainId changes
     useEffect(() => {
         // empty chain
         if(!chainId) {
@@ -433,6 +433,25 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                     </div>
                 </div>
             </div>
+
+            <Space direction="vertical" size='small' style={{ maxWidth: '400px', width: '100%' }}>
+                <Alert
+                type="warning"
+                showIcon
+                message="Testnet Low Liquidity"
+                description={<>
+                    <code>Suggested Token</code><br />
+                    <span className="badge bg-warning">BSC</span> 0.0001 BNB
+                    <i className='mx-2 fas fa-arrow-right'></i>
+                    USDT <span className="badge bg-warning">BSC</span><br />
+                    <span className="badge bg-warning">BSC</span> 0.0001 BNB
+                    <i className='mx-2 fas fa-random'></i>
+                    aUSDT <span className="badge bg-danger">AVAX</span><br />
+                </>}
+                closable
+                // onClose={onClose}
+                />
+            </Space>
         </div>
     );
 }
