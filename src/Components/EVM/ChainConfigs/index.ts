@@ -15,7 +15,7 @@ export const BSC_TEST: ChainConfig = {
         symbol: 'BNB',
     },
     blockExplorerUrl: 'https://testnet.bscscan.com',
-    streameraAddress: '0x2D6d5b42fe8898515a74A2b53055967AE522e290',
+    streameraAddress: '0x8dce04da0C5D54298a4c4B0e9d5B7372D9a75AdE',
     dexAddress: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1",
     nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
     wrappedNativeTokenAddress: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
@@ -36,6 +36,10 @@ export const POLYGON_TEST: ChainConfig = {
         symbol: 'MATIC',
     },
     blockExplorerUrl: 'https://mumbai.polygonscan.com',
+    streameraAddress: '0x618499193a14AE668F844770c818e788763e45A2',
+    dexAddress: "0x8954AfA98594b838bda56FE4C12a09D7739D179b",
+    nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    wrappedNativeTokenAddress: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
 };
 export const AVAX_TEST: ChainConfig = {
     name: 'Avalanche Testnet',
@@ -50,6 +54,10 @@ export const AVAX_TEST: ChainConfig = {
         symbol: 'AVAX',
     },
     blockExplorerUrl: 'https://testnet.snowtrace.io/',
+    streameraAddress: '0x8A174E319401C45c23A9fdfF31d16E83dC7a3f68',
+    dexAddress: "0xE54Ca86531e17Ef3616d22Ca28b0D458b6C89106",
+    nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    wrappedNativeTokenAddress: '0xd00ae08403B9bbb9124bB305C09058E32C39A48c',
 };
 export const ETH: ChainConfig = {
     name: 'Ethereum',
@@ -383,6 +391,10 @@ export const GOERLI: ChainConfig = {
         symbol: 'ETH',
     },
     blockExplorerUrl: 'https://goerli.etherscan.io',
+    streameraAddress: '0x4e83524285919A7913Ac7Ed9E0F01E97D10dB03b',
+    dexAddress: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    wrappedNativeTokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
 };
 export const MOONBASE_ALPHA: ChainConfig = {
     name: 'Moonbase',
@@ -397,6 +409,10 @@ export const MOONBASE_ALPHA: ChainConfig = {
         symbol: 'DEV',
     },
     blockExplorerUrl: 'https://moonbase.moonscan.io',
+    streameraAddress: '0xaBFdb828687c26DE5acd363CB6eb5242B83De27f',
+    dexAddress: "0x2d4e873f9Ab279da9f1bb2c532d4F06f67755b77",
+    nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    wrappedNativeTokenAddress: '0x372d0695E75563D9180F8CE31c9924D7e8aaac47',
 };
 export const FILECOIN_TESTNET: ChainConfig = {
     name: 'Filecoin',
@@ -424,4 +440,8 @@ export const FANTOM_TESTNET: ChainConfig = {
         symbol: 'FTM',
     },
     blockExplorerUrl: 'https://testnet.ftmscan.com',
+    streameraAddress: '0x592D01064f80DeBC6B1e12CDEa847Ecf6e7192c9',
+    dexAddress: "0xa6AD18C2aC47803E193F75c3677b14BF19B94883",
+    nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    wrappedNativeTokenAddress: '0xf1277d1Ed8AD466beddF92ef448A132661956621',
 };
