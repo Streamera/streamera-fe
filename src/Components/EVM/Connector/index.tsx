@@ -1,6 +1,7 @@
 import MetaMaskOnboarding from '@metamask/onboarding';
 import React, { useState, useEffect, useRef } from 'react';
 import { ButtonProps } from './types';
+import { toast } from 'react-toastify';
 
 const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChainChange, onFinishLoading, children, style, className, }: ButtonProps) => {
     const [isDisabled, setDisabled] = useState(true);
@@ -140,7 +141,8 @@ const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChain
         if (MetaMaskOnboarding.isMetaMaskInstalled()) {
             window.ethereum!
                 .request({ method: 'eth_requestAccounts' })
-                .then((newAccounts: any) => setAccounts(newAccounts));
+                .then((newAccounts: any) => setAccounts(newAccounts))
+                .catch((e: any) => toast.error('User rejected connection!'));
         } else {
             if(onboarding.current) {
                 onboarding.current.startOnboarding();

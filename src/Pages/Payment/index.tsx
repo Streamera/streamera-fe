@@ -284,7 +284,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
             let user = res.data[0];
             let userDetails: UserDetails = { ...user, ...user.social };
 
-            if(!supportedChains.map(x => x.chainId.toString()).includes(user.to_chain)) {
+            if(!supportedChains.map(x => x.chainId.toString()).includes(user.to_chain) && supportedChains.length > 0) {
                 userDetails.to_chain = supportedChains[0].chainId.toString();
                 userDetails.to_token_address = supportedTokens[supportedChains[0].chainId][0].address ?? "";
             }
@@ -313,6 +313,11 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
     useEffect(() => {
         // empty chain
         if(!chainId) {
+            return;
+        }
+
+        // not loaded yet
+        if(!supportedTokens) {
             return;
         }
 
