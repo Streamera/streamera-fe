@@ -260,7 +260,7 @@ const Page = ({ allowedChains }: { allowedChains: ChainConfig[] }) => {
                     <strong>Donation Settings</strong>
                     <div className="input-group">
                         <div className="input-group-prepend">
-                            <div className="input-group-text">streamera.com/donate/</div>
+                            <div className="input-group-text">dapp.streamera.online/pay/</div>
                         </div>
                         <input type="text" className="form-control" placeholder="Username" value={userDetails.name} onChange={(e) => onUserDetailsChanged(e.target.value, "name")}/>
                     </div>
