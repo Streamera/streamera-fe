@@ -33,8 +33,6 @@ const Page = () => {
         getTxs();
     }, [address, getTxs]);
 
-    }, [])
-
     const HistoryLog = useCallback((data: PaymentData[]) => {
         let component: JSX.Element[] = [];
         let index = 0;
