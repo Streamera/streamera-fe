@@ -2,15 +2,18 @@ import { ChangeEvent, useCallback, useContext, useEffect, useRef, useState } fro
 import './styles.scss'
 import { OverlayButtonType, Timeframe } from './types';
 import { toast } from 'react-toastify';
-import { cloneObj } from '../../common/utils';
+import { cloneObj, getDappDomain } from '../../common/utils';
 import { QRCode } from 'react-qrcode-logo';
 import { AddressContext } from '../../App';
 import axios from '../../Services/axios';
 import { useCookies } from 'react-cookie';
 import { Announcement, Leaderboard, Milestone, Notification, OverlayPosition, QrCode, Status, Theme, User, Voting, VotingOptions } from '../../types';
-import { Select, DatePicker, Switch } from 'antd';
+import { Select, DatePicker, Switch, ColorPicker, Slider, Input, InputNumber, Tag } from 'antd';
 import {StudioAnnouncement, StudioLeaderboard, StudioMilestone, StudioVoting} from '../../Components/Studio';
+import PositionInput from '../../Components/PositionInput';
 import dayjs from 'dayjs';
+import moment from 'moment';
+import { UserDetails } from '../Profile/types';
 const { RangePicker } = DatePicker;
 
 const timeframeOptions = [
@@ -116,6 +119,7 @@ const Page = () => {
     const [ gif, setGif ] = useState<string>("");
     const [ notificationPosition, setNotificationPosition ] = useState<OverlayPosition>("middle-center");
     const [ notificationStatus, setNotificationStatus ] = useState<Status>("inactive");
+    const gifRef = useRef<any>();
 
     // Leaderboard
     const [ leaderboardId, setLeaderboardId ] = useState(0);
@@ -163,20 +167,23 @@ const Page = () => {
     const [ newQrLogoFile, setNewQrLogoFile ] = useState<File>();
     const [ qrPosition, setQrPosition ] = useState<OverlayPosition>("middle-center");
     const [ qrStatus, setQrStatus ] = useState<Status>("inactive");
+    const qrLogoRef = useRef<any>();
     const previousAddress = useRef<string>("");
+    const previousQrLogo = useRef<string>("");
+
+    // setup (userState)
+    const [ userState, setUserState ] = useState<User | null>(null);
 
     // announcement
-    const onAnnouncementColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setAnnouncementColor(e.target.value);
+    const onAnnouncementColorChange = useCallback((hex: string) => {
+        setAnnouncementColor(hex);
     }, []);
 
-    const onAnnouncementBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setAnnouncementBackgroundColor(e.target.value);
+    const onAnnouncementBackgroundColorChange = useCallback((hex: string) => {
+        setAnnouncementBackgroundColor(hex);
     }, []);
 
-    const onAnnouncementTextSpeedChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        let speed = parseInt(e.target.value);
-
+    const onAnnouncementTextSpeedChange = useCallback((speed: number) => {
         if(isNaN(speed)) {
             speed = 100;
         }
@@ -204,12 +211,12 @@ const Page = () => {
         setNotificationText(e.target.value);
     }, []);
 
-    const onNotificationTextColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setNotificationTextColor(e.target.value);
+    const onNotificationTextColorChange = useCallback((hex: string) => {
+        setNotificationTextColor(hex);
     }, []);
 
-    const onNotificationBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setNotificationBackgroundColor(e.target.value);
+    const onNotificationBackgroundColorChange = useCallback((hex: string) => {
+        setNotificationBackgroundColor(hex);
     }, []);
 
     const onNotificationPositionChange = useCallback((value: OverlayPosition) => {
@@ -220,21 +227,12 @@ const Page = () => {
         setNotificationStatus(value? "active" : "inactive");
     }, []);
 
-    // leaderboard
-    const onLeaderboardTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setLeaderboardText(e.target.value);
-    }, []);
+    const onGifButtonClicked = useCallback(() => {
+        if(!gifRef.current) {
+            return;
+        }
 
-    const onLeaderboardTextColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setLeaderboardTextColor(e.target.value);
-    }, []);
-
-    const onLeaderboardBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setLeaderboardBackgroundColor(e.target.value);
-    }, []);
-
-    const onLeaderboardTimeframeChanged = useCallback((value: Timeframe) => {
-        setLeaderboardTimeframe(value);
+        gifRef.current.click();
     }, []);
 
     const onGifValueChanged = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -242,6 +240,23 @@ const Page = () => {
             setGif(URL.createObjectURL(event.target.files[0]));
             setGifFile(event.target.files[0]);
         }
+    }, []);
+
+    // leaderboard
+    const onLeaderboardTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setLeaderboardText(e.target.value);
+    }, []);
+
+    const onLeaderboardTextColorChange = useCallback((hex: string) => {
+        setLeaderboardTextColor(hex);
+    }, []);
+
+    const onLeaderboardBackgroundColorChange = useCallback((hex: string) => {
+        setLeaderboardBackgroundColor(hex);
+    }, []);
+
+    const onLeaderboardTimeframeChanged = useCallback((value: Timeframe) => {
+        setLeaderboardTimeframe(value);
     }, []);
 
     const onLeaderboardPositionChange = useCallback((value: OverlayPosition) => {
@@ -261,28 +276,37 @@ const Page = () => {
         setMilestoneText(e.target.value);
     }, []);
 
-    const onMilestoneTextColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setMilestoneTextColor(e.target.value);
+    const onMilestoneTextColorChange = useCallback((hex: string) => {
+        setMilestoneTextColor(hex);
     }, []);
 
-    const onMilestoneBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setMilestoneBackgroundColor(e.target.value);
+    const onMilestoneBackgroundColorChange = useCallback((hex: string) => {
+        setMilestoneBackgroundColor(hex);
     }, []);
 
-    const onMilestoneProgressMainColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setMilestoneProgressMainColor(e.target.value);
+    const onMilestoneProgressMainColorChange = useCallback((hex: string) => {
+        setMilestoneProgressMainColor(hex);
     }, []);
 
-    const onMilestoneProgressColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setMilestoneProgressColor(e.target.value);
+    const onMilestoneProgressColorChange = useCallback((hex: string) => {
+        setMilestoneProgressColor(hex);
     }, []);
 
-    const onMilestoneTargetChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setMilestoneTarget(e.target.value);
+    const onMilestoneTargetChange = useCallback((value: string | null) => {
+        setMilestoneTarget(value ?? "0");
     }, []);
 
     const onMilestoneDateRangeChange = useCallback((dateRangeFn: any, dateRangeStrings: any, info: any) => {
         let [startDate, endDate] = dateRangeStrings;
+
+        if(!startDate) {
+            startDate = moment().format('YYYY-MM-DD HH:mm:ss');
+        }
+
+        if(!endDate) {
+            endDate = moment(startDate).add(1, 'day').format('YYYY-MM-DD HH:mm:ss');
+        }
+
         setMilestoneStartAt(startDate);
         setMilestoneEndAt(endDate);
     }, []);
@@ -316,12 +340,12 @@ const Page = () => {
         setVotingChoice("");
     }, []);
 
-    const onVotingTextColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setVotingTextColor(e.target.value);
+    const onVotingTextColorChange = useCallback((hex: string) => {
+        setVotingTextColor(hex);
     }, []);
 
-    const onVotingBackgroundColorChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        setVotingBackgroundColor(e.target.value);
+    const onVotingBackgroundColorChange = useCallback((hex: string) => {
+        setVotingBackgroundColor(hex);
     }, []);
 
     const onVotingPositionChange = useCallback((value: OverlayPosition) => {
@@ -334,6 +358,15 @@ const Page = () => {
 
     const onVotingDateRangeChange = useCallback((dateRangeFn: any, dateRangeStrings: any, info: any) => {
         let [startDate, endDate] = dateRangeStrings;
+
+        if(!startDate) {
+            startDate = moment().format('YYYY-MM-DD HH:mm:ss');
+        }
+
+        if(!endDate) {
+            endDate = moment(startDate).add(1, 'day').format('YYYY-MM-DD HH:mm:ss');
+        }
+
         setVotingStartAt(startDate);
         setVotingEndAt(endDate);
     }, []);
@@ -376,10 +409,22 @@ const Page = () => {
     }, [votingChoices]);
 
     // qrcode
+    const onQrButtonClicked = useCallback(() => {
+        if(!qrLogoRef.current) {
+            return;
+        }
+
+        qrLogoRef.current.click();
+    }, []);
+
     const onQrCodeLogoChanged = useCallback((event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
-            setNewQrLogo(URL.createObjectURL(event.target.files[0]));
-            setNewQrLogoFile(event.target.files[0]);
+            setNewQrLogoFile(undefined);
+
+            setTimeout(() => {
+                setNewQrLogo(URL.createObjectURL(event.target.files![0]));
+                setNewQrLogoFile(event.target.files![0]);
+            }, 0);
         }
     }, []);
 
@@ -746,6 +791,10 @@ const Page = () => {
         setQrStatus(status);
     }, []);
 
+    const sendTrigger = useCallback(async() => {
+        await axios.post<QrCode[]>('/trigger/demo', { user_id: userState!.id });
+    }, [userState]);
+
     // useEffects
     useEffect(() => {
         const getUserData = async() => {
@@ -762,6 +811,8 @@ const Page = () => {
             getMilestone(user);
             getVoting(user);
             getQrCode(user);
+
+            setUserState(user);
         }
 
         getUserData();
@@ -776,15 +827,15 @@ const Page = () => {
                 <button className={activeTab === 'milestone'? 'active' : ''} onClick={() => setActiveTab('milestone')}>Milestone</button>
                 <button className={activeTab === 'voting'? 'active' : ''} onClick={() => setActiveTab('voting')}>Voting</button>
                 <button className={activeTab === 'qrcode'? 'active' : ''} onClick={() => setActiveTab('qrcode')}>QR Code</button>
+                <button className={activeTab === 'setup'? 'active' : ''} onClick={() => setActiveTab('setup')}>Setup</button>
             </div>
 
             <div className="main-content">
-                <strong>{activeTab.charAt(0).toUpperCase() + activeTab.substring(1, activeTab.length)}</strong>
                 { /** Announcement */}
                 {
                     activeTab === "announcement" &&
                     <>
-                        <StudioAnnouncement 
+                        <StudioAnnouncement
                             text={announcementText}
                             speed={announcementTextSpeed}
                             color={announcementColor}
@@ -793,8 +844,32 @@ const Page = () => {
                             isPreview
                         />
 
-                        <strong className='mt-4'>Active</strong>
-                        <Switch onChange={onAnnouncementActiveChange} checked={announcementStatus === "active"}></Switch>
+                        <div className="d-flex flex-column w-100">
+
+                        </div>
+                        <div className="d-flex align-items-center justify-content-center my-5 w-100">
+                            <strong className='mr-2'>Active</strong>
+                            <Switch onChange={onAnnouncementActiveChange} checked={announcementStatus === "active"}></Switch>
+                            <strong className='ml-5 mr-2'>Text</strong>
+                            <ColorPicker
+                                value={announcementColor}
+                                onChange={(value, hex) => onAnnouncementColorChange(hex) }
+                            />
+                            <strong className='ml-5 mr-2'>Background</strong>
+                            <ColorPicker
+                                value={announcementBackgroundColor}
+                                onChange={(value, hex) => onAnnouncementBackgroundColorChange(hex) }
+                            />
+                        </div>
+                        <strong>Text Speed</strong>
+                        <Slider
+                            defaultValue={announcementTextSpeed}
+                            onAfterChange={onAnnouncementTextSpeedChange}
+                            min={10}
+                            max={300}
+                            className='w-100'
+                            style={{ maxWidth: 500 }}
+                        />
 
                         <strong className='mt-4'>Theme</strong>
                         <Select
@@ -806,29 +881,19 @@ const Page = () => {
                         >
                         </Select>
 
-                        <div className="d-flex align-items-center mt-3 w-100">
-                            <strong className='mr-2'>Text Color</strong>
-                            <input type="color" value={announcementColor} onChange={onAnnouncementColorChange}/>
-                            <strong className='ml-5 mr-2'>Background Color</strong>
-                            <input type="color" value={announcementBackgroundColor} onChange={onAnnouncementBackgroundColorChange}/>
-                            <strong className='ml-5 mr-2'>Text Speed</strong>
-                            <input type="decimal" step={1} className='form-control' style={{ maxWidth: 100 }} value={announcementTextSpeed} onChange={onAnnouncementTextSpeedChange}/>
-                        </div>
-
-                        <div className="d-flex flex-column mt-4 align-items-start w-100">
-                            <strong>Display Text</strong>
-                            <input type="text" className='form-control mt-1' value={announcementText} style={{ maxWidth: 500 }} onChange={onAnnouncementTextChange}/>
-                        </div>
+                        <strong className='mt-4'>Display Text</strong>
+                        <Input
+                            style={{ maxWidth: 500 }}
+                            className='w-100'
+                            value={announcementText}
+                            onChange={onAnnouncementTextChange}
+                        />
 
                         <strong className='mt-4'>Position</strong>
-                        <Select
-                            className='w-100 text-left'
-                            style={{ maxWidth: 500 }}
-                            options={overlayPositionOptions}
-                            onChange={value => { onAnnouncementPositionChange(value); }}
+                        <PositionInput
                             value={announcementPosition}
-                        >
-                        </Select>
+                            onChange={onAnnouncementPositionChange}
+                        />
                     </>
                 }
                 { /** Notification */}
@@ -845,32 +910,39 @@ const Page = () => {
                             </div>
                         </div>
 
-                        <strong className='mt-4'>Active</strong>
-                        <Switch onChange={onNotificationActiveChange} checked={notificationStatus === "active"}></Switch>
+                        <div className="d-flex align-items-center my-5">
 
-                        <div className="d-flex flex-column align-items-start mt-3 w-100">
-                            <div className="d-flex align-items-center mt-3 w-100">
-                                <strong className='mr-2'>Color</strong>
-                                <input type="color" value={notificationTextColor} onChange={onNotificationTextColorChange}/>
-                                <strong className='ml-5 mr-2'>Background Color</strong>
-                                <input type="color" value={notificationBackgroundColor} onChange={onNotificationBackgroundColorChange}/>
-                            </div>
-                            <strong className='mt-3'>GIF</strong>
-                            <input type="file" accept='image/gif' onChange={onGifValueChanged}/>
+                            <strong className='mr-2'>Active</strong>
+                            <Switch onChange={onNotificationActiveChange} checked={notificationStatus === "active"}></Switch>
 
-                            <strong className='mt-3'>Notification Text</strong>
-                            <input type="text" className='form-control' style={{ maxWidth: 500 }} value={notificationText} onChange={onNotificationTextChange}/>
+                            <strong className='ml-5 mr-2'>Text</strong>
+                            <ColorPicker
+                                value={notificationTextColor}
+                                onChange={(value, hex) => onNotificationTextColorChange(hex) }
+                            />
+                            <strong className='ml-5 mr-2'>Background</strong>
+                            <ColorPicker
+                                value={notificationBackgroundColor}
+                                onChange={(value, hex) => onNotificationBackgroundColorChange(hex) }
+                            />
 
-                            <strong className='mt-4'>Position</strong>
-                            <Select
-                                className='w-100 text-left'
-                                style={{ maxWidth: 500 }}
-                                options={overlayPositionOptions}
-                                onChange={value => { onNotificationPositionChange(value); }}
-                                value={notificationPosition}
-                            >
-                            </Select>
+                            <button className='ml-5 upload-button' onClick={onGifButtonClicked}><i className="fa fa-upload"></i><span>Upload GIF</span></button>
+                            <input ref={ref => gifRef.current = ref} className='d-none' type="file" accept='image/gif,image/webp' onChange={onGifValueChanged}/>
                         </div>
+
+                        <strong className='mt-4'>Notification Text</strong>
+                        <Input
+                            style={{ maxWidth: 500 }}
+                            className='w-100'
+                            value={notificationText}
+                            onChange={onNotificationTextChange}
+                        />
+
+                        <strong className='mt-4'>Position</strong>
+                        <PositionInput
+                            value={notificationPosition}
+                            onChange={onNotificationPositionChange}
+                        />
                     </>
                 }
                 { /** Leaderboard */}
@@ -911,8 +983,22 @@ const Page = () => {
                             ]}
                             isPreview
                         />
-                        <strong className='mt-4'>Active</strong>
-                        <Switch onChange={onLeaderboardActiveChange} checked={leaderboardStatus === "active"}></Switch>
+
+                        <div className="d-flex align-items-center mt-3">
+                            <strong className='mr-2'>Active</strong>
+                            <Switch onChange={onLeaderboardActiveChange} checked={leaderboardStatus === "active"}></Switch>
+
+                            <strong className='ml-5 mr-2'>Text</strong>
+                            <ColorPicker
+                                value={leaderboardTextColor}
+                                onChange={(value, hex) => onLeaderboardTextColorChange(hex) }
+                            />
+                            <strong className='ml-5 mr-2'>Background</strong>
+                            <ColorPicker
+                                value={leaderboardBackgroundColor}
+                                onChange={(value, hex) => onLeaderboardBackgroundColorChange(hex) }
+                            />
+                        </div>
 
                         <strong className='mt-4'>Theme</strong>
                         <Select
@@ -924,36 +1010,28 @@ const Page = () => {
                         >
                         </Select>
 
-                        <div className="d-flex flex-column align-items-start mt-3 w-100">
-                            <div className="d-flex align-items-center mt-3 w-100">
-                                <strong className='mr-2'>Color</strong>
-                                <input type="color" value={leaderboardTextColor} onChange={onLeaderboardTextColorChange}/>
-                                <strong className='ml-5 mr-2'>Background Color</strong>
-                                <input type="color" value={leaderboardBackgroundColor} onChange={onLeaderboardBackgroundColorChange}/>
-                            </div>
-                            <strong className='mt-3'>Text</strong>
-                            <input type="text" className='form-control' style={{ maxWidth: 500 }} value={leaderboardText} onChange={onLeaderboardTextChange}/>
+                        <strong className='mt-3'>Text</strong>
+                        <Input
+                            style={{ maxWidth: 500 }}
+                            value={leaderboardText}
+                            onChange={onLeaderboardTextChange}
+                        />
 
-                            <strong className='mt-3'>Timeframe</strong>
-                            <Select
-                                className='w-100 text-left'
-                                style={{ maxWidth: 500 }}
-                                options={timeframeOptions}
-                                onChange={value => { onLeaderboardTimeframeChanged(value); }}
-                                value={leaderboardTimeframe}
-                            >
-                            </Select>
+                        <strong className='mt-3'>Timeframe</strong>
+                        <Select
+                            className='w-100 text-left'
+                            style={{ maxWidth: 500 }}
+                            options={timeframeOptions}
+                            onChange={value => { onLeaderboardTimeframeChanged(value); }}
+                            value={leaderboardTimeframe}
+                        >
+                        </Select>
 
-                            <strong className='mt-4'>Position</strong>
-                            <Select
-                                className='w-100 text-left'
-                                style={{ maxWidth: 500 }}
-                                options={overlayPositionOptions}
-                                onChange={value => { onLeaderboardPositionChange(value); }}
-                                value={leaderboardPosition}
-                            >
-                            </Select>
-                        </div>
+                        <strong className='mt-4'>Position</strong>
+                        <PositionInput
+                            value={leaderboardPosition}
+                            onChange={onLeaderboardPositionChange}
+                        />
                     </>
                 }
                 { /** Milestone */}
@@ -973,8 +1051,35 @@ const Page = () => {
                             isPreview
                         />
 
-                        <strong className='mt-4'>Active</strong>
-                        <Switch onChange={onMilestoneActiveChange} checked={milestoneStatus === "active"}></Switch>
+                        <div className="d-flex flex-column justify-content-center">
+                            <div className="d-flex align-items-center mt-3">
+                                <strong className='mr-2'>Active</strong>
+                                <Switch onChange={onMilestoneActiveChange} checked={milestoneStatus === "active"}></Switch>
+
+                                <strong className='ml-5 mr-2'>Text</strong>
+                                <ColorPicker
+                                    value={milestoneTextColor}
+                                    onChange={(value, hex) => onMilestoneTextColorChange(hex) }
+                                />
+                                <strong className='ml-5 mr-2'>Background</strong>
+                                <ColorPicker
+                                    value={milestoneBackgroundColor}
+                                    onChange={(value, hex) => onMilestoneBackgroundColorChange(hex) }
+                                />
+                            </div>
+                            <div className="d-flex justify-content-center mt-3">
+                                <strong className='mr-2'>Bar Color</strong>
+                                <ColorPicker
+                                    value={milestoneProgressColor}
+                                    onChange={(value, hex) => onMilestoneProgressColorChange(hex) }
+                                />
+                                <strong className='ml-5 mr-2'>Progress Color</strong>
+                                <ColorPicker
+                                    value={milestoneProgressMainColor}
+                                    onChange={(value, hex) => onMilestoneProgressMainColorChange(hex) }
+                                />
+                            </div>
+                        </div>
 
                         <strong className='mt-4'>Theme</strong>
                         <Select
@@ -986,50 +1091,44 @@ const Page = () => {
                         >
                         </Select>
 
-                        <div className="d-flex flex-column align-items-start mt-3 w-100">
+                        <strong className='mt-3'>Date Range</strong>
+                        <RangePicker
+                            showTime
+                            value={[dayjs(milestoneStartAt), dayjs(milestoneEndAt)]}
+                            onCalendarChange={onMilestoneDateRangeChange}
+                            style={{ width: 500 }}
+                        />
+                        <strong className='mt-3'>Text</strong>
+                        <Input
+                            className='w-100'
+                            value={milestoneText}
+                            onChange={onMilestoneTextChange}
+                            style={{ maxWidth: 500 }}
+                        />
 
-                            <div className="d-flex align-items-center mt-3 w-100">
-                                <strong className='mr-2'>Color</strong>
-                                <input type="color" value={milestoneTextColor} onChange={onMilestoneTextColorChange}/>
-                                <strong className='ml-5 mr-2'>Background Color</strong>
-                                <input type="color" value={milestoneBackgroundColor} onChange={onMilestoneBackgroundColorChange}/>
-                                <strong className='ml-5 mr-2'>Progress Main Color</strong>
-                                <input type="color" value={milestoneProgressMainColor} onChange={onMilestoneProgressMainColorChange}/>
-                                <strong className='ml-5 mr-2'>Progress Color</strong>
-                                <input type="color" value={milestoneProgressColor} onChange={onMilestoneProgressColorChange}/>
-                            </div>
-                            <strong className='mt-3'>Date Range</strong>
-                            <RangePicker
-                                showTime
-                                value={[dayjs(milestoneStartAt), dayjs(milestoneEndAt)]}
-                                onCalendarChange={onMilestoneDateRangeChange}
-                            />
-                            <strong className='mt-3'>Text</strong>
-                            <input type="text" className='form-control' style={{ maxWidth: 500 }} value={milestoneText} onChange={onMilestoneTextChange}/>
+                        <strong className='mt-3'>Target</strong>
+                        <InputNumber
+                            className='w-100'
+                            style={{ maxWidth: 500 }}
+                            value={milestoneTarget}
+                            onChange={onMilestoneTargetChange}
+                        />
 
-                            <strong className='mt-3'>Target</strong>
-                            <input type="decimal" step={0.01} className='form-control' style={{ maxWidth: 500 }} value={milestoneTarget} onChange={onMilestoneTargetChange}/>
+                        <strong className='mt-3'>Timeframe</strong>
+                        <Select
+                            className='w-100 text-left'
+                            style={{ maxWidth: 500 }}
+                            options={timeframeOptions}
+                            onChange={value => { onMilestoneTimeframeChanged(value); }}
+                            value={leaderboardTimeframe}
+                        >
+                        </Select>
 
-                            <strong className='mt-3'>Timeframe</strong>
-                            <Select
-                                className='w-100 text-left'
-                                style={{ maxWidth: 500 }}
-                                options={timeframeOptions}
-                                onChange={value => { onMilestoneTimeframeChanged(value); }}
-                                value={leaderboardTimeframe}
-                            >
-                            </Select>
-
-                            <strong className='mt-4'>Position</strong>
-                            <Select
-                                className='w-100 text-left'
-                                style={{ maxWidth: 500 }}
-                                options={overlayPositionOptions}
-                                onChange={value => { onMilestonePositionChange(value); }}
-                                value={milestonePosition}
-                            >
-                            </Select>
-                        </div>
+                        <strong className='mt-4'>Position</strong>
+                        <PositionInput
+                            value={milestonePosition}
+                            onChange={onMilestonePositionChange}
+                        />
                     </>
                 }
                 { /** Voting */}
@@ -1047,8 +1146,20 @@ const Page = () => {
                             isPreview
                         />
 
-                        <strong className='mt-4'>Active</strong>
-                        <Switch onChange={onVotingActiveChange}  checked={votingStatus === "active"}></Switch>
+                        <div className="d-flex align-items-center mt-3">
+                            <strong className='mr-2'>Active</strong>
+                            <Switch onChange={onVotingActiveChange}  checked={votingStatus === "active"}></Switch>
+                            <strong className='ml-5 mr-2'>Text</strong>
+                            <ColorPicker
+                                value={votingTextColor}
+                                onChange={(value, hex) => onVotingTextColorChange(hex) }
+                            />
+                            <strong className='ml-5 mr-2'>Background</strong>
+                            <ColorPicker
+                                value={votingBackgroundColor}
+                                onChange={(value, hex) => onVotingBackgroundColorChange(hex) }
+                            />
+                        </div>
 
                         <strong className='mt-4'>Theme</strong>
                         <Select
@@ -1060,47 +1171,50 @@ const Page = () => {
                         >
                         </Select>
 
-                        <div className="d-flex flex-column align-items-start mt-3 w-100">
-                            <div className="d-flex align-items-center mt-3 w-100">
-                                <strong className='mr-2'>Color</strong>
-                                <input type="color" value={votingTextColor} onChange={onVotingTextColorChange}/>
-                                <strong className='ml-5 mr-2'>Background Color</strong>
-                                <input type="color" value={votingBackgroundColor} onChange={onVotingBackgroundColorChange}/>
-                            </div>
-                            <strong className='mt-3'>Date Range</strong>
-                            <RangePicker
-                                showTime
-                                value={[dayjs(votingStartAt), dayjs(votingEndAt)]}
-                                onCalendarChange={onVotingDateRangeChange}
-                            />
-                            <strong className='mt-3'>Title</strong>
-                            <input type="text" className='form-control' style={{ maxWidth: 500 }} value={votingText} onChange={onVotingTextChange}/>
-                            <strong className='mt-3'>New Choice</strong>
-                            <div className="d-flex align-items-center" style={{ maxWidth: 500 }}>
-                                <input type="text" className='form-control' value={votingChoice} onChange={onVotingChoiceChange}/>
-                                <button className="btn btn-success btn-sm ml-2" onClick={() => { onChoiceAdd() } }><i className="fa fa-plus"></i></button>
-                            </div>
-                            <div className="choices-container">
-                                {
-                                    votingChoices.map((x, index) => (
-                                        <div className="vote-choice" key={`${x.option}|choices|${index}`}>
-                                            <span>{x.option}</span>
-                                            <button className='btn btn-sm btn-danger' onClick={() => { onChoiceDelete(x.id ?? 0, x.option) }}><i className="fa fa-trash"></i></button>
-                                        </div>
-                                    ))
-                                }
-                            </div>
+                        <strong className='mt-3'>Date Range</strong>
+                        <RangePicker
+                            className='w-100'
+                            style={{ maxWidth: 500 }}
+                            showTime
+                            value={[dayjs(votingStartAt), dayjs(votingEndAt)]}
+                            onCalendarChange={onVotingDateRangeChange}
+                        />
+                        <strong className='mt-3'>Title</strong>
+                        <Input
+                            className='w-100'
+                            style={{ maxWidth: 500 }}
+                            value={votingText}
+                            onChange={onVotingTextChange}
+                        />
 
-                            <strong className='mt-4'>Position</strong>
-                            <Select
-                                className='w-100 text-left'
+                        <strong className='mt-3'>New Choice</strong>
+                        <div className="d-flex align-items-center w-100" style={{ maxWidth: 500 }}>
+                            <Input
+                                className='w-100'
                                 style={{ maxWidth: 500 }}
-                                options={overlayPositionOptions}
-                                onChange={value => { onVotingPositionChange(value); }}
-                                value={votingPosition}
-                            >
-                            </Select>
+                                value={votingChoice}
+                                onChange={onVotingChoiceChange}
+                            />
+                            <button className="btn btn-success btn-sm ml-2" onClick={() => { onChoiceAdd() } }><i className="fa fa-plus"></i></button>
                         </div>
+                        <div className="choices-container">
+                            {
+                                votingChoices.map((x, index) => (
+                                    <div className="vote-choice" key={`${x.option}|choices|${index}`}>
+                                        <button className="delete" onClick={() => onChoiceDelete(x.id ?? 0, x.option)}>
+                                            <span className='text'>{x.option}</span>
+                                            <span className="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"></path></svg></span>
+                                        </button>
+                                    </div>
+                                ))
+                            }
+                        </div>
+
+                        <strong className='mt-4'>Position</strong>
+                        <PositionInput
+                            value={votingPosition}
+                            onChange={onVotingPositionChange}
+                        />
                     </>
                 }
                 { /** QR Code */}
@@ -1119,7 +1233,7 @@ const Page = () => {
                             /** editing */
                             newQrLogoFile &&
                             <QRCode
-                                value={`https://metamask.app.link/dapp/localhost:3000/pay/${address}`}
+                                value={`https://metamask.app.link/dapp/${getDappDomain()}/pay/${address}`}
                                 logoImage={newQrLogo}
                                 logoHeight={50}
                                 logoWidth={50}
@@ -1128,10 +1242,11 @@ const Page = () => {
                                     const canvas: any = document.getElementById("qr-code");
                                     if(canvas) {
                                         canvas.toBlob((blob: Blob) => {
-                                            if(address === previousAddress.current) {
+                                            if(address === previousAddress.current && newQrLogo === previousQrLogo.current) {
                                                 return;
                                             }
                                             previousAddress.current = address;
+                                            previousQrLogo.current = newQrLogo;
                                             setQrBlob(blob);
                                         });
                                     }
@@ -1140,33 +1255,116 @@ const Page = () => {
                             />
                         }
 
-                        <strong className='mt-4'>Active</strong>
-                        <Switch onChange={onQrActiveChange} checked={qrStatus === "active"}></Switch>
+                        <div className="d-flex mt-3">
+                            <strong className='mr-2'>Active</strong>
+                            <Switch onChange={onQrActiveChange} checked={qrStatus === "active"}></Switch>
 
-                        <strong className='mt-4'>Change Logo</strong>
-                        <input type="file" onChange={onQrCodeLogoChanged} accept='image/jpeg, image/png'></input>
+                            <button className='ml-5 upload-button' onClick={onQrButtonClicked}><i className="fa fa-upload"></i><span>Upload Logo</span></button>
+                            <input className='d-none' ref={ref => qrLogoRef.current = ref} type="file" onChange={onQrCodeLogoChanged} accept='image/jpeg, image/png'></input>
+                        </div>
 
                         <strong className='mt-4'>Position</strong>
-                        <Select
-                            className='w-100 text-left'
-                            style={{ maxWidth: 500 }}
-                            options={overlayPositionOptions}
-                            onChange={value => { onQrPositionChange(value); }}
+                        <PositionInput
                             value={qrPosition}
-                        >
-                        </Select>
+                            onChange={onQrPositionChange}
+                        />
                     </>
                 }
-                <div className="button-container">
-                    <button
-                        className='save'
-                        onClick={onSaveClick}
-                        disabled={!address}
-                        style={{cursor: address? 'pointer' : 'no-drop'}}
-                    >
-                        {address? 'Save' : 'Connect to Continue'}
-                    </button>
-                </div>
+                { /** Setup */}
+                {
+                    activeTab === "setup" &&
+                    <>
+                        <div className='mt-3 mx-5 text-left'>
+                            <h3>Overlay URL:</h3>
+                            Click the <span className="badge bg-info">Copy</span> button and paste the URL in the OBS "Browser Module".
+                            <br />
+                            <br />
+                            <p>
+                                <Tag color="#2db7f5">New</Tag>After changing the view, double click on the browser source on OBS and press "Refresh cache of current page".
+                                <br />
+                                If it doesn't appear, make sure OBS has been updated to the latest version.
+                            </p>
+
+                            <input type="text" id="studio-url" className="studio-url" value={`${getDappDomain()}/studio/${address}`} readOnly />
+
+                            <div className='studio-action'>
+                                <button
+                                    className='mt-2 btn btn-info studio-copy'
+                                    disabled={!address}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(`${getDappDomain()}/studio/${address}`);
+                                        toast.success(`Copied URL`)
+                                    }}
+                                >
+                                    Copy
+                                </button>
+                                &nbsp;
+                                <a
+                                    className='mt-2 btn btn-warning studio-open'
+                                    href={`${getDappDomain()}/studio/${address}`}
+                                    target={`_blank`}
+                                >
+                                    Open in new tab
+                                </a>
+                                &nbsp;
+                                <button
+                                    className='mt-2 btn btn-success studio-popup'
+                                    onClick={sendTrigger}
+                                    disabled={!address}
+                                >
+                                    Pop up notification
+                                </button>
+                            </div>
+
+
+                            <h3 className='mt-5'>Payment URL:</h3>
+                            Click the <span className="badge bg-info">Copy</span> button and send the payment url to your audience.
+                            <br />
+                            <br />
+
+                            <input type="text" id="pay-url" className="pay-url" value={`${getDappDomain()}/pay/${address}`} readOnly />
+
+                            <div className='studio-action'>
+                                <button
+                                    className='mt-2 btn btn-info'
+                                    disabled={!address}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(`${getDappDomain()}/pay/${address}`);
+                                        toast.success(`Copied URL`)
+                                    }}
+                                >
+                                    Copy
+                                </button>
+                                &nbsp;
+                                <a
+                                    className='mt-2 btn btn-warning'
+                                    href={`${getDappDomain()}/pay/${address}`}
+                                    target={`_blank`}
+                                >
+                                    Open in new tab
+                                </a>
+                            </div>
+                        </div>
+
+                        <div className="d-flex mt-3">
+
+                        </div>
+
+                    </>
+                }
+                {
+                    activeTab != 'setup' &&
+                    <div className="button-container">
+                        <button
+                            className='save'
+                            onClick={onSaveClick}
+                            disabled={!address}
+                            style={{cursor: address? 'pointer' : 'no-drop'}}
+                        >
+                            {address? 'Save' : 'Connect to Continue'}
+                        </button>
+                    </div>
+                }
             </div>
         </div>
     );

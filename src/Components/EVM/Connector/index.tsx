@@ -1,6 +1,7 @@
 import MetaMaskOnboarding from '@metamask/onboarding';
 import React, { useState, useEffect, useRef } from 'react';
 import { ButtonProps } from './types';
+import { toast } from 'react-toastify';
 
 const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChainChange, onFinishLoading, children, style, className, }: ButtonProps) => {
     const [isDisabled, setDisabled] = useState(true);
@@ -8,6 +9,7 @@ const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChain
     const [chain, setChain] = useState('');
     const [accounts, setAccounts] = useState<string[]>([]);
     const onboarding = useRef<MetaMaskOnboarding>();
+    const interval = useRef<NodeJS.Timer>();
 
     useEffect(() => {
         if (!onboarding.current) {
@@ -78,7 +80,7 @@ const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChain
                 setIsLoading(false);
             }, 500);
 
-            window.ethereum!.on('accountsChanged', (newAccounts) => {
+            /* const onAccountsChanged = (newAccounts: unknown) => {
                 if(Array.isArray(newAccounts)) {
                     if(typeof(newAccounts[0] === 'string')) {
                         setAccounts(newAccounts);
@@ -88,14 +90,19 @@ const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChain
                 else {
                     setAccounts([]);
                 }
-            });
+            } */
 
-            window.ethereum!.on('chainChanged', (hexId) => {
+            // window.ethereum!.on('accountsChanged', onAccountsChanged);
+
+            /* const onChainChanged = (hexId: unknown) => {
                 setChain(hexId as string);
-            });
+            }; */
+
+            //window.ethereum!.on('chainChanged', onChainChanged);
 
             return () => {
-                window.ethereum!.removeListener('accountsChanged', (newAccounts) => setAccounts(newAccounts));
+                // window.ethereum!.removeListener('accountsChanged', onAccountsChanged);
+                // window.ethereum!.removeListener('chainChanged', onChainChanged);
             };
         }
 
@@ -105,11 +112,38 @@ const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChain
         }
     }, []);
 
+    // force requests
+    useEffect(() => {
+        if(interval.current) {
+            clearInterval(interval.current);
+            interval.current = undefined;
+        }
+
+        interval.current = setInterval(async() => {
+            if(!window.ethereum) {
+                return;
+            }
+    
+            let obtainedChainId = await window.ethereum!.request({ method: 'eth_chainId' });
+    
+            // hex id
+            if(chain !== obtainedChainId) {
+                setChain(obtainedChainId as string);
+            }
+
+            let obtainedAccounts = await window.ethereum!.request({ method: 'eth_accounts' }) as string[];
+            if(obtainedAccounts[0] !== accounts[0]) {
+                setAccounts(obtainedAccounts);
+            }
+        }, 500);
+    }, [ chain, accounts ]);
+
     const onClick = () => {
         if (MetaMaskOnboarding.isMetaMaskInstalled()) {
             window.ethereum!
                 .request({ method: 'eth_requestAccounts' })
-                .then((newAccounts: any) => setAccounts(newAccounts));
+                .then((newAccounts: any) => setAccounts(newAccounts))
+                .catch((e: any) => toast.error('User rejected connection!'));
         } else {
             if(onboarding.current) {
                 onboarding.current.startOnboarding();

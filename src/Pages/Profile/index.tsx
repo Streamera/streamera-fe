@@ -9,8 +9,9 @@ import { useCookies } from 'react-cookie';
 import { toast } from 'react-toastify';
 import { Select } from 'antd';
 import { User } from '../../types';
+import { ChainConfig } from '../../Components/EVM/ChainConfigs/types';
 
-const Page = () => {
+const Page = ({ allowedChains }: { allowedChains: ChainConfig[] }) => {
     const [pfpFile, setPfpFile] = useState<File>();
     const [pfp, setPfp] = useState<string>("");
     const [cookies] = useCookies(['signatures']);
@@ -34,7 +35,6 @@ const Page = () => {
     });
 
     // for display purposes only
-    const [toTokenSymbol, setToTokenSymbol] = useState("");
     const [toChainName, setToChainName] = useState("");
 
     const { address } = useContext(AddressContext);
@@ -75,17 +75,17 @@ const Page = () => {
             cloned[param] = value as string & number[];
         }
 
-        if (param === 'to_token_symbol') {
-            const symbol = supportedTokens[userDetails.to_chain.toString()].find(x => x.address === userDetails.to_token_address)?.symbol ?? "";
-
-            console.log(`symbol: ${symbol}`);
-            cloned[param] = symbol;
-        }
-
         if (param === "to_chain") {
             let supportedToken = supportedTokens[value][0]?.address ?? "";
             cloned["to_token_address"] = supportedToken;
+            cloned[param] = value.toString();
         }
+
+        if(param === "to_token_address" || param === "to_chain") {
+            let symbol = supportedTokens[cloned.to_chain.toString()].find(x => x.address === cloned.to_token_address)?.symbol ?? "";
+            cloned["to_token_symbol"] = symbol;
+        }
+
         setUserDetails(cloned);
     }, [ userDetails, supportedTokens ]);
 
@@ -124,15 +124,8 @@ const Page = () => {
 
     // change to token symbol
     useEffect(() => {
-        if(!supportedTokens[userDetails.to_chain]) {
-            setToTokenSymbol("");
-            return;
-        }
 
-        let symbol = supportedTokens[userDetails.to_chain.toString()].find(x => x.address === userDetails.to_token_address)?.symbol ?? "";
-        setToTokenSymbol(symbol);
-
-        let chainName = supportedChains.filter(x => x.chainId.toString() === userDetails.to_chain)[0]?.name ?? "";
+        let chainName = supportedChains.filter(x => x.chainId.toString() === userDetails.to_chain.toString())[0]?.name ?? "";
         setToChainName(chainName);
     }, [userDetails.to_token_address, userDetails.to_chain, supportedTokens, supportedChains]);
 
@@ -154,7 +147,7 @@ const Page = () => {
             return;
         }
 
-        if(!toTokenSymbol) {
+        if(!userDetails.to_token_symbol) {
             toast.error('Missing token');
             return;
         }
@@ -206,7 +199,7 @@ const Page = () => {
 
         toast.success("Updated");
         return;
-    }, [address, userDetails, cookies, toTokenSymbol, pfpFile]);
+    }, [address, userDetails, cookies, pfpFile]);
 
     return (
         <div className='profile-page'>
@@ -267,7 +260,7 @@ const Page = () => {
                     <strong>Donation Settings</strong>
                     <div className="input-group">
                         <div className="input-group-prepend">
-                            <div className="input-group-text">streamera.com/donate/</div>
+                            <div className="input-group-text">dapp.streamera.online/pay/</div>
                         </div>
                         <input type="text" className="form-control" placeholder="Username" value={userDetails.name} onChange={(e) => onUserDetailsChanged(e.target.value, "name")}/>
                     </div>
@@ -283,10 +276,10 @@ const Page = () => {
                         </div>
                         <Select
                             style={{ flex: 1, textAlign: 'left' }}
-                            options={supportedChains.map(x => {
+                            options={allowedChains.map(x => {
                                 return {
                                     label: x.name,
-                                    value: x.chainId.toString(),
+                                    value: x.numericId,
                                 }
                             })}
                             onChange={value => { onUserDetailsChanged(value, 'to_chain'); }}
@@ -300,7 +293,7 @@ const Page = () => {
                         </div>
                         <Select
                             style={{ flex: 1, textAlign: 'left' }}
-                            options={supportedTokens[userDetails.to_chain]?.map(x => {
+                            options={supportedTokens[userDetails.to_chain.toString()]?.map(x => {
                                 return {
                                     label: x.symbol,
                                     value: x.address,
@@ -308,9 +301,8 @@ const Page = () => {
                             })}
                             onChange={value => {
                                 onUserDetailsChanged(value, 'to_token_address');
-                                onUserDetailsChanged(value, 'to_token_symbol');
                             }}
-                            value={toTokenSymbol}
+                            value={userDetails.to_token_symbol}
                         >
                         </Select>
                     </div>

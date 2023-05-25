@@ -8,6 +8,8 @@ import { Buffer } from 'buffer';
 import { getSignaturePassword } from '../../common/utils';
 import { useCookies } from 'react-cookie';
 import { toast } from 'react-toastify';
+import { ExpandOutlined, ReadOutlined, ApiOutlined, ProfileOutlined, } from '@ant-design/icons';
+import { Button } from 'antd';
 
 const Page = () => {
     const { address } = useContext(AddressContext);
@@ -121,8 +123,6 @@ const Page = () => {
                 params: [msg, address, pw],
             });
 
-            console.log(signature);
-
         } catch (err) {
             console.log(err);
             setIsVerified(false);
@@ -155,18 +155,44 @@ const Page = () => {
                 !isLoading &&
                 !isVerified &&
                 <div className="d-flex align-items-center justify-content-center" style={{ height: '100vh', width: '100vw' }}>
-                    <button onClick={onVerifyClick}>Verify to Continue</button>
+                    <Button onClick={onVerifyClick}>Verify to Continue</Button>
                 </div>
 
             }
             {
                 !isLoading &&
                 isVerified &&
-                <div className="link-button-container">
-                    <Link to="/overlay" className='link-button'>Overlay</Link>
-                    <Link to="/history" className='link-button'>History</Link>
-                    <Link to="/integration" className='link-button'>Integration</Link>
-                    <Link to="/profile" className='link-button'>Profile</Link>
+                <div className="link-pie">
+                    <div className="main">
+                        <div className="up">
+                            <Link to="/overlay">
+                                <button className="card1">
+                                    <ExpandOutlined className='mr-2'/>
+                                    <span>Overlay</span>
+                                </button>
+                            </Link>
+                            <Link to="/history">
+                                <button className="card2">
+                                    <span>History</span>
+                                    <ReadOutlined className='ml-2'/>
+                                </button>
+                            </Link>
+                        </div>
+                        <div className="down">
+                            <Link to="/integration">
+                                <button className="card3">
+                                    <ApiOutlined className='mr-2'/>
+                                    <span>Integration</span>
+                                </button>
+                            </Link>
+                            <Link to="/profile">
+                                <button className="card4">
+                                    <span>Profile</span>
+                                    <ProfileOutlined className='ml-2'/>
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             }
         </div>

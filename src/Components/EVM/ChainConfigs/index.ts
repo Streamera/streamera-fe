@@ -3,9 +3,9 @@ import { ethers } from 'ethers';
 
 // chains
 export const BSC_TEST: ChainConfig = {
-    name: 'BNB Chain',
+    name: 'BSC',
     shortName: 'BSC',
-    id: ethers.utils.hexlify(97),
+    id: ethers.utils.hexlify(97).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 97,
     evmChain: 'binance',
     rpc: 'https://data-seed-prebsc-2-s1.binance.org:8545',
@@ -15,7 +15,7 @@ export const BSC_TEST: ChainConfig = {
         symbol: 'BNB',
     },
     blockExplorerUrl: 'https://testnet.bscscan.com',
-    streameraAddress: '0x2D6d5b42fe8898515a74A2b53055967AE522e290',
+    streameraAddress: '0x8dce04da0C5D54298a4c4B0e9d5B7372D9a75AdE',
     dexAddress: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1",
     nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
     wrappedNativeTokenAddress: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
@@ -36,9 +36,13 @@ export const POLYGON_TEST: ChainConfig = {
         symbol: 'MATIC',
     },
     blockExplorerUrl: 'https://mumbai.polygonscan.com',
+    streameraAddress: '0x618499193a14AE668F844770c818e788763e45A2',
+    dexAddress: "0x8954AfA98594b838bda56FE4C12a09D7739D179b",
+    nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    wrappedNativeTokenAddress: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
 };
 export const AVAX_TEST: ChainConfig = {
-    name: 'Avalanche C-Chain Testnet',
+    name: 'Avalanche Testnet',
     shortName: 'AVAX',
     evmChain: 'avalanche',
     id: '0xa869',
@@ -50,12 +54,16 @@ export const AVAX_TEST: ChainConfig = {
         symbol: 'AVAX',
     },
     blockExplorerUrl: 'https://testnet.snowtrace.io/',
+    streameraAddress: '0x8A174E319401C45c23A9fdfF31d16E83dC7a3f68',
+    dexAddress: "0xE54Ca86531e17Ef3616d22Ca28b0D458b6C89106",
+    nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    wrappedNativeTokenAddress: '0xd00ae08403B9bbb9124bB305C09058E32C39A48c',
 };
 export const ETH: ChainConfig = {
     name: 'Ethereum',
     shortName: 'ETH',
     evmChain: 'ethereum',
-    id: ethers.utils.hexlify(1),
+    id: ethers.utils.hexlify(1).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 1,
     rpc: '',
     nativeCurrency: {
@@ -68,7 +76,7 @@ export const BSC: ChainConfig = {
     name: 'BNB Chain',
     shortName: 'BSC',
     evmChain: 'binance',
-    id: ethers.utils.hexlify(56),
+    id: ethers.utils.hexlify(56).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 56,
     rpc: 'https://bsc-dataseed1.binance.org',
     nativeCurrency: {
@@ -96,7 +104,7 @@ export const POLYGON: ChainConfig = {
     name: 'Polygon',
     shortName: 'Polygon',
     evmChain: 'polygon',
-    id: ethers.utils.hexlify(137),
+    id: ethers.utils.hexlify(137).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 137,
     rpc: 'https://polygon-rpc.com',
     nativeCurrency: {
@@ -110,7 +118,7 @@ export const ARB: ChainConfig = {
     name: 'Arbitrum One',
     shortName: 'ARB',
     evmChain: 'arbitrium',
-    id: ethers.utils.hexlify(42161),
+    id: ethers.utils.hexlify(42161).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 42161,
     rpc: 'https://arb1.arbitrum.io/rpc',
     nativeCurrency: {
@@ -121,10 +129,10 @@ export const ARB: ChainConfig = {
     blockExplorerUrl: 'https://arbiscan.io',
 };
 export const ARB_TEST: ChainConfig = {
-    name: 'Arbitrum Goerli',
+    name: 'Arbitrum',
     shortName: 'ARB',
     evmChain: 'arbitrium',
-    id: ethers.utils.hexlify(421613),
+    id: ethers.utils.hexlify(421613).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 421613,
     rpc: 'https://arbitrum-goerli.public.blastapi.io',
     nativeCurrency: {
@@ -137,7 +145,7 @@ export const ARB_TEST: ChainConfig = {
 export const OP: ChainConfig = {
     name: 'Optimism',
     shortName: 'OP',
-    id: ethers.utils.hexlify(10),
+    id: ethers.utils.hexlify(10).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 10,
     rpc: 'https://mainnet.optimism.io',
     nativeCurrency: {
@@ -150,7 +158,7 @@ export const OP: ChainConfig = {
 export const CRO: ChainConfig = {
     name: 'Cronos Mainnet',
     shortName: 'CRO',
-    id: ethers.utils.hexlify(25),
+    id: ethers.utils.hexlify(25).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 25,
     rpc: 'https://evm.cronos.org',
     nativeCurrency: {
@@ -164,7 +172,7 @@ export const FTM: ChainConfig = {
     name: 'Fantom Opera',
     shortName: 'FTM',
     evmChain: 'fantom',
-    id: ethers.utils.hexlify(250),
+    id: ethers.utils.hexlify(250).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 250,
     rpc: 'https://rpc.ftm.tools',
     nativeCurrency: {
@@ -177,7 +185,7 @@ export const FTM: ChainConfig = {
 export const KLAYTN: ChainConfig = {
     name: 'Klaytn Mainnet Cypress',
     shortName: 'KLAYTN',
-    id: ethers.utils.hexlify(8217),
+    id: ethers.utils.hexlify(8217).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 8217,
     rpc: 'https://public-node-api.klaytnapi.com/v1/cypress',
     nativeCurrency: {
@@ -190,7 +198,7 @@ export const KLAYTN: ChainConfig = {
 export const KAVA: ChainConfig = {
     name: 'Kava EVM',
     shortName: 'KAVA',
-    id: ethers.utils.hexlify(2222),
+    id: ethers.utils.hexlify(2222).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 2222,
     rpc: 'https://evm.kava.io',
     nativeCurrency: {
@@ -203,7 +211,7 @@ export const KAVA: ChainConfig = {
 export const GNO: ChainConfig = {
     name: 'Gnosis',
     shortName: 'GNO',
-    id: ethers.utils.hexlify(100),
+    id: ethers.utils.hexlify(100).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 100,
     rpc: 'https://rpc.gnosischain.com',
     nativeCurrency: {
@@ -217,7 +225,7 @@ export const AURORA: ChainConfig = {
     name: 'Aurora Mainnet',
     shortName: 'AURORA',
     evmChain: 'aurora',
-    id: ethers.utils.hexlify(1313161554),
+    id: ethers.utils.hexlify(1313161554).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 1313161554,
     rpc: 'https://mainnet.aurora.dev',
     nativeCurrency: {
@@ -230,7 +238,7 @@ export const AURORA: ChainConfig = {
 export const HECO: ChainConfig = {
     name: 'Huobi ECO Chain Mainnet',
     shortName: 'HECO',
-    id: ethers.utils.hexlify(128),
+    id: ethers.utils.hexlify(128).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 128,
     rpc: 'https://http-mainnet.hecochain.com',
     nativeCurrency: {
@@ -243,7 +251,7 @@ export const HECO: ChainConfig = {
 export const FUSION: ChainConfig = {
     name: 'Fusion Mainnet',
     shortName: 'FUSION',
-    id: ethers.utils.hexlify(32659),
+    id: ethers.utils.hexlify(32659).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 32659,
     rpc: 'https://mainnet.anyswap.exchange',
     nativeCurrency: {
@@ -256,7 +264,7 @@ export const FUSION: ChainConfig = {
 export const CELO: ChainConfig = {
     name: 'Celo Mainnet',
     shortName: 'CELO',
-    id: ethers.utils.hexlify(42220),
+    id: ethers.utils.hexlify(42220).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 42220,
     rpc: 'https://forno.celo.org',
     nativeCurrency: {
@@ -267,9 +275,9 @@ export const CELO: ChainConfig = {
     blockExplorerUrl: 'https://explorer.celo.org',
 };
 export const CELO_TEST: ChainConfig = {
-    name: 'Celo Alfajores',
+    name: 'Celo',
     shortName: 'CELO',
-    id: ethers.utils.hexlify(44787),
+    id: ethers.utils.hexlify(44787).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 44787,
     rpc: 'https://alfajores-forno.celo-testnet.org',
     nativeCurrency: {
@@ -282,7 +290,7 @@ export const CELO_TEST: ChainConfig = {
 export const EVMOS: ChainConfig = {
     name: 'Evmos',
     shortName: 'EVMOS',
-    id: ethers.utils.hexlify(9001),
+    id: ethers.utils.hexlify(9001).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 9001,
     rpc: 'https://eth.bd.evmos.org:8545',
     nativeCurrency: {
@@ -295,7 +303,7 @@ export const EVMOS: ChainConfig = {
 export const DOGE: ChainConfig = {
     name: 'Dogechain Mainnet',
     shortName: 'DOGE',
-    id: ethers.utils.hexlify(2000),
+    id: ethers.utils.hexlify(2000).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 2000,
     rpc: 'https://rpc-sg.dogechain.dog',
     nativeCurrency: {
@@ -308,7 +316,7 @@ export const DOGE: ChainConfig = {
 export const OKX: ChainConfig = {
     name: 'OKXChain Mainnet',
     shortName: 'OKX',
-    id: ethers.utils.hexlify(66),
+    id: ethers.utils.hexlify(66).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 66,
     rpc: 'https://exchainrpc.okex.org',
     nativeCurrency: {
@@ -321,7 +329,7 @@ export const OKX: ChainConfig = {
 export const BOBA: ChainConfig = {
     name: 'Boba Network',
     shortName: 'BOBA',
-    id: ethers.utils.hexlify(288),
+    id: ethers.utils.hexlify(288).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 288,
     rpc: 'https://mainnet.boba.network',
     nativeCurrency: {
@@ -334,7 +342,7 @@ export const BOBA: ChainConfig = {
 export const MOVR: ChainConfig = {
     name: 'Moonriver',
     shortName: 'MOVR',
-    id: ethers.utils.hexlify(1285),
+    id: ethers.utils.hexlify(1285).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 1285,
     rpc: 'https://rpc.api.moonriver.moonbeam.network',
     nativeCurrency: {
@@ -348,7 +356,7 @@ export const GLMR: ChainConfig = {
     name: 'Moonbeam',
     shortName: 'GLMR',
     evmChain: 'moonbeam',
-    id: ethers.utils.hexlify(1284),
+    id: ethers.utils.hexlify(1284).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 1284,
     rpc: 'https://rpc.api.moonbeam.network',
     nativeCurrency: {
@@ -361,7 +369,7 @@ export const GLMR: ChainConfig = {
 export const ONE: ChainConfig = {
     name: 'Harmony One',
     shortName: 'ONE',
-    id: ethers.utils.hexlify(1666600000),
+    id: ethers.utils.hexlify(1666600000).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 1666600000,
     rpc: 'https://api.harmony.one',
     nativeCurrency: {
@@ -372,9 +380,9 @@ export const ONE: ChainConfig = {
     blockExplorerUrl: 'https://explorer.harmony.one',
 };
 export const GOERLI: ChainConfig = {
-    name: 'Goerli Testnet',
+    name: 'Goerli',
     shortName: 'Goerli',
-    id: ethers.utils.hexlify(5),
+    id: ethers.utils.hexlify(5).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 5,
     rpc: 'https://rpc.ankr.com/eth_goerli',
     nativeCurrency: {
@@ -383,12 +391,16 @@ export const GOERLI: ChainConfig = {
         symbol: 'ETH',
     },
     blockExplorerUrl: 'https://goerli.etherscan.io',
+    streameraAddress: '0x4e83524285919A7913Ac7Ed9E0F01E97D10dB03b',
+    dexAddress: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    wrappedNativeTokenAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
 };
 export const MOONBASE_ALPHA: ChainConfig = {
-    name: 'Moonbase Alpha Tesnet',
+    name: 'Moonbase',
     shortName: 'Moonbase',
     evmChain: 'moonbase',
-    id: ethers.utils.hexlify(1287),
+    id: ethers.utils.hexlify(1287).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 1287,
     rpc: 'https://moonbase-alpha.public.blastapi.io',
     nativeCurrency: {
@@ -397,11 +409,15 @@ export const MOONBASE_ALPHA: ChainConfig = {
         symbol: 'DEV',
     },
     blockExplorerUrl: 'https://moonbase.moonscan.io',
+    streameraAddress: '0xaBFdb828687c26DE5acd363CB6eb5242B83De27f',
+    dexAddress: "0x2d4e873f9Ab279da9f1bb2c532d4F06f67755b77",
+    nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    wrappedNativeTokenAddress: '0x372d0695E75563D9180F8CE31c9924D7e8aaac47',
 };
 export const FILECOIN_TESTNET: ChainConfig = {
-    name: 'Filecoin Hyperspace Testnet',
+    name: 'Filecoin',
     shortName: 'Filecoin Testnet',
-    id: ethers.utils.hexlify(3141),
+    id: ethers.utils.hexlify(3141).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 3141,
     rpc: 'https://rpc.ankr.com/filecoin_testnet',
     nativeCurrency: {
@@ -412,10 +428,10 @@ export const FILECOIN_TESTNET: ChainConfig = {
     blockExplorerUrl: 'https://filfox.info/en',
 };
 export const FANTOM_TESTNET: ChainConfig = {
-    name: 'Fantom Testnet',
+    name: 'Fantom',
     shortName: 'Fantom Testnet',
     evmChain: 'fantom',
-    id: ethers.utils.hexlify(4002),
+    id: ethers.utils.hexlify(4002).replace(/^0x0/, '0x'), // hexlify likes to change it to 0x0
     numericId: 4002,
     rpc: 'https://rpc.ankr.com/fantom_testnet',
     nativeCurrency: {
@@ -424,4 +440,8 @@ export const FANTOM_TESTNET: ChainConfig = {
         symbol: 'FTM',
     },
     blockExplorerUrl: 'https://testnet.ftmscan.com',
+    streameraAddress: '0x592D01064f80DeBC6B1e12CDEa847Ecf6e7192c9',
+    dexAddress: "0xa6AD18C2aC47803E193F75c3677b14BF19B94883",
+    nativeTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    wrappedNativeTokenAddress: '0xf1277d1Ed8AD466beddF92ef448A132661956621',
 };

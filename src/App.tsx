@@ -15,17 +15,20 @@ import { Link } from 'react-router-dom';
 import { SquidContextData, SupportedChain } from './types';
 import { useCookies } from 'react-cookie';
 import _ from 'lodash';
+import { ARB_TEST, FANTOM_TESTNET, GOERLI, MOONBASE_ALPHA } from './Components/EVM/ChainConfigs';
 
 const { BSC_TEST, POLYGON_TEST, BSC, POLYGON } = ChainConfigs;
 const isTestnet = process.env.REACT_APP_CHAIN_ENV === "testnet";
 
 // assign chain info based on env
-const BscChain = isTestnet ? BSC_TEST : BSC;
-const PolygonChain = isTestnet ? POLYGON_TEST : POLYGON;
-
 const allowedChains = isTestnet ? [
     BSC_TEST,
-    POLYGON_TEST
+    POLYGON_TEST,
+    ARB_TEST,
+    // CELO_TEST,
+    GOERLI,
+    FANTOM_TESTNET,
+    MOONBASE_ALPHA,
 ] : [
     BSC,
     POLYGON
@@ -35,7 +38,7 @@ const allowedChains = isTestnet ? [
 export const AddressContext = createContext({
     address: "",
     chain: "",
-    chainId: -1,
+    chainId: 0,
     chainName: "",
 });
 
@@ -66,12 +69,12 @@ function App() {
     const [supportedTokens, setSupportedTokens] = useState<{ [chain: string]: TokenData[] }>({});
 
     const [chain, setChain] = useState('');
-    const [chainId, setChainId] = useState(-1);
+    const [chainId, setChainId] = useState(0);
     const [chainName, setChainName] = useState('');
     // const [isMobile, setIsMobile] = useState(false);
     const [shouldRenderLogo, setShouldRenderLogo] = useState(true);
-    const [shouldRenderHeader, setShouldRenderHeader] = useState(true);
-    const [shouldRenderFooter, setShouldRenderFooter] = useState(true);
+    const [shouldRenderHeader, setShouldRenderHeader] = useState(false);
+    const [shouldRenderFooter, setShouldRenderFooter] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
     //header will be hidden too
@@ -126,28 +129,34 @@ function App() {
     }, [ currentPath, cookies, navigate ]);
 
     const handleChainChange = useCallback(async (chain: string) => {
+        if(currentChain.current === chain && !isLoading && !address) {
+            return;
+        }
+
         currentChain.current = chain;
         setChain(chain);
 
         let chainConfig = allowedChains.filter(x => x.id === chain)[0];
         let chainName = chainConfig?.shortName ?? '';
-        let chainId = chainConfig?.numericId ?? -1;
+        let chainId = chainConfig?.numericId ?? 0;
         setChainName(chainName.toLowerCase());
-        setChainId(typeof(chainId) === 'number'? chainId : -1);
+        setChainId(typeof(chainId) === 'number'? chainId : 0);
 
         setShouldShowSwitcher(
             currentPath === '/pay/:streamerAddress'
+            && !!chain
+            && !isLoading
             && !allowedChains.map(x => x.id).includes(chain)
             && !!address // must be logged in
         );
-    }, [currentPath, address]);
+    }, [currentPath, address, isLoading]);
 
     const handleUserRejection = useCallback(() => {
-        toast.error('You sure?');
+        toast.error('User rejected');
     }, []);
 
     const handleUnknownError = useCallback(() => {
-        toast.error('Portal fluids gone bad');
+        toast.error('Error occured');
     }, []);
 
     const onFinishLoading = useCallback(() => {
@@ -257,22 +266,40 @@ function App() {
 
 				{/** Connectors */}
 				<div className={`connector-container`}>
-					<EVMConnector
-						handleNewAccount={handleNewAccount}
-						handleChainChange={handleChainChange}
-						onFinishLoading={onFinishLoading}
-						className={`${isLoading? 'loading' : ''} metamask-connector`}
-					>
-						<div className={`metamask-btn ${address? 'disabled' : ''}`}>
-							<img src="/metamask-logo.png" alt="metamask-logo"></img>
-							<div className='metamask-text'>
-								<span>{
-									!window.ethereum? 'Get Metamask' :
-									(address? ellipsizeThis(address, 6, 0) : 'Connect')
-								}</span>
-							</div>
-						</div>
-					</EVMConnector>
+                    <EVMConnector
+                        handleNewAccount={handleNewAccount}
+                        handleChainChange={handleChainChange}
+                        onFinishLoading={onFinishLoading}
+                        className={`${isLoading? 'loading' : ''} metamask-connector ${!address && currentPath !== "/pay/:streamerAddress"? 'logged-out' : ''}`}
+                    >
+                        <>
+                            {
+                                !address &&
+                                currentPath !== "/pay/:streamerAddress" &&
+                                <div className="button-parrot">
+                                    Connect
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                    <div className="parrot"></div>
+                                </div>
+                            }
+                            {
+                                (address || currentPath === "/pay/:streamerAddress") &&
+                                <div className={`metamask-btn ${address? 'disabled' : ''}`}>
+                                    <img src="/metamask-logo.png" alt="metamask-logo"></img>
+                                    <div className='metamask-text'>
+                                        <span>{
+                                            !window.ethereum? 'Get Metamask' :
+                                            (address? ellipsizeThis(address, 6, 0) : 'Connect')
+                                        }</span>
+                                    </div>
+                                </div>
+                            }
+                        </>
+                    </EVMConnector>
 
 					{/* <span className={`logo-text ${address? 'd-block' : 'd-none'}`}>{ellipsizeThis(address, 5, 5)}</span> */}
 				</div>
@@ -282,27 +309,23 @@ function App() {
                 shouldShowSwitcher &&
                 address &&
                 <div className='chain-chooser-container'>
-                    <h1>Currently only supports these chains</h1>
-                    <EVMSwitcher
-                        targetChain={BscChain}
-                        handleChainChange={handleChainChange}
-                        handleUserRejection={handleUserRejection}
-                        handleUnknownError={handleUnknownError}
-                        className={'navigate-button ' + (chain === BscChain.id? 'active' : '')}
-                        currentChainId={chain}
-                    >
-                        <span>BSC</span>
-                    </EVMSwitcher>
-                    <EVMSwitcher
-                        targetChain={PolygonChain}
-                        handleChainChange={handleChainChange}
-                        handleUserRejection={handleUserRejection}
-                        handleUnknownError={handleUnknownError}
-                        className={'navigate-button ' + (chain === PolygonChain.id? 'active' : '')}
-                        currentChainId={chain}
-                    >
-                        <span>Polygon</span>
-                    </EVMSwitcher>
+                    <span>Currently only supports these chains</span>
+                    {
+                        allowedChains.map(x => (
+                            <EVMSwitcher
+                                targetChain={x}
+                                handleChainChange={handleChainChange}
+                                handleUserRejection={handleUserRejection}
+                                handleUnknownError={handleUnknownError}
+                                className={'navigate-button ' + (chain === x.id? 'active' : '')}
+                                currentChainId={chain}
+                                key={`chain-${x.id}`}
+                            >
+                                <span>{x.name}</span>
+                            </EVMSwitcher>
+
+                        ))
+                    }
                 </div>
             }
 
@@ -332,7 +355,7 @@ function App() {
                         <Routes>
                             <Route path="/" element={address? <Home /> : <Landing />}></Route>
                             <Route path="/landing" element={<Landing />}></Route>
-                            <Route path="/profile" element={<Profile />}></Route>
+                            <Route path="/profile" element={<Profile allowedChains={allowedChains} />}></Route>
                             <Route path="/integration" element={<Integration />}></Route>
                             <Route path="/overlay" element={<Overlay />}></Route>
                             <Route path="/pay/:streamerAddress" element={<Payment shouldHide={shouldShowSwitcher}/>}></Route>
@@ -347,9 +370,14 @@ function App() {
                 <span>
 				    Made with ❤️ by the Streamera Team.
                 </span>
-                <span>
-                    Twitter and stuff
-                </span>
+                <div className='button-with-tooltip'>
+                    <ul className="wrapper">
+                        <li className="icon github">
+                            <span className="tooltip">Github</span>
+                            <a href='https://github.com/Streamera' target='_blank' rel="noopener noreferrer"><i className="fab fa-github"></i></a>
+                        </li>
+                    </ul>
+                </div>
 			</footer>
 
 			<ToastContainer

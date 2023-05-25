@@ -33,12 +33,11 @@ body {
     footer {
         position: fixed;
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        padding: 10px;
         bottom: 0;
         width: 100%;
         max-width: 1260px;
-        background-color: white;
     }
 
     &.loading {
@@ -51,12 +50,14 @@ body {
     .chain-chooser-container {
         width: 100%;
         max-width: 900px;
-        min-height: 100vh;
+        height: 100vh;
 
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+
+        overflow: auto;
 
         h2 {
             font-size: 50px;
@@ -69,19 +70,30 @@ body {
             }
         }
 
+        > span {
+          margin-bottom: 30px;
+          font-size: 20px;
+        }
+
         .navigate-button {
             background-color: white;
 
             text-transform: uppercase;
             letter-spacing: 3px;
-            font-size: 50px;
-            width: 350px;
+            font-size: 16px;
+            width: 150px;
 
             padding: 5px 20px;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            border: 5px solid black;
+            margin-top: 15px;
+            border: 1px solid black;
             border-radius: 10px;
+
+            transition: color 0.25s ease, border-color 0.25s ease;
+
+            &:hover {
+              color: #1777ff;
+              border-color: #1777ff;
+            }
 
             &:last-child {
                 margin-bottom: 0;
@@ -154,13 +166,102 @@ body {
             opacity: 0;
         }
 
-        &.logged-in {
-            display: none;
-            /* transform: translateX(-23vw);
+        &.logged-out {
+            transform: translateX(calc(-620px + 75px)) translateY(calc(50vh - 25px));
 
-            @media screen and (max-width: 900px) {
-                transform: translateX(-19vw);
-            } */
+            @media screen and (max-width: 1260px) {
+              transform: translateX(calc(-50vw + 75px)) translateY(calc(50vh - 25px));
+            }
+        }
+    }
+
+    button:has(.button-parrot) {
+        background: transparent;
+        color: black;
+        border: 3px solid black;
+        border-radius: 50px;
+        padding: 0.8rem 2rem;
+        font: 18px "Margarine", sans-serif;
+        outline: none;
+        cursor: pointer;
+        position: relative;
+        transition: 0.2s ease-in-out;
+        letter-spacing: 2px;
+
+
+        .button-parrot .parrot {
+          position: absolute;
+          width: 60px;
+          text-align: center;
+          animation: blink 0.8s infinite;
+          color: transparent;
+        }
+        
+        .button-parrot .parrot:before {
+          content: "Click Me!";
+        }
+        
+        .button-parrot .parrot:nth-child(1) {
+          top: -30px;
+          left: -40px;
+          font: 12px/1 "Margarine", sans-serif;
+          transform: rotate(-20deg);
+          animation-duration: 0.5s;
+        }
+        
+        .button-parrot .parrot:nth-child(2) {
+          font: 12px/1 "Margarine", sans-serif;
+          right: -40px;
+          top: -20px;
+          transform: rotate(15deg);
+          animation-duration: 0.3s;
+        }
+        
+        .button-parrot .parrot:nth-child(3) {
+          font: 16px/1 "Margarine", sans-serif;
+          top: -60px;
+          left: 15px;
+          transform: rotate(10deg);
+          animation-duration: 1s;
+        }
+        
+        .button-parrot .parrot:nth-child(4) {
+          font: 18px/1 "Margarine", sans-serif;
+          top: -70px;
+          left: 95px;
+          transform: rotate(2deg);
+          animation-duration: 0.7s;
+        }
+        
+        .button-parrot .parrot:nth-child(5) {
+          font: 14px/1 "Margarine", sans-serif;
+          top: 80px;
+          left: 105px;
+          transform: rotate(-20deg);
+          animation-duration: 0.8s;
+        }
+        
+        .button-parrot .parrot:nth-child(6) {
+          font: 12px/1 "Margarine", sans-serif;
+          top: 80px;
+          left: 5px;
+          transform: rotate(10deg);
+          animation-duration: 1.2s;
+        }
+        
+        &:hover .parrot:before {
+          content: "Do it!";
+          width: 70px;
+        }
+        
+        @keyframes blink {
+          25%, 75% {
+            color: transparent;
+          }
+        
+          40%, 60% {
+            color: black;
+          }
         }
     }
 
@@ -258,5 +359,96 @@ body {
             text-decoration: none;
             text-transform: uppercase;
         }
+    }
+
+    .button-with-tooltip {
+        a {
+            color: inherit;
+        }
+        .wrapper {
+            display: inline-flex;
+            list-style: none;
+            // height: 120px;
+            width: 100%;
+            // padding-top: 40px;
+            font-family: "Poppins", sans-serif;
+            justify-content: center;
+          }
+          
+          .wrapper .icon {
+            position: relative;
+            background: #fff;
+            border-radius: 50%;
+            margin: 10px;
+            width: 50px;
+            height: 50px;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          }
+          
+          .wrapper .tooltip {
+            position: absolute;
+            top: 0;
+            font-size: 14px;
+            background: #fff;
+            color: #fff;
+            padding: 5px 8px;
+            border-radius: 5px;
+            box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          }
+          
+          .wrapper .tooltip::before {
+            position: absolute;
+            content: "";
+            height: 8px;
+            width: 8px;
+            background: #fff;
+            bottom: -3px;
+            left: 50%;
+            transform: translate(-50%) rotate(45deg);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          }
+          
+          .wrapper .icon:hover .tooltip {
+            top: -45px;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+          }
+          
+          .wrapper .icon:hover span,
+          .wrapper .icon:hover .tooltip {
+            text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.1);
+          }
+          
+          .wrapper .facebook:hover,
+          .wrapper .facebook:hover .tooltip,
+          .wrapper .facebook:hover .tooltip::before {
+            background: #1877F2;
+            color: #fff;
+          }
+          
+          .wrapper .twitter:hover,
+          .wrapper .twitter:hover .tooltip,
+          .wrapper .twitter:hover .tooltip::before {
+            background: #1DA1F2;
+            color: #fff;
+          }
+          
+          .wrapper .github:hover,
+          .wrapper .github:hover .tooltip,
+          .wrapper .github:hover .tooltip::before {
+            background: black;
+            color: white;
+          }
     }
 }
