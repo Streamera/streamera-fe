@@ -8,11 +8,12 @@ import { AddressContext } from '../../App';
 import axios from '../../Services/axios';
 import { useCookies } from 'react-cookie';
 import { Announcement, Leaderboard, Milestone, Notification, OverlayPosition, QrCode, Status, Theme, User, Voting, VotingOptions } from '../../types';
-import { Select, DatePicker, Switch, ColorPicker, Slider, Input, InputNumber } from 'antd';
+import { Select, DatePicker, Switch, ColorPicker, Slider, Input, InputNumber, Tag } from 'antd';
 import {StudioAnnouncement, StudioLeaderboard, StudioMilestone, StudioVoting} from '../../Components/Studio';
 import PositionInput from '../../Components/PositionInput';
 import dayjs from 'dayjs';
 import moment from 'moment';
+import { UserDetails } from '../Profile/types';
 const { RangePicker } = DatePicker;
 
 const timeframeOptions = [
@@ -169,6 +170,9 @@ const Page = () => {
     const qrLogoRef = useRef<any>();
     const previousAddress = useRef<string>("");
     const previousQrLogo = useRef<string>("");
+
+    // setup (userState)
+    const [ userState, setUserState ] = useState<User | null>(null);
 
     // announcement
     const onAnnouncementColorChange = useCallback((hex: string) => {
@@ -787,6 +791,10 @@ const Page = () => {
         setQrStatus(status);
     }, []);
 
+    const sendTrigger = useCallback(async() => {
+        await axios.post<QrCode[]>('/trigger/demo', { user_id: userState!.id });
+    }, []);
+
     // useEffects
     useEffect(() => {
         const getUserData = async() => {
@@ -803,6 +811,8 @@ const Page = () => {
             getMilestone(user);
             getVoting(user);
             getQrCode(user);
+
+            setUserState(user);
         }
 
         getUserData();
@@ -817,6 +827,7 @@ const Page = () => {
                 <button className={activeTab === 'milestone'? 'active' : ''} onClick={() => setActiveTab('milestone')}>Milestone</button>
                 <button className={activeTab === 'voting'? 'active' : ''} onClick={() => setActiveTab('voting')}>Voting</button>
                 <button className={activeTab === 'qrcode'? 'active' : ''} onClick={() => setActiveTab('qrcode')}>QR Code</button>
+                <button className={activeTab === 'setup'? 'active' : ''} onClick={() => setActiveTab('setup')}>Setup</button>
             </div>
 
             <div className="main-content">
@@ -824,7 +835,7 @@ const Page = () => {
                 {
                     activeTab === "announcement" &&
                     <>
-                        <StudioAnnouncement 
+                        <StudioAnnouncement
                             text={announcementText}
                             speed={announcementTextSpeed}
                             color={announcementColor}
@@ -916,7 +927,7 @@ const Page = () => {
                             />
 
                             <button className='ml-5 upload-button' onClick={onGifButtonClicked}><i className="fa fa-upload"></i><span>Upload GIF</span></button>
-                            <input ref={ref => gifRef.current = ref} className='d-none' type="file" accept='image/gif' onChange={onGifValueChanged}/>
+                            <input ref={ref => gifRef.current = ref} className='d-none' type="file" accept='image/gif,image/webp' onChange={onGifValueChanged}/>
                         </div>
 
                         <strong className='mt-4'>Notification Text</strong>
@@ -1001,8 +1012,8 @@ const Page = () => {
 
                         <strong className='mt-3'>Text</strong>
                         <Input
-                            style={{ maxWidth: 500 }} 
-                            value={leaderboardText} 
+                            style={{ maxWidth: 500 }}
+                            value={leaderboardText}
                             onChange={onLeaderboardTextChange}
                         />
 
@@ -1098,8 +1109,8 @@ const Page = () => {
                         <strong className='mt-3'>Target</strong>
                         <InputNumber
                             className='w-100'
-                            style={{ maxWidth: 500 }} 
-                            value={milestoneTarget} 
+                            style={{ maxWidth: 500 }}
+                            value={milestoneTarget}
                             onChange={onMilestoneTargetChange}
                         />
 
@@ -1163,7 +1174,7 @@ const Page = () => {
                         <strong className='mt-3'>Date Range</strong>
                         <RangePicker
                             className='w-100'
-                            style={{ maxWidth: 500 }} 
+                            style={{ maxWidth: 500 }}
                             showTime
                             value={[dayjs(votingStartAt), dayjs(votingEndAt)]}
                             onCalendarChange={onVotingDateRangeChange}
@@ -1171,8 +1182,8 @@ const Page = () => {
                         <strong className='mt-3'>Title</strong>
                         <Input
                             className='w-100'
-                            style={{ maxWidth: 500 }} 
-                            value={votingText} 
+                            style={{ maxWidth: 500 }}
+                            value={votingText}
                             onChange={onVotingTextChange}
                         />
 
@@ -1180,8 +1191,8 @@ const Page = () => {
                         <div className="d-flex align-items-center w-100" style={{ maxWidth: 500 }}>
                             <Input
                                 className='w-100'
-                                style={{ maxWidth: 500 }} 
-                                value={votingChoice} 
+                                style={{ maxWidth: 500 }}
+                                value={votingChoice}
                                 onChange={onVotingChoiceChange}
                             />
                             <button className="btn btn-success btn-sm ml-2" onClick={() => { onChoiceAdd() } }><i className="fa fa-plus"></i></button>
@@ -1259,16 +1270,101 @@ const Page = () => {
                         />
                     </>
                 }
-                <div className="button-container">
-                    <button
-                        className='save'
-                        onClick={onSaveClick}
-                        disabled={!address}
-                        style={{cursor: address? 'pointer' : 'no-drop'}}
-                    >
-                        {address? 'Save' : 'Connect to Continue'}
-                    </button>
-                </div>
+                { /** Setup */}
+                {
+                    activeTab === "setup" &&
+                    <>
+                        <div className='mt-3 mx-5 text-left'>
+                            <h3>Overlay URL:</h3>
+                            Click the <span className="badge bg-info">Copy</span> button and paste the URL in the OBS "Browser Module".
+                            <br />
+                            <br />
+                            <p>
+                                <Tag color="#2db7f5">New</Tag>After changing the view, double click on the browser source on OBS and press "Refresh cache of current page".
+                                <br />
+                                If it doesn't appear, make sure OBS has been updated to the latest version.
+                            </p>
+
+                            <input type="text" id="studio-url" className="studio-url" value={`${getDappDomain()}/studio/${address}`} readOnly />
+
+                            <div className='studio-action'>
+                                <button
+                                    className='mt-2 btn btn-info studio-copy'
+                                    disabled={!address}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(`${getDappDomain()}/studio/${address}`);
+                                        toast.success(`Copied URL`)
+                                    }}
+                                >
+                                    Copy
+                                </button>
+                                &nbsp;
+                                <a
+                                    className='mt-2 btn btn-warning studio-open'
+                                    href={`${getDappDomain()}/studio/${address}`}
+                                    target={`_blank`}
+                                >
+                                    Open in new tab
+                                </a>
+                                &nbsp;
+                                <button
+                                    className='mt-2 btn btn-success studio-popup'
+                                    onClick={sendTrigger}
+                                    disabled={!address}
+                                >
+                                    Pop up notification
+                                </button>
+                            </div>
+
+
+                            <h3 className='mt-5'>Payment URL:</h3>
+                            Click the <span className="badge bg-info">Copy</span> button and send the payment url to your audience.
+                            <br />
+                            <br />
+
+                            <input type="text" id="pay-url" className="pay-url" value={`${getDappDomain()}/pay/${address}`} readOnly />
+
+                            <div className='studio-action'>
+                                <button
+                                    className='mt-2 btn btn-info'
+                                    disabled={!address}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(`${getDappDomain()}/pay/${address}`);
+                                        toast.success(`Copied URL`)
+                                    }}
+                                >
+                                    Copy
+                                </button>
+                                &nbsp;
+                                <a
+                                    className='mt-2 btn btn-warning'
+                                    href={`${getDappDomain()}/pay/${address}`}
+                                    target={`_blank`}
+                                >
+                                    Open in new tab
+                                </a>
+                            </div>
+                        </div>
+
+                        <div className="d-flex mt-3">
+
+                        </div>
+
+                    </>
+                }
+                {
+                    activeTab != 'setup' &&
+                    <div className="button-container">
+                        <button
+                            className='save'
+                            onClick={onSaveClick}
+                            disabled={!address}
+                            style={{cursor: address? 'pointer' : 'no-drop'}}
+                        >
+                            {address? 'Save' : 'Connect to Continue'}
+                        </button>
+                    </div>
+                }
             </div>
         </div>
     );
