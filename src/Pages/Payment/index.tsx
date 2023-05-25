@@ -234,17 +234,6 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         setFromTokenWorth(`≈ $${(value * price).toFixed(2)}`);
     }, [chainId, fromTokenAddress, getUsdWorthFromSquid]);
 
-    // for from chain logo display (sender)
-    const updateFromChain = useCallback(() => {
-        // set from chain logo (sender)
-        const fromChainName = availableChainLogo.includes(Number(chainId)) ? chainId : 'other';
-        setFromChainLogo(`/Chains/${fromChainName}.png`);
-
-        const fromTokenAddress = supportedTokens[chainId]?.[0].address ?? "";
-        setFromTokenAddress(fromTokenAddress)
-
-    }, [chainId, supportedTokens]);
-
     // overlay loader
     const OverlayLoader = () => {
         const webpIndex = Math.floor(Math.random() * 6);
@@ -317,6 +306,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         getUser();
     }, [ streamerAddress, supportedChains, supportedTokens ]);
 
+    //when chainId changes 
     useEffect(() => {
         // empty chain
         if(!chainId) {
@@ -328,10 +318,28 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
             return;
         }
 
-        if(!supportedTokens[chainId]) {
-            toast.error('Chain not supported');
-            setHasError(true);
+        const fromChainName = availableChainLogo.includes(Number(chainId)) ? chainId : 'other';
+        setFromChainLogo(`/Chains/${fromChainName}.png`);
+
+        const fromTokenAddress = supportedTokens[chainId]?.[0].address ?? "";
+        if(!fromTokenAddress) {
+            toast.error("Unable to find token");
             return;
+        }
+        setFromTokenAddress(fromTokenAddress)
+
+    }, [ chainId, supportedTokens ]);
+
+    // on token change
+    useEffect(() => {
+        // empty chain
+        if(!chainId) {
+            return;
+        }
+
+        let token = supportedTokens[chainId]?.find((x) => x.address === fromTokenAddress);
+        if(!token) {
+            token = supportedTokens[chainId]?.[0];
         }
 
         const setUsdWorth = async() => {
@@ -339,26 +347,20 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                 // missing token
                 return;
             }
-            const price = await getUsdWorthFromSquid(chainId, fromTokenAddress);
+
+            if(!token) {
+                return;
+            }
+
+            const price = await getUsdWorthFromSquid(chainId, token.address);
             setFromTokenWorth(`≈ $${(fromAmount * price).toFixed(2)}`);
         }
 
-        updateFromChain();
         setUsdWorth();
-
-
-        let token = supportedTokens[chainId]?.find((x) => x.address === fromTokenAddress);
-        if(!token) {
-            token = supportedTokens[chainId]?.[0];
-        }
         setFromTokenData(token);
         setHasError(false);
 
-    }, [ chainId, fromAmount, fromTokenAddress, getUsdWorthFromSquid, streamerAddress, supportedChains, supportedTokens, updateFromChain, fromTokenData]);
-
-    useEffect(() => {
-
-    }, [ chainId ]);
+    }, [ chainId, fromAmount, fromTokenAddress, getUsdWorthFromSquid, streamerAddress, supportedChains, supportedTokens, fromTokenData]);
 
     return (
         <div className={`payment-page ${shouldHide? 'd-none' : ''}`}>
@@ -403,7 +405,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                                     disabled={!address ||hasError}
                                     suffixIcon={<img height={'15px'} width={'15px'} src={fromChainLogo} alt="suffix"/>}
                                     className='token-select'
-                                    defaultValue={"0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"}
+                                    value={fromTokenAddress}
                                     defaultActiveFirstOption={true}
                                     options={supportedTokens[chainId]?.map((x) => {
                                         return { value: x.address, label: x.symbol }

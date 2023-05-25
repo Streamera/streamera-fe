@@ -149,7 +149,6 @@ export default class ContractCall {
             adjustedToTokenAddress,
             isFromNative,
         } = await this._approveOrGetApproval(callParam, true);
-        return;
 
         /* console.log('quote')
         console.log({
