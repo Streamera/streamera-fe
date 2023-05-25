@@ -35,17 +35,17 @@
         box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
         background: #e62222;
     }
-    
+
     button.delete, button.delete span {
         transition: 200ms;
     }
-    
+
     button.delete .text {
         transform: translateX(35px);
         color: white;
         font-weight: bold;
     }
-    
+
     button.delete .icon {
         position: absolute;
         border-left: 1px solid #c41b1b;
@@ -56,30 +56,30 @@
         align-items: center;
         justify-content: center;
     }
-    
+
     button.delete svg {
         width: 15px;
         fill: #eee;
     }
-    
+
     button.delete:hover {
         background: #ff3636;
     }
-    
+
     button.delete:hover .text {
         color: transparent;
     }
-    
+
     button.delete:hover .icon {
         width: 150px;
         border-left: none;
         transform: translateX(0);
     }
-    
+
     button.delete:focus {
         outline: none;
     }
-    
+
     button.delete:active .icon svg {
         transform: scale(0.8);
     }
@@ -93,7 +93,7 @@
             height: 50px;
             width: 100%;
             background-color: #dedede;
-            
+
 
             &:not(:first-child) {
                 margin-top: 10px;
@@ -188,7 +188,7 @@
                 border: 1px solid black;
                 height: 30vh;
                 justify-content: space-between;
-                
+
                 > div > div {
                     //options
                     font-size: 0.75em;
@@ -261,6 +261,17 @@
                     margin-right: 10px;
                 }
             }
+        }
+
+        .pay-url, .studio-url {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid rgb(155, 155, 155);
+        }
+
+        .studio-action .btn {
+            width: 160px;
+            color: #fff;
         }
     }
 }
