@@ -50,12 +50,14 @@ body {
     .chain-chooser-container {
         width: 100%;
         max-width: 900px;
-        min-height: 100vh;
+        height: 100vh;
 
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+
+        overflow: auto;
 
         h2 {
             font-size: 50px;
@@ -85,7 +87,7 @@ body {
             margin-top: 15px;
             border: 1px solid black;
             border-radius: 10px;
-            
+
             transition: color 0.25s ease, border-color 0.25s ease;
 
             &:hover {
