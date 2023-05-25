@@ -41,10 +41,13 @@ export default class ContractCall {
             throw Error("Unable to get wrapped token address!");
         }
 
+        console.log(`fromTokenAddress1: ${fromTokenAddress}`);
         // change to wrapped version
-        fromTokenAddress = isFromNative && !isBridgeSwap? this.chainConfig.wrappedNativeTokenAddress! : fromTokenAddress;
+        fromTokenAddress = !isFromNative? fromTokenAddress : this.chainConfig.wrappedNativeTokenAddress!;
         toTokenAddress = !isToNative || isBridgeSwap /* if is bridge swap then we are using the 0xeee address */? toTokenAddress : this.chainConfig.wrappedNativeTokenAddress!;
         let fromToken = new ethers.Contract(fromTokenAddress, ERC20.abi, this.signer);
+
+        console.log(`fromTokenAddress2: ${fromTokenAddress}`);
 
         // if not from native then we need to get approvals and check token balance
         if(!isFromNative) {
@@ -66,7 +69,9 @@ export default class ContractCall {
             }
         }
 
-        if (!isFromNative) {
+        console.log(`isFromNative: ${isFromNative}`);
+        console.log(`isBridgeSwap: ${isBridgeSwap}`);
+        if ((isFromNative && !isBridgeSwap) || !isFromNative) {
             const allowed = await fromToken.allowance(sender, this.chainConfig.streameraAddress);
 
             // do not reapprove if got enough allowance
@@ -144,6 +149,7 @@ export default class ContractCall {
             adjustedToTokenAddress,
             isFromNative,
         } = await this._approveOrGetApproval(callParam, true);
+        return;
 
         /* console.log('quote')
         console.log({
@@ -161,7 +167,7 @@ export default class ContractCall {
         const params = {
             fromChain,
             fromToken: adjustedFromTokenAddress, // use native token address for from token address
-            fromAmount: (BigInt(adjustedAmount) * BigInt(95) / BigInt(100)).toString(), // 95 cause 5% tax
+            fromAmount: (BigInt(adjustedAmount) * BigInt(99) / BigInt(100)).toString(), // 99 cause 1% tax
             toChain, // Avalanche Fuji Testnet (hardcode)
             toToken: adjustedToTokenAddress,
             toAddress: recipient, // hardcode for now, need to get from backend
@@ -169,16 +175,19 @@ export default class ContractCall {
             enableForecall: true, // instant execution service, defaults to true
             quoteOnly: false // optional, defaults to false
         };
+        console.log(params);
 
         // get squid route info quote
         const { route } = await squid.getRoute(params);
 
-        if(!route || !route.transactionRequest || !route.transactionRequest.data) {
+        console.log(JSON.stringify(route));
+
+        if(!route || !route.transactionRequest || !route.transactionRequest!.data) {
             throw Error("Route not found!");
         }
         // get squid router & calldata from quote
-        const sqCallData = route.transactionRequest.data;
-        const sqRouter = route.transactionRequest.targetAddress
+        const sqCallData = route.transactionRequest!.data;
+        const sqRouter = route.transactionRequest!.targetAddress
 
         // calculate gas cost & gas limit
         let sendNativeAmount = route.estimate.gasCosts.reduce((accumulator, currentValue) => {
@@ -192,6 +201,12 @@ export default class ContractCall {
         // need to add native amount to gas if want to send native token
         if(isFromNative) sendNativeAmount = sendNativeAmount.add(adjustedAmount.toString());
 
+        console.log(`sqRouter: ${sqRouter}`);
+        console.log(`tokenA: ${!isFromNative? fromTokenAddress : this.nativeTokenAddress}`);
+        console.log(`amountIn: ${adjustedAmount.toString()}`);
+        console.log(`gasLimit: ${sqGasLimit.toString()}`);
+        console.log(`sendNativeAmount: ${sendNativeAmount.toString()}`);
+
         /* console.log('send')
         console.log({
             router: sqRouter,
@@ -204,7 +219,7 @@ export default class ContractCall {
             }
         }) */
         //execute tx
-        let streamera = new ethers.Contract(this.chainConfig.streameraAddress, Streamera.abi, this.signer);
+        let streamera = new ethers.Contract(this.chainConfig.streameraAddress!, Streamera.abi, this.signer);
         const swap = await streamera.squidSwap(
                                     sqRouter,
                                     !isFromNative? fromTokenAddress : this.nativeTokenAddress, // we use 0xeee if it's from native
