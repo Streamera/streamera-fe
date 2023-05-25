@@ -80,7 +80,7 @@ const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChain
                 setIsLoading(false);
             }, 500);
 
-            const onAccountsChanged = (newAccounts: unknown) => {
+            /* const onAccountsChanged = (newAccounts: unknown) => {
                 if(Array.isArray(newAccounts)) {
                     if(typeof(newAccounts[0] === 'string')) {
                         setAccounts(newAccounts);
@@ -90,18 +90,19 @@ const OnboardingButton: React.FC<ButtonProps> = ({ handleNewAccount, handleChain
                 else {
                     setAccounts([]);
                 }
-            }
+            } */
 
-            window.ethereum!.on('accountsChanged', onAccountsChanged);
+            // window.ethereum!.on('accountsChanged', onAccountsChanged);
 
-            const onChainChanged = (hexId: unknown) => {
+            /* const onChainChanged = (hexId: unknown) => {
                 setChain(hexId as string);
-            };
-            window.ethereum!.on('chainChanged', onChainChanged);
+            }; */
+
+            //window.ethereum!.on('chainChanged', onChainChanged);
 
             return () => {
-                window.ethereum!.removeListener('accountsChanged', onAccountsChanged);
-                window.ethereum!.removeListener('chainChanged', onChainChanged);
+                // window.ethereum!.removeListener('accountsChanged', onAccountsChanged);
+                // window.ethereum!.removeListener('chainChanged', onChainChanged);
             };
         }
 

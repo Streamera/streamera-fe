@@ -75,14 +75,14 @@ const Switcher: React.FC<ButtonProps> = ({
     }, [currentChainId]);
 
     useEffect(() => {
-        if(chain !== '') {
+        /* if(chain !== '') {
             //only handle chain change when chain is not empty
             //handle disconnect with connector
             handleChainChange(chain);
-        }
+        } */
 
         setIsDisabled(chain === targetChain.id);
-    }, [handleChainChange, chain, targetChain]);
+    }, [/* handleChainChange, */ chain, targetChain]);
     
     useEffect(() => {
         if (MetaMaskOnboarding.isMetaMaskInstalled()) {
@@ -103,7 +103,8 @@ const Switcher: React.FC<ButtonProps> = ({
 
     const onSuccess = () => {
         setChain(chain);
-        handleChainChange(chain);
+        // dont need to do this cause connector will check for chain changes
+        // handleChainChange(chain);
         setIsRequesting(false);
     }
 

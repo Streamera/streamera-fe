@@ -73,8 +73,8 @@ function App() {
     const [chainName, setChainName] = useState('');
     // const [isMobile, setIsMobile] = useState(false);
     const [shouldRenderLogo, setShouldRenderLogo] = useState(true);
-    const [shouldRenderHeader, setShouldRenderHeader] = useState(true);
-    const [shouldRenderFooter, setShouldRenderFooter] = useState(true);
+    const [shouldRenderHeader, setShouldRenderHeader] = useState(false);
+    const [shouldRenderFooter, setShouldRenderFooter] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
     //header will be hidden too
@@ -129,6 +129,10 @@ function App() {
     }, [ currentPath, cookies, navigate ]);
 
     const handleChainChange = useCallback(async (chain: string) => {
+        if(currentChain.current === chain && !isLoading && !address) {
+            return;
+        }
+
         currentChain.current = chain;
         setChain(chain);
 
@@ -140,10 +144,12 @@ function App() {
 
         setShouldShowSwitcher(
             currentPath === '/pay/:streamerAddress'
+            && !!chain
+            && !isLoading
             && !allowedChains.map(x => x.id).includes(chain)
             && !!address // must be logged in
         );
-    }, [currentPath, address]);
+    }, [currentPath, address, isLoading]);
 
     const handleUserRejection = useCallback(() => {
         toast.error('User rejected');
