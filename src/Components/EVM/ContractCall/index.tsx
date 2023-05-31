@@ -172,6 +172,10 @@ export default class ContractCall {
             return accumulator.add(ethers.utils.parseUnits(currentValue.amount, 'wei'));
         }, ethers.utils.parseUnits('0', 'wei'));
 
+        const sqPlatformRaw = route.estimate.feeCosts.find((fee) => fee.name === 'Gas Receiver Fee') ?? { amount: '0' };
+        const sqPlatform = ethers.utils.parseUnits(sqPlatformRaw.amount, 'wei')
+        sendNativeAmount = sendNativeAmount.add(sqPlatform);
+
         const sqGasLimit = route.estimate.gasCosts.reduce((accumulator, currentValue) => {
             return accumulator.add(ethers.utils.parseUnits(currentValue.limit, 'wei'));
         }, ethers.utils.parseUnits('500000', 'wei')); // add more gas limit to prevent fail
