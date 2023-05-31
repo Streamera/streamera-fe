@@ -27,7 +27,7 @@ const allowedChains = isTestnet ? [
     // ARB_TEST,
     AVAX_TEST,
     // CELO_TEST,
-    GOERLI,
+    // GOERLI,
     FANTOM_TESTNET,
     MOONBASE_ALPHA,
 ] : [

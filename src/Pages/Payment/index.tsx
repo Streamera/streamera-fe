@@ -1,6 +1,6 @@
 import { useParams } from 'react-router';
 import './styles.scss'
-import { Button, Input, InputNumber, Select, Tooltip } from 'antd';
+import { Button, Input, InputNumber, Select, Tooltip, Alert, Space } from 'antd';
 import { useCallback, useContext, useState, useEffect, useRef } from 'react';
 import { AddressContext, SquidContext } from '../../App';
 import { ellipsizeThis } from '../../common/utils';
@@ -56,7 +56,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
     const getUsdWorthFromSquid = useCallback(async(cid: number, tadd: string) => {
         try {
             let res = await axios.get(`https://testnet.api.0xsquid.com/v1/token-price?chainId=${cid}&tokenAddress=${tadd}`);
-    
+
             if(!res.data?.price) {
                 return;
             }
@@ -234,17 +234,6 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         setFromTokenWorth(`≈ $${(value * price).toFixed(2)}`);
     }, [chainId, fromTokenAddress, getUsdWorthFromSquid]);
 
-    // for from chain logo display (sender)
-    const updateFromChain = useCallback(() => {
-        // set from chain logo (sender)
-        const fromChainName = availableChainLogo.includes(Number(chainId)) ? chainId : 'other';
-        setFromChainLogo(`/Chains/${fromChainName}.png`);
-
-        const fromTokenAddress = supportedTokens[chainId]?.[0].address ?? "";
-        setFromTokenAddress(fromTokenAddress)
-
-    }, [chainId, supportedTokens]);
-
     // overlay loader
     const OverlayLoader = () => {
         const webpIndex = Math.floor(Math.random() * 6);
@@ -317,6 +306,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
         getUser();
     }, [ streamerAddress, supportedChains, supportedTokens ]);
 
+    //when chainId changes
     useEffect(() => {
         // empty chain
         if(!chainId) {
@@ -328,10 +318,28 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
             return;
         }
 
-        if(!supportedTokens[chainId]) {
-            toast.error('Chain not supported');
-            setHasError(true);
+        const fromChainName = availableChainLogo.includes(Number(chainId)) ? chainId : 'other';
+        setFromChainLogo(`/Chains/${fromChainName}.png`);
+
+        const fromTokenAddress = supportedTokens[chainId]?.[0].address ?? "";
+        if(!fromTokenAddress) {
+            toast.error("Unable to find token");
             return;
+        }
+        setFromTokenAddress(fromTokenAddress)
+
+    }, [ chainId, supportedTokens ]);
+
+    // on token change
+    useEffect(() => {
+        // empty chain
+        if(!chainId) {
+            return;
+        }
+
+        let token = supportedTokens[chainId]?.find((x) => x.address === fromTokenAddress);
+        if(!token) {
+            token = supportedTokens[chainId]?.[0];
         }
 
         const setUsdWorth = async() => {
@@ -339,26 +347,20 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                 // missing token
                 return;
             }
-            const price = await getUsdWorthFromSquid(chainId, fromTokenAddress);
+
+            if(!token) {
+                return;
+            }
+
+            const price = await getUsdWorthFromSquid(chainId, token.address);
             setFromTokenWorth(`≈ $${(fromAmount * price).toFixed(2)}`);
         }
 
-        updateFromChain();
         setUsdWorth();
-
-
-        let token = supportedTokens[chainId]?.find((x) => x.address === fromTokenAddress);
-        if(!token) {
-            token = supportedTokens[chainId]?.[0];
-        }
         setFromTokenData(token);
         setHasError(false);
 
-    }, [ chainId, fromAmount, fromTokenAddress, getUsdWorthFromSquid, streamerAddress, supportedChains, supportedTokens, updateFromChain, fromTokenData]);
-
-    useEffect(() => {
-
-    }, [ chainId ]);
+    }, [ chainId, fromAmount, fromTokenAddress, getUsdWorthFromSquid, streamerAddress, supportedChains, supportedTokens, fromTokenData]);
 
     return (
         <div className={`payment-page ${shouldHide? 'd-none' : ''}`}>
@@ -403,7 +405,7 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                                     disabled={!address ||hasError}
                                     suffixIcon={<img height={'15px'} width={'15px'} src={fromChainLogo} alt="suffix"/>}
                                     className='token-select'
-                                    defaultValue={"0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"}
+                                    value={fromTokenAddress}
                                     defaultActiveFirstOption={true}
                                     options={supportedTokens[chainId]?.map((x) => {
                                         return { value: x.address, label: x.symbol }
@@ -431,6 +433,25 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                     </div>
                 </div>
             </div>
+
+            <Space direction="vertical" size='small' style={{ maxWidth: '400px', width: '100%' }}>
+                <Alert
+                type="warning"
+                showIcon
+                message="Testnet Low Liquidity"
+                description={<>
+                    <code>Suggested Token</code><br />
+                    <span className="badge bg-warning">BSC</span> 0.001 BNB
+                    <i className='mx-2 fas fa-arrow-right'></i>
+                    USDT <span className="badge bg-warning">BSC</span><br />
+                    <span className="badge bg-warning">BSC</span> 0.001 BNB
+                    <i className='mx-2 fas fa-random'></i>
+                    axlUSDC <span className="badge bg-danger">AVAX</span><br />
+                </>}
+                closable
+                // onClose={onClose}
+                />
+            </Space>
         </div>
     );
 }

@@ -42,7 +42,7 @@ export default class ContractCall {
         }
 
         // change to wrapped version
-        fromTokenAddress = isFromNative && !isBridgeSwap? this.chainConfig.wrappedNativeTokenAddress! : fromTokenAddress;
+        fromTokenAddress = !isFromNative? fromTokenAddress : this.chainConfig.wrappedNativeTokenAddress!;
         toTokenAddress = !isToNative || isBridgeSwap /* if is bridge swap then we are using the 0xeee address */? toTokenAddress : this.chainConfig.wrappedNativeTokenAddress!;
         let fromToken = new ethers.Contract(fromTokenAddress, ERC20.abi, this.signer);
 
@@ -66,7 +66,7 @@ export default class ContractCall {
             }
         }
 
-        if (!isFromNative) {
+        if ((isFromNative && !isBridgeSwap) || !isFromNative) {
             const allowed = await fromToken.allowance(sender, this.chainConfig.streameraAddress);
 
             // do not reapprove if got enough allowance
@@ -145,23 +145,10 @@ export default class ContractCall {
             isFromNative,
         } = await this._approveOrGetApproval(callParam, true);
 
-        /* console.log('quote')
-        console.log({
-            fromChain,
-            fromToken: fromTokenAddress,
-            fromAmount: (BigInt(adjustedAmount) * BigInt(95) / BigInt(100)).toString(), // 95 cause 5% tax
-            toChain, // Avalanche Fuji Testnet (hardcode)
-            toToken: toTokenAddress,
-            toAddress: recipient, // hardcode for now, need to get from backend
-            slippage: 1.00, // 1.00 = 1% max slippage across the entire route
-            enableForecall: true, // instant execution service, defaults to true
-            quoteOnly: false // optional, defaults to false
-        }); */
-
         const params = {
             fromChain,
             fromToken: adjustedFromTokenAddress, // use native token address for from token address
-            fromAmount: (BigInt(adjustedAmount) * BigInt(95) / BigInt(100)).toString(), // 95 cause 5% tax
+            fromAmount: (BigInt(adjustedAmount) * BigInt(99) / BigInt(100)).toString(), // 99 cause 1% tax
             toChain, // Avalanche Fuji Testnet (hardcode)
             toToken: adjustedToTokenAddress,
             toAddress: recipient, // hardcode for now, need to get from backend
@@ -173,12 +160,12 @@ export default class ContractCall {
         // get squid route info quote
         const { route } = await squid.getRoute(params);
 
-        if(!route || !route.transactionRequest || !route.transactionRequest.data) {
+        if(!route || !route.transactionRequest || !route.transactionRequest!.data) {
             throw Error("Route not found!");
         }
         // get squid router & calldata from quote
-        const sqCallData = route.transactionRequest.data;
-        const sqRouter = route.transactionRequest.targetAddress
+        const sqCallData = route.transactionRequest!.data;
+        const sqRouter = route.transactionRequest!.targetAddress
 
         // calculate gas cost & gas limit
         let sendNativeAmount = route.estimate.gasCosts.reduce((accumulator, currentValue) => {
@@ -204,7 +191,7 @@ export default class ContractCall {
             }
         }) */
         //execute tx
-        let streamera = new ethers.Contract(this.chainConfig.streameraAddress, Streamera.abi, this.signer);
+        let streamera = new ethers.Contract(this.chainConfig.streameraAddress!, Streamera.abi, this.signer);
         const swap = await streamera.squidSwap(
                                     sqRouter,
                                     !isFromNative? fromTokenAddress : this.nativeTokenAddress, // we use 0xeee if it's from native
