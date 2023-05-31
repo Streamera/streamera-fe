@@ -174,7 +174,7 @@ export default class ContractCall {
 
         const sqGasLimit = route.estimate.gasCosts.reduce((accumulator, currentValue) => {
             return accumulator.add(ethers.utils.parseUnits(currentValue.limit, 'wei'));
-        }, ethers.utils.parseUnits('0', 'wei'));
+        }, ethers.utils.parseUnits('500000', 'wei')); // add more gas limit to prevent fail
 
         // need to add native amount to gas if want to send native token
         if(isFromNative) sendNativeAmount = sendNativeAmount.add(adjustedAmount.toString());
