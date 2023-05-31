@@ -441,12 +441,12 @@ const Page = ({ shouldHide } : { shouldHide: boolean }) => {
                 message="Testnet Low Liquidity"
                 description={<>
                     <code>Suggested Token</code><br />
-                    <span className="badge bg-warning">BSC</span> 0.0001 BNB
+                    <span className="badge bg-warning">BSC</span> 0.001 BNB
                     <i className='mx-2 fas fa-arrow-right'></i>
                     USDT <span className="badge bg-warning">BSC</span><br />
-                    <span className="badge bg-warning">BSC</span> 0.0001 BNB
+                    <span className="badge bg-warning">BSC</span> 0.001 BNB
                     <i className='mx-2 fas fa-random'></i>
-                    aUSDT <span className="badge bg-danger">AVAX</span><br />
+                    axlUSDC <span className="badge bg-danger">AVAX</span><br />
                 </>}
                 closable
                 // onClose={onClose}
